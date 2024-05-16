@@ -8,6 +8,8 @@ CTTP is used for requesting and sending data between a client and server. It is 
 CTTP differs between requests and responses.
 CTTP is in many points similar to the [HTTP Protocol](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP).
 
+---
+
 ## Requests
 
 A CTTP Request consist of a [request method](#request-methods), a path, the [header](#request-headers) and an optional data field.
@@ -21,6 +23,8 @@ A CTTP Request consist of a [request method](#request-methods), a path, the [hea
 }
 ```
 
+<br>
+
 ### Request Methods
 
 Possible request methods are
@@ -29,9 +33,13 @@ Possible request methods are
 - `POST` - Send information to the server
 - `DELETE` - Delete information from the server
 
+<br>
+
 ### Request Headers
 
 Request headers can contain the following fields, but each of them is optional
+
+---
 
 ## Responses
 
@@ -45,6 +53,8 @@ A CTTP Response consists of a [status code](#status-codes), its brief meaning, t
 	Data = any
 }
 ```
+
+<br>
 
 ### Status Codes
 
@@ -72,6 +82,8 @@ A CTTP Response consists of a [status code](#status-codes), its brief meaning, t
 - `507` - Insufficient Storage
 - `521` - Server Is Down
 - `522` - Connection Timed Out
+
+<br>
 
 ### Response Headers
 

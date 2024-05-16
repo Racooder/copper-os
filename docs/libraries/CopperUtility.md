@@ -6,6 +6,8 @@ layout: default
 
 CopperUtility is a collection of utility functions for various Copper OS libraries.
 
+---
+
 ## Classes
 
 ### List
@@ -19,47 +21,47 @@ CopperUtility is a collection of utility functions for various Copper OS librari
 
 - new(): [List](#List)
 
----
+<br>
 
 - pushLeft(`value`: [any](https://www.lua.org/pil/2.html))
 
 Adds a value to the beginning of the list
 
----
+<br>
 
 - pushRight(`value`: [any](https://www.lua.org/pil/2.html))
 
 Adds a value to the end of the list
 
----
+<br>
 
 - popLeft() : [any](https://www.lua.org/pil/2.html)
 
 Removes and returns the first value of the list
 
----
+<br>
 
 - popRight() : [any](https://www.lua.org/pil/2.html)
 
 Removes and returns the last value of the list
 
-<br>
+---
 
 ## Functions
 
----
+<br>
 
 splitString(`inputstr`: [string](https://www.lua.org/pil/2.4.html), `sep`: [string](https://www.lua.org/pil/2.4.html)) : [string](https://www.lua.org/pil/2.4.html)
 
 Splits a string into a table of strings based on a separator.
 
----
+<br>
 
 trimString(`inputstr`: [string](https://www.lua.org/pil/2.4.html)) : [string](https://www.lua.org/pil/2.4.html)
 
 Removes whitespaces from the start and end of a string
 
----
+<br>
 
 concatTables(`t1`: [table](https://www.lua.org/pil/2.5.html), `t2`: [table](https://www.lua.org/pil/2.5.html)) : [table](https://www.lua.org/pil/2.5.html)
 
