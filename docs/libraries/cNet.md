@@ -1,8 +1,7 @@
 ---
 layout: default
----
-
 # cNet (Copper Networking)
+---
 
 cNet is the networking library of Copper OS.
 
@@ -27,20 +26,14 @@ The possible types of the [CryptoNet](CryptoNet) message event.
 | `MODEM_MESSAGE`     | Triggered when a modem message is received         |
 | `PLAIN_MESSAGE`     | Triggered when an unencrypted message is received  |
 
----
-
 ### CttpRequestMethod
 
 The [possible methods](CTTP#request-methods) for a [CTTP Request](CTTP#requests).
 These change nothing about the functionality of the request, but help to organize them.
 
----
-
 ### CttpStatus
 
 The [possible statuses](CTTP#Status-Codes) for [CTTP Responses](CTTP#Responses).
-
----
 
 ### ModemSide
 
@@ -68,8 +61,6 @@ Possible attachment sides of the modem
 
 - new(`requestMethod`: [CttpRequestMethod](#CttpRequestMethod), `path`: [string](https://www.lua.org/pil/2.4.html), `header?`: [CttpHeader](#CttpHeader), `data?`: [any](https://www.lua.org/pil/2.html)) : [CttpRequest](#CttpRequest)
 
----
-
 ### CttpResponse
 
 #### Fields
@@ -82,8 +73,6 @@ Possible attachment sides of the modem
 #### Functions
 
 - new(`status`: [CttpStatus](#CttpStatus), `header?`: [CttpHeader](#CttpHeader), `data?`: [any](https://www.lua.org/pil/2.html)) : [CttpResponse](#CttpResponse)
-
----
 
 ### CtcpConnection
 
@@ -103,37 +92,25 @@ Possible attachment sides of the modem
 
 Calculates a checksum for any serializable object
 
----
-
 - startEventLoop(`onStart`: [function](https://www.lua.org/pil/2.6.html))
 
 Starts the [[CryptoNet]] event loop.
 
 `onStart` is a callback function that is called when [[CryptoNet]] is set up.
 
----
-
 - host(`serverId`: [string](https://www.lua.org/pil/2.4.html), `modemSide?`: [ModemSide](#ModemSide))
-
----
 
 - connectCtcp(`serverId`: [string](https://www.lua.org/pil/2.4.html), `timeout?`: [number](https://www.lua.org/pil/2.3.html), `modemSide?`: [ModemSide](#ModemSide)) : [CtcpConnection](#CtcpConnection)/[nil](https://www.lua.org/pil/2.1.html)
 
 Opens a connection to a server using the [CTCP Handshake](CTCP#CTCP-Handshake)
 
----
-
 - disconnectCtcp(`ctcpConnection`: [CtcpConnection](#CtcpConnection), `timeout?`: [number](https://www.lua.org/pil/2.3.html)) : [boolean](https://www.lua.org/pil/2.2.html)
 
 Closes a [[CTCP]] connection using the [Finishing Handshake](CTCP#Closing the connection).
 
----
-
 - sendCttpRequest(`ctcpConnection`: [CtcpConnection](#CtcpConnection), `request`: [CttpRequest](#CttpRequest), `timeout`: [number](https://www.lua.org/pil/2.3.html)) : [CttpResponse](#CttpResponse)/[nil](https://www.lua.org/pil/2.1.html), [boolean](https://www.lua.org/pil/2.2.html)
 
 Sends a [CTTP Request](CTTP#Requests) to a server.
-
----
 
 - connectAndSendCttpRequest(`serverId`: [string](https://www.lua.org/pil/2.4.html), `request`: [CttpRequest](#CttpRequest), `timeout?`: [number](https://www.lua.org/pil/2.3.html), `modemSide?`: [ModemSide](#ModemSide)) : [CttpResponse](#CttpResponse)/[nil](https://www.lua.org/pil/2.1.html), [boolean](https://www.lua.org/pil/2.2.html), [boolean](https://www.lua.org/pil/2.2.html), [boolean](https://www.lua.org/pil/2.2.html)
 
@@ -141,26 +118,16 @@ Connects to a server, sends a [CTTP Request](CTTP#Requests) and disconnects.
 
 Returns the response, if the connection was successful, if the request was acknowledged and if the disconnect was acknowledged.
 
----
-
 - setMessageHandler(`eventType`: [MessageEventType](#MessageEventType), `handler`: [function](https://www.lua.org/pil/2.6.html))
 
 Sets a custom handler for [CryptoNet Message Events](#MessageEventType)
-
----
 
 - setRestApi(`requestMethod`: [CttpRequestMethod](#CttpRequestMethod), `path`: [string](https://www.lua.org/pil/2.4.html), `handler`: [function](https://www.lua.org/pil/2.6.html))
 
 Sets a handler for a [CTTP Request](CTTP#Requests)
 
----
-
 - register(`serverId`: [string](https://www.lua.org/pil/2.4.html), `username`: [string](https://www.lua.org/pil/2.4.html), `password`: [string](https://www.lua.org/pil/2.4.html), `timeout`: [number](https://www.lua.org/pil/2.3.html), `modemSide`: [ModemSide](#ModemSide)) : [integer](https://www.lua.org/pil/2.3.html)
 
----
-
 - login(`connection`: [CtcpConnection](#CtcpConnection)/[table](https://www.lua.org/pil/2.5.html), `username`: [string](https://www.lua.org/pil/2.4.html), `password`: [string](https://www.lua.org/pil/2.4.html))
-
----
 
 - logout(`connection`: [CtcpConnection](#CtcpConnection))
