@@ -17,31 +17,33 @@ CopperUtility is a collection of utility functions for various Copper OS librari
 
 #### Functions
 
-new(): [List](#List)
+- new(): [List](#List)
 
 ---
 
-pushLeft(`value`: [any](https://www.lua.org/pil/2.html))
+- pushLeft(`value`: [any](https://www.lua.org/pil/2.html))
 
 Adds a value to the beginning of the list
 
 ---
 
-pushRight(`value`: [any](https://www.lua.org/pil/2.html))
+- pushRight(`value`: [any](https://www.lua.org/pil/2.html))
 
 Adds a value to the end of the list
 
 ---
 
-popLeft() : [any](https://www.lua.org/pil/2.html)
+- popLeft() : [any](https://www.lua.org/pil/2.html)
 
 Removes and returns the first value of the list
 
 ---
 
-popRight() : [any](https://www.lua.org/pil/2.html)
+- popRight() : [any](https://www.lua.org/pil/2.html)
 
 Removes and returns the last value of the list
+
+<br>
 
 ## Functions
 
