@@ -6,7 +6,7 @@ layout: default
 
 cNet is the networking library of Copper OS.
 
----
+<br>
 
 ## Libraries
 
@@ -14,7 +14,7 @@ cNet is the networking library of Copper OS.
 
 `cNet.CryptoNet` can be used to access functions of the [CryptoNet](CryptoNet) library. However, this is rarely needed
 
----
+<br>
 
 ## Enums
 
@@ -31,20 +31,20 @@ The possible types of the [CryptoNet](CryptoNet) message event.
 - `MODEM_MESSAGE` - Triggered when a modem message is received
 - `PLAIN_MESSAGE` - Triggered when an unencrypted message is received
 
-<br>
+---
 
 ### CttpRequestMethod
 
 The [possible methods](CTTP#request-methods) for a [CTTP Request](CTTP#requests).
 These change nothing about the functionality of the request, but help to organize them.
 
-<br>
+---
 
 ### CttpStatus
 
 The [possible statuses](CTTP#Status-Codes) for [CTTP Responses](CTTP#Responses).
 
-<br>
+---
 
 ### ModemSide
 
@@ -57,7 +57,7 @@ Possible attachment sides of the modem
 - `LEFT`
 - `RIGHT`
 
----
+<br>
 
 ## Classes
 
@@ -74,7 +74,7 @@ Possible attachment sides of the modem
 
 - new(`requestMethod`: [CttpRequestMethod](#CttpRequestMethod), `path`: [string](https://www.lua.org/pil/2.4.html), `header?`: [CttpHeader](#CttpHeader), `data?`: [any](https://www.lua.org/pil/2.html)) : [CttpRequest](#CttpRequest)
 
-<br>
+---
 
 ### CttpResponse
 
@@ -89,7 +89,7 @@ Possible attachment sides of the modem
 
 - new(`status`: [CttpStatus](#CttpStatus), `header?`: [CttpHeader](#CttpHeader), `data?`: [any](https://www.lua.org/pil/2.html)) : [CttpResponse](#CttpResponse)
 
-<br>
+---
 
 ### CtcpConnection
 
@@ -103,7 +103,7 @@ Possible attachment sides of the modem
 
 - new(`socket`: [Socket](CryptoNet#Socket), `seqNumber`: [integer](https://www.lua.org/pil/2.3.html), `ackNumber`: [integer](https://www.lua.org/pil/2.3.html))
 
----
+<br>
 
 ## Functions
 
@@ -111,7 +111,7 @@ Possible attachment sides of the modem
 
 Calculates a checksum for any serializable object
 
-<br>
+---
 
 - startEventLoop(`onStart`: [function](https://www.lua.org/pil/2.6.html))
 
@@ -119,29 +119,29 @@ Starts the [[CryptoNet]] event loop.
 
 `onStart` is a callback function that is called when [[CryptoNet]] is set up.
 
-<br>
+---
 
 - host(`serverId`: [string](https://www.lua.org/pil/2.4.html), `modemSide?`: [ModemSide](#ModemSide))
 
-<br>
+---
 
 - connectCtcp(`serverId`: [string](https://www.lua.org/pil/2.4.html), `timeout?`: [number](https://www.lua.org/pil/2.3.html), `modemSide?`: [ModemSide](#ModemSide)) : [CtcpConnection](#CtcpConnection)/[nil](https://www.lua.org/pil/2.1.html)
 
 Opens a connection to a server using the [CTCP Handshake](CTCP#CTCP-Handshake)
 
-<br>
+---
 
 - disconnectCtcp(`ctcpConnection`: [CtcpConnection](#CtcpConnection), `timeout?`: [number](https://www.lua.org/pil/2.3.html)) : [boolean](https://www.lua.org/pil/2.2.html)
 
 Closes a [[CTCP]] connection using the [Finishing Handshake](CTCP#Closing the connection).
 
-<br>
+---
 
 - sendCttpRequest(`ctcpConnection`: [CtcpConnection](#CtcpConnection), `request`: [CttpRequest](#CttpRequest), `timeout`: [number](https://www.lua.org/pil/2.3.html)) : [CttpResponse](#CttpResponse)/[nil](https://www.lua.org/pil/2.1.html), [boolean](https://www.lua.org/pil/2.2.html)
 
 Sends a [CTTP Request](CTTP#Requests) to a server.
 
-<br>
+---
 
 - connectAndSendCttpRequest(`serverId`: [string](https://www.lua.org/pil/2.4.html), `request`: [CttpRequest](#CttpRequest), `timeout?`: [number](https://www.lua.org/pil/2.3.html), `modemSide?`: [ModemSide](#ModemSide)) : [CttpResponse](#CttpResponse)/[nil](https://www.lua.org/pil/2.1.html), [boolean](https://www.lua.org/pil/2.2.html), [boolean](https://www.lua.org/pil/2.2.html), [boolean](https://www.lua.org/pil/2.2.html)
 
@@ -149,26 +149,26 @@ Connects to a server, sends a [CTTP Request](CTTP#Requests) and disconnects.
 
 Returns the response, if the connection was successful, if the request was acknowledged and if the disconnect was acknowledged.
 
-<br>
+---
 
 - setMessageHandler(`eventType`: [MessageEventType](#MessageEventType), `handler`: [function](https://www.lua.org/pil/2.6.html))
 
 Sets a custom handler for [CryptoNet Message Events](#MessageEventType)
 
-<br>
+---
 
 - setRestApi(`requestMethod`: [CttpRequestMethod](#CttpRequestMethod), `path`: [string](https://www.lua.org/pil/2.4.html), `handler`: [function](https://www.lua.org/pil/2.6.html))
 
 Sets a handler for a [CTTP Request](CTTP#Requests)
 
-<br>
+---
 
 - register(`serverId`: [string](https://www.lua.org/pil/2.4.html), `username`: [string](https://www.lua.org/pil/2.4.html), `password`: [string](https://www.lua.org/pil/2.4.html), `timeout`: [number](https://www.lua.org/pil/2.3.html), `modemSide`: [ModemSide](#ModemSide)) : [integer](https://www.lua.org/pil/2.3.html)
 
-<br>
+---
 
 - login(`connection`: [CtcpConnection](#CtcpConnection)/[table](https://www.lua.org/pil/2.5.html), `username`: [string](https://www.lua.org/pil/2.4.html), `password`: [string](https://www.lua.org/pil/2.4.html))
 
-<br>
+---
 
 - logout(`connection`: [CtcpConnection](#CtcpConnection))
