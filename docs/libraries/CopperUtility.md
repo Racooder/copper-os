@@ -17,7 +17,7 @@ CopperUtility is a collection of utility functions for various Copper OS librari
 
 #### Functions
 
-##### new(): [List](https://github.com/Racooder/copper-os/wiki/CopperUtility#List)
+##### new(): [List](#List)
 
 ##### pushLeft(`value`: [any](https://www.lua.org/pil/2.html))
 

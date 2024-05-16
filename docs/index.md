@@ -6,7 +6,7 @@ layout: default
 
 ## Libraries
 
-- [cNet](libraries/cNet.md)
+- [cNet](libraries/cNet)
 - [CopperUtility](libraries/CopperUtility)
 - [CryptoNet](libraries/CryptoNet)
 

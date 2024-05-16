@@ -10,7 +10,7 @@ CTTP is in many points similar to the [HTTP Protocol](https://developer.mozilla.
 
 ## Requests
 
-A CTTP Request consist of a [request method](https://github.com/Racooder/copper-os/wiki/CTTP#request-methods), a path, the [header](https://github.com/Racooder/copper-os/wiki/CTTP#request-headers) and an optional data field.
+A CTTP Request consist of a [request method](#request-methods), a path, the [header](#request-headers) and an optional data field.
 
 ```
 {
@@ -35,7 +35,7 @@ Request headers can contain the following fields, but each of them is optional
 
 ## Responses
 
-A CTTP Response consists of a [status code](https://github.com/Racooder/copper-os/wiki/CTTP#status-codes), its brief meaning, the [header](https://github.com/Racooder/copper-os/wiki/CTTP#response-headers) and an optional data field.
+A CTTP Response consists of a [status code](#status-codes), its brief meaning, the [header](#response-headers) and an optional data field.
 
 ```
 {
