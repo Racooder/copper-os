@@ -50,12 +50,12 @@ The [possible statuses](CTTP#Status-Codes) for [CTTP Responses](CTTP#Responses).
 
 Possible attachment sides of the modem
 
-- `TOP`
-- `BOTTOM`
-- `BACK`
-- `FRONT`
-- `LEFT`
-- `RIGHT`
+| `TOP`    |
+| `BOTTOM` |
+| `BACK`   |
+| `FRONT`  |
+| `LEFT`   |
+| `RIGHT`  |
 
 <br>
 
