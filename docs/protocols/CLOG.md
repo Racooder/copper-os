@@ -1,5 +1,5 @@
 ---
-layout: page
-title: CLOG
-permalink: /protocols/clog
+layout: default
 ---
+
+# CLOG

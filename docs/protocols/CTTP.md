@@ -1,8 +1,8 @@
 ---
-layout: page
-title: CTTP (Copper Text Transfer Protocol)
-permalink: /protocols/cttp
+layout: default
 ---
+
+# CTTP (Copper Text Transfer Protocol)
 
 CTTP is used for requesting and sending data between a client and server. It is contained in a [[CTCP]] packet.
 CTTP differs between requests and responses.

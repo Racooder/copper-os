@@ -1,8 +1,8 @@
 ---
-layout: page
-title: cNet (Copper Network)
-permalink: /libraries/cNet
+layout: default
 ---
+
+# cNet (Copper Networking)
 
 cNet is the networking library of Copper OS.
 

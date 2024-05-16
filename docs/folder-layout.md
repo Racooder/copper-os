@@ -1,8 +1,8 @@
 ---
 layout: default
-title: Copper OS Folder Layout
-permalink: /folder-layout
 ---
+
+# Folder Layout
 
 # Root
 
