@@ -1,7 +1,7 @@
 title: Copper OS
 email: racooder@racoonia.net
 description: A operating system for computercraft and what goes with it.
-baseurl: "/copper-os/docs/"
+baseurl: "/copper-os/"
 url: "https://racooder.github.io"
 github_username: Racooder
 
