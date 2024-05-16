@@ -1,3 +1,9 @@
+---
+layout: page
+title: CNP
+permalink: /protocols/cnp
+---
+
 # CNP (Copper Network Protocol)
 
 The outermost packet is always a CNP packet, it looks like this:

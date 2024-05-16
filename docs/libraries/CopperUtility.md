@@ -1,3 +1,9 @@
+---
+layout: page
+title: CopperUtility
+permalink: /libraries/CopperUtility
+---
+
 # CopperUtility
 
 CopperUtility is a collection of utility functions for various Copper OS libraries.

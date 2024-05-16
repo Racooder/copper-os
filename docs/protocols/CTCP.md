@@ -1,3 +1,9 @@
+---
+layout: page
+title: CTCP
+permalink: /protocols/ctcp
+---
+
 # CTCP (Copper Transmission Control Protocol)
 
 CTCP is used for reliably exchanging data. It is contained in a [[CNP]] packet's payload.

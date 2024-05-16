@@ -1,3 +1,9 @@
+---
+layout: page
+title: Folder Layout
+permalink: /folder-layout
+---
+
 # Copper Os Folder Layout
 
 ```
