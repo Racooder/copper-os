@@ -22,8 +22,6 @@ cNet is the networking library of Copper OS.
 
 The possible types of the [CryptoNet](CryptoNet) message event.
 
-|                     |                                                    |
-|---------------------|----------------------------------------------------|
 | `CONNECTION_CLOSED` | Triggered when a client disconnected from a server |
 | `CONNECTION_OPENED` | Triggered when a client connected to a server      |
 | `ENCRYPTED_MESSAGE` | Triggered when an encrypted message is received    |
