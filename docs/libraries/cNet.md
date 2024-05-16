@@ -6,15 +6,11 @@ layout: default
 
 cNet is the networking library of Copper OS.
 
-<br>
-
 ## Libraries
 
 ### CryptoNet
 
 `cNet.CryptoNet` can be used to access functions of the [CryptoNet](CryptoNet) library. However, this is rarely needed
-
-<br>
 
 ## Enums
 
@@ -56,8 +52,6 @@ Possible attachment sides of the modem
 | `FRONT`  |
 | `LEFT`   |
 | `RIGHT`  |
-
-<br>
 
 ## Classes
 
@@ -102,8 +96,6 @@ Possible attachment sides of the modem
 #### Functions
 
 - new(`socket`: [Socket](CryptoNet#Socket), `seqNumber`: [integer](https://www.lua.org/pil/2.3.html), `ackNumber`: [integer](https://www.lua.org/pil/2.3.html))
-
-<br>
 
 ## Functions
 

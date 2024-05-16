@@ -23,8 +23,6 @@ A CTTP Request consist of a [request method](#request-methods), a path, the [hea
 }
 ```
 
-<br>
-
 ### Request Methods
 
 Possible request methods are
@@ -32,8 +30,6 @@ Possible request methods are
 - `GET` - Get information from the server
 - `POST` - Send information to the server
 - `DELETE` - Delete information from the server
-
-<br>
 
 ### Request Headers
 
@@ -53,8 +49,6 @@ A CTTP Response consists of a [status code](#status-codes), its brief meaning, t
 	Data = any
 }
 ```
-
-<br>
 
 ### Status Codes
 
@@ -82,8 +76,6 @@ A CTTP Response consists of a [status code](#status-codes), its brief meaning, t
 - `507` - Insufficient Storage
 - `521` - Server Is Down
 - `522` - Connection Timed Out
-
-<br>
 
 ### Response Headers
 

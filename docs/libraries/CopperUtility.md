@@ -6,8 +6,6 @@ layout: default
 
 CopperUtility is a collection of utility functions for various Copper OS libraries.
 
-<br>
-
 ## Classes
 
 ### List
@@ -44,8 +42,6 @@ Removes and returns the first value of the list
 - popRight() : [any](https://www.lua.org/pil/2.html)
 
 Removes and returns the last value of the list
-
-<br>
 
 ## Functions
 
