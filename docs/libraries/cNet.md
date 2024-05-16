@@ -1,7 +1,8 @@
 ---
 layout: default
-# cNet (Copper Networking)
 ---
+
+# cNet (Copper Networking)
 
 cNet is the networking library of Copper OS.
 
@@ -52,10 +53,10 @@ Possible attachment sides of the modem
 
 #### Fields
 
-- `requestMethod` - The [method](#CttpRequestMethod) of the request
-- `path`
-- `header` The [header](CTTP#Request-Headers) of the request
-- `data` - Any data that is sent with the request
+| `requestMethod` | The [method](#CttpRequestMethod) of the request   |
+| `path`          |                                                   |
+| `header`        | The [header](CTTP#Request-Headers) of the request |
+| `data`          | Any data that is sent with the request            |
 
 #### Functions
 
@@ -65,10 +66,10 @@ Possible attachment sides of the modem
 
 #### Fields
 
-- `statusCode` - The [method](#CttpRequestMethod) of the response
-- `statusMessage`
-- `header` The [header](CTTP#Response-Headers) of the response
-- `data` - Any data that is sent with the response
+| `statusCode`    | The [method](#CttpRequestMethod) of the response    |
+| `statusMessage` |                                                     |
+| `header`        | The [header](CTTP#Response-Headers) of the response |
+| `data`          | Any data that is sent with the response             |
 
 #### Functions
 
@@ -78,9 +79,9 @@ Possible attachment sides of the modem
 
 #### Fields
 
-- `socket` - The [[CryptoNet]] socket
-- `seqNumber` - The [[CTCP]] sequence number
-- `ackNumber` - The [[CTCP]] acknowledgment number
+| `socket`    | The [CryptoNet](CryptoNet) socket           |
+| `seqNumber` | The [CTCP](ctcp) sequence number       |
+| `ackNumber` | The [CTCP](ctcp) acknowledgment number |
 
 #### Functions
 
