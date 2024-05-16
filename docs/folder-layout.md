@@ -1,10 +1,10 @@
 ---
 layout: page
-title: Folder Layout
+title: Copper OS Folder Layout
 permalink: /folder-layout
 ---
 
-# Copper Os Folder Layout
+# Root
 
 ```
 root

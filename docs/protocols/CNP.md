@@ -1,10 +1,8 @@
 ---
 layout: page
-title: CNP
+title: CNP (Copper Network Protocol)
 permalink: /protocols/cnp
 ---
-
-# CNP (Copper Network Protocol)
 
 The outermost packet is always a CNP packet, it looks like this:
 

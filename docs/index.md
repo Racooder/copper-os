@@ -5,8 +5,6 @@
 layout: home
 ---
 
-# Copper OS
-
 [Folder Structure](folder-layout)
 
 ## Libraries
