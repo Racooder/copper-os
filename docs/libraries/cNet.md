@@ -18,14 +18,16 @@ cNet is the networking library of Copper OS.
 
 The possible types of the [CryptoNet](CryptoNet) message event.
 
-| `CONNECTION_CLOSED` | Triggered when a client disconnected from a server |
-| `CONNECTION_OPENED` | Triggered when a client connected to a server      |
-| `ENCRYPTED_MESSAGE` | Triggered when an encrypted message is received    |
-| `LOGIN`             | Triggered when a client successfully logged in     |
-| `LOGIN_FAILED`      | Triggered when a client failed to log in           |
-| `LOGOUT`            | Triggered when a client logged out                 |
-| `MODEM_MESSAGE`     | Triggered when a modem message is received         |
-| `PLAIN_MESSAGE`     | Triggered when an unencrypted message is received  |
+| Event Type          | Trigger                         |
+|---------------------|---------------------------------|
+| `CONNECTION_CLOSED` | Client disconnected from server |
+| `CONNECTION_OPENED` | Client connected to server      |
+| `ENCRYPTED_MESSAGE` | Encrypted message is received   |
+| `LOGIN`             | Client successfully logged in   |
+| `LOGIN_FAILED`      | Client failed to log in         |
+| `LOGOUT`            | Client logged out               |
+| `MODEM_MESSAGE`     | Modem message is received       |
+| `PLAIN_MESSAGE`     | Unencrypted message is received |
 
 ### CttpRequestMethod
 
