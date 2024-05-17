@@ -8,22 +8,22 @@ layout: default
 
 ```
 root
-|-system
-|-packages
-| |-...
-|-libs
-| |-...
-|-user
-| |-...
+├─system
+├─packages
+│ └─...
+├─libs
+│ └─...
+└─user
+  └─...
 ```
 
 # Package Layout
 
 ```
 package id
-|-app.meta
-|-main.lua
-|-appdata
-| |-...
-|-...
+├─app.meta
+├─main.lua
+├─appdata
+│ └─...
+└─...
 ```

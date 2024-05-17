@@ -39,7 +39,7 @@ Removes and returns the last value of the list
 
 ## Functions
 
-splitString(`inputstr`: [string](https://www.lua.org/pil/2.4.html), `sep`: [string](https://www.lua.org/pil/2.4.html)) : [string](https://www.lua.org/pil/2.4.html)
+- splitString(`inputstr`: [string](https://www.lua.org/pil/2.4.html), `sep`: [string](https://www.lua.org/pil/2.4.html)) : [string](https://www.lua.org/pil/2.4.html)
 
 Splits a string into a table of strings based on a separator.
 
@@ -47,7 +47,7 @@ Splits a string into a table of strings based on a separator.
 {% include examples/CopperUtility/split_string.lua %}
 ```
 
-trimString(`inputstr`: [string](https://www.lua.org/pil/2.4.html)) : [string](https://www.lua.org/pil/2.4.html)
+- trimString(`inputstr`: [string](https://www.lua.org/pil/2.4.html)) : [string](https://www.lua.org/pil/2.4.html)
 
 Removes whitespaces from the start and end of a string
 
@@ -55,7 +55,7 @@ Removes whitespaces from the start and end of a string
 {% include examples/CopperUtility/trim_string.lua %}
 ```
 
-concatTables(`t1`: [table](https://www.lua.org/pil/2.5.html), `t2`: [table](https://www.lua.org/pil/2.5.html)) : [table](https://www.lua.org/pil/2.5.html)
+- concatTables(`t1`: [table](https://www.lua.org/pil/2.5.html), `t2`: [table](https://www.lua.org/pil/2.5.html)) : [table](https://www.lua.org/pil/2.5.html)
 
 Concatenates two tables. The first table is modified.
 

@@ -121,7 +121,7 @@ Starts the [CryptoNet](CryptoNet) event loop.
 
 - connectCtcp(`serverId`: [string](https://www.lua.org/pil/2.4.html), `timeout?`: [number](https://www.lua.org/pil/2.3.html), `modemSide?`: [ModemSide](#modemside)) : [CtcpConnection](#ctcpconnection)/[nil](https://www.lua.org/pil/2.1.html)
 
-Opens a connection to a server using the [CTCP Handshake](../protocols/cttp#connection-handshake)
+Opens a connection to a server using the [CTCP Handshake](../protocols/ctcp#connection-handshake)
 
 ```lua
 {% include examples/cNet/cttp_request.lua %}
