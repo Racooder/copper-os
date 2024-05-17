@@ -51,14 +51,10 @@ Possible attachment sides of the modem
 
 ### CttpRequest
 
-#### Fields
-
 | `requestMethod` | The [method](#cttprequestmethod) of the request   |
 | `path`          |                                                   |
 | `header`        | The [header](../protocols/cttp#request-headers) of the request |
 | `data`          | Any data that is sent with the request            |
-
-#### Functions
 
 - new(`requestMethod`: [CttpRequestMethod](#cttprequestmethod), `path`: [string](https://www.lua.org/pil/2.4.html), `header?`: [CttpHeader](#cttpheader), `data?`: [any](https://www.lua.org/pil/2.html)) : [CttpRequest](#cttprequest)
 
@@ -66,14 +62,10 @@ Creates a new cttprequest
 
 ### CttpResponse
 
-#### Fields
-
 | `statusCode`    | The [method](#cttprequestmethod) of the response    |
 | `statusMessage` |                                                     |
 | `header`        | The [header](../protocols/cttp#response-headers) of the response |
 | `data`          | Any data that is sent with the response             |
-
-#### Functions
 
 - new(`status`: [CttpStatus](#cttpstatus), `header?`: [CttpHeader](#cttpheader), `data?`: [any](https://www.lua.org/pil/2.html)) : [CttpResponse](#cttpresponse)
 
@@ -81,13 +73,9 @@ Creates a new cttpresponse
 
 ### CtcpConnection
 
-#### Fields
-
 | `Socket`    | The [CryptoNet](CryptoNet) Socket      |
 | `seqNumber` | The [CTCP](../protocols/ctcp) sequence number       |
 | `ackNumber` | The [CTCP](../protocols/ctcp) acknowledgment number |
-
-#### Functions
 
 - new(`Socket`: [Socket](CryptoNet#Socket), `seqNumber`: [integer](https://www.lua.org/pil/2.3.html), `ackNumber`: [integer](https://www.lua.org/pil/2.3.html))
 
