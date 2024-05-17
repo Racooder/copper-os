@@ -14,7 +14,7 @@ cNet is the networking library of Copper OS.
 
 ## Enums
 
-### messageeventtype
+### MessageEventType
 
 The possible types of the [CryptoNet](CryptoNet) message event.
 
@@ -27,16 +27,16 @@ The possible types of the [CryptoNet](CryptoNet) message event.
 | `MODEM_MESSAGE`     | Triggered when a modem message is received         |
 | `PLAIN_MESSAGE`     | Triggered when an unencrypted message is received  |
 
-### cttprequestmethod
+### CttpRequestMethod
 
 The [possible methods](../protocols/cttp#request-methods) for a [CTTP Request](../protocols/cttp#requests).
 These change nothing about the functionality of the request, but help to organize them.
 
-### cttpstatus
+### CttpStatus
 
 The [possible statuses](../protocols/cttp#status-codes) for [CTTP Responses](../protocols/cttp#responses).
 
-### modemside
+### ModemSide
 
 Possible attachment sides of the modem
 
@@ -49,7 +49,7 @@ Possible attachment sides of the modem
 
 ## Classes
 
-### cttprequest
+### CttpRequest
 
 #### Fields
 
@@ -64,7 +64,7 @@ Possible attachment sides of the modem
 
 Creates a new cttprequest
 
-### cttpresponse
+### CttpResponse
 
 #### Fields
 
@@ -79,7 +79,7 @@ Creates a new cttprequest
 
 Creates a new cttpresponse
 
-### ctcpconnection
+### CtcpConnection
 
 #### Fields
 
