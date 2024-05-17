@@ -1,3 +1,4 @@
+-- Checksum Example
 local cNet = require "cNet"
 
 local a = { a=1, b=2, c=3 }

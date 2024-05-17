@@ -1,3 +1,4 @@
+-- Short CTTP Request Example
 local cNet = require "cNet"
 
 cNet.startEventLoop(function ()

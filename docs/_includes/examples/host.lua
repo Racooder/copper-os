@@ -1,3 +1,4 @@
+-- Hosting Example
 local cNet = require "cNet"
 
 cNet.setRestApi("GET", "/path", function ()

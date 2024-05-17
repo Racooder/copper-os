@@ -99,7 +99,7 @@ Calculates a checksum for any serializable object
 
 - startEventLoop(`onStart`: [function](https://www.lua.org/pil/2.6.html))
 
-Starts the [[CryptoNet]] event loop.
+Starts the [CryptoNet](CryptoNet) event loop.
 
 `onStart` is a callback function that is called when [[CryptoNet]] is set up.
 
@@ -123,7 +123,7 @@ Opens a connection to a server using the [CTCP Handshake](CTCP#CTCP-Handshake)
 
 - disconnectCtcp(`ctcpConnection`: [CtcpConnection](#CtcpConnection), `timeout?`: [number](https://www.lua.org/pil/2.3.html)) : [boolean](https://www.lua.org/pil/2.2.html)
 
-Closes a [[CTCP]] connection using the [Finishing Handshake](CTCP#Closing the connection).
+Closes a [CTCP](ctcp) connection using the [Finishing Handshake](CTCP#Closing the connection).
 
 ```lua
 {% include examples/cttp_request.lua %}
