@@ -93,31 +93,59 @@ Possible attachment sides of the modem
 
 Calculates a checksum for any serializable object
 
+```lua
+{% include examples/checksum.lua %}
+```
+
 - startEventLoop(`onStart`: [function](https://www.lua.org/pil/2.6.html))
 
 Starts the [[CryptoNet]] event loop.
 
 `onStart` is a callback function that is called when [[CryptoNet]] is set up.
 
+```lua
+{% include examples/host.lua %}
+```
+
 - host(`serverId`: [string](https://www.lua.org/pil/2.4.html), `modemSide?`: [ModemSide](#ModemSide))
+
+```lua
+{% include examples/host.lua %}
+```
 
 - connectCtcp(`serverId`: [string](https://www.lua.org/pil/2.4.html), `timeout?`: [number](https://www.lua.org/pil/2.3.html), `modemSide?`: [ModemSide](#ModemSide)) : [CtcpConnection](#CtcpConnection)/[nil](https://www.lua.org/pil/2.1.html)
 
 Opens a connection to a server using the [CTCP Handshake](CTCP#CTCP-Handshake)
 
+```lua
+{% include examples/cttp_request.lua %}
+```
+
 - disconnectCtcp(`ctcpConnection`: [CtcpConnection](#CtcpConnection), `timeout?`: [number](https://www.lua.org/pil/2.3.html)) : [boolean](https://www.lua.org/pil/2.2.html)
 
 Closes a [[CTCP]] connection using the [Finishing Handshake](CTCP#Closing the connection).
 
+```lua
+{% include examples/cttp_request.lua %}
+```
+
 - sendCttpRequest(`ctcpConnection`: [CtcpConnection](#CtcpConnection), `request`: [CttpRequest](#CttpRequest), `timeout`: [number](https://www.lua.org/pil/2.3.html)) : [CttpResponse](#CttpResponse)/[nil](https://www.lua.org/pil/2.1.html), [boolean](https://www.lua.org/pil/2.2.html)
 
 Sends a [CTTP Request](CTTP#Requests) to a server.
+
+```lua
+{% include examples/cttp_request.lua %}
+```
 
 - connectAndSendCttpRequest(`serverId`: [string](https://www.lua.org/pil/2.4.html), `request`: [CttpRequest](#CttpRequest), `timeout?`: [number](https://www.lua.org/pil/2.3.html), `modemSide?`: [ModemSide](#ModemSide)) : [CttpResponse](#CttpResponse)/[nil](https://www.lua.org/pil/2.1.html), [boolean](https://www.lua.org/pil/2.2.html), [boolean](https://www.lua.org/pil/2.2.html), [boolean](https://www.lua.org/pil/2.2.html)
 
 Connects to a server, sends a [CTTP Request](CTTP#Requests) and disconnects.
 
 Returns the response, if the connection was successful, if the request was acknowledged and if the disconnect was acknowledged.
+
+```lua
+{% include examples/cttp_request_short.lua %}
+```
 
 - setMessageHandler(`eventType`: [MessageEventType](#MessageEventType), `handler`: [function](https://www.lua.org/pil/2.6.html))
 
@@ -126,6 +154,10 @@ Sets a custom handler for [CryptoNet Message Events](#MessageEventType)
 - setRestApi(`requestMethod`: [CttpRequestMethod](#CttpRequestMethod), `path`: [string](https://www.lua.org/pil/2.4.html), `handler`: [function](https://www.lua.org/pil/2.6.html))
 
 Sets a handler for a [CTTP Request](CTTP#Requests)
+
+```lua
+{% include examples/host.lua %}
+```
 
 - register(`serverId`: [string](https://www.lua.org/pil/2.4.html), `username`: [string](https://www.lua.org/pil/2.4.html), `password`: [string](https://www.lua.org/pil/2.4.html), `timeout`: [number](https://www.lua.org/pil/2.3.html), `modemSide`: [ModemSide](#ModemSide)) : [integer](https://www.lua.org/pil/2.3.html)
 
