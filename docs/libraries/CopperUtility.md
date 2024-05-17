@@ -43,6 +43,14 @@ Splits a string into a table of strings based on a separator.
 {% include examples/CopperUtility/split_string.lua %}
 ```
 
+- splitByChunk(`text`: [string](https://www.lua.org/pil/2.4.html), `chunkSize`: [integer](https://www.lua.org/pil/2.3.html))
+
+Split a string into chunks of a given size.
+
+```lua
+{% include examples/CopperUtility/split_by_chunk.lua %}
+```
+
 - trimString(`inputstr`: [string](https://www.lua.org/pil/2.4.html)) : [string](https://www.lua.org/pil/2.4.html)
 
 Removes whitespaces from the start and end of a string
