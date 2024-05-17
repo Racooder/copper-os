@@ -119,7 +119,7 @@ Opens a connection to a server using the [CTCP Handshake](../protocols/ctcp#conn
 
 - disconnectCtcp(`ctcpConnection`: [CtcpConnection](#ctcpconnection), `timeout?`: [number](https://www.lua.org/pil/2.3.html)) : [boolean](https://www.lua.org/pil/2.2.html)
 
-Closes a [CTCP](../protocols/ctcp) connection using the [Finishing Handshake](../protocols/CTCP#closing the connection).
+Closes a [CTCP](../protocols/ctcp) connection using the [Finishing Handshake](../protocols/ctcp#closing-the-connection).
 
 ```lua
 {% include examples/cNet/cttp_request.lua %}
