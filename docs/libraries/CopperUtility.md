@@ -12,8 +12,8 @@ CopperUtility is a collection of utility functions for various Copper OS librari
 
 #### Fields
 
-- `first` - The index of the first element in the list
-- `last` - The index of the last element in the list
+| `first` | The index of the first element in the list |
+| `last`  | The index of the last element in the list  |
 
 #### Functions
 
