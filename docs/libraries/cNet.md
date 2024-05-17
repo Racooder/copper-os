@@ -62,6 +62,8 @@ Possible attachment sides of the modem
 
 - new(`requestMethod`: [CttpRequestMethod](#CttpRequestMethod), `path`: [string](https://www.lua.org/pil/2.4.html), `header?`: [CttpHeader](#CttpHeader), `data?`: [any](https://www.lua.org/pil/2.html)) : [CttpRequest](#CttpRequest)
 
+Creates a new CttpRequest
+
 ### CttpResponse
 
 #### Fields
@@ -75,6 +77,8 @@ Possible attachment sides of the modem
 
 - new(`status`: [CttpStatus](#CttpStatus), `header?`: [CttpHeader](#CttpHeader), `data?`: [any](https://www.lua.org/pil/2.html)) : [CttpResponse](#CttpResponse)
 
+Creates a new CttpResponse
+
 ### CtcpConnection
 
 #### Fields
@@ -86,6 +90,8 @@ Possible attachment sides of the modem
 #### Functions
 
 - new(`socket`: [Socket](CryptoNet#Socket), `seqNumber`: [integer](https://www.lua.org/pil/2.3.html), `ackNumber`: [integer](https://www.lua.org/pil/2.3.html))
+
+Creates a new CtcpConnection
 
 ## Functions
 
@@ -151,6 +157,10 @@ Returns the response, if the connection was successful, if the request was ackno
 
 Sets a custom handler for [CryptoNet Message Events](#MessageEventType)
 
+```lua
+{% include examples/cNet/message_handler.lua %}
+```
+
 - setRestApi(`requestMethod`: [CttpRequestMethod](#CttpRequestMethod), `path`: [string](https://www.lua.org/pil/2.4.html), `handler`: [function](https://www.lua.org/pil/2.6.html))
 
 Sets a handler for a [CTTP Request](CTTP#Requests)
@@ -161,6 +171,18 @@ Sets a handler for a [CTTP Request](CTTP#Requests)
 
 - register(`serverId`: [string](https://www.lua.org/pil/2.4.html), `username`: [string](https://www.lua.org/pil/2.4.html), `password`: [string](https://www.lua.org/pil/2.4.html), `timeout`: [number](https://www.lua.org/pil/2.3.html), `modemSide`: [ModemSide](#ModemSide)) : [integer](https://www.lua.org/pil/2.3.html)
 
+```lua
+{% include examples/cNet/login.lua %}
+```
+
 - login(`connection`: [CtcpConnection](#CtcpConnection)/[table](https://www.lua.org/pil/2.5.html), `username`: [string](https://www.lua.org/pil/2.4.html), `password`: [string](https://www.lua.org/pil/2.4.html))
 
+```lua
+{% include examples/cNet/login.lua %}
+```
+
 - logout(`connection`: [CtcpConnection](#CtcpConnection))
+
+```lua
+{% include examples/cNet/login.lua %}
+```

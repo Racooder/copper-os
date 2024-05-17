@@ -19,6 +19,8 @@ CopperUtility is a collection of utility functions for various Copper OS librari
 
 - new(): [List](#List)
 
+Creates a new list
+
 - pushLeft(`value`: [any](https://www.lua.org/pil/2.html))
 
 Adds a value to the beginning of the list
