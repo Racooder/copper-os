@@ -8,4 +8,25 @@
 		margin-top: 48px;
 		border-bottom: 1px dashed #b5e853;
 	}
+
+	h3 {
+		margin-top: 32px;
+	}
+
+	h2 + h3 {
+		margin-top: 0px !important;
+	}
+
+	ul {
+		margin-left: -40px;
+		margin-top: 24px;
+	}
+
+	h2 + ul {
+		margin-top: 0px !important;
+	}
+
+	h4 + ul {
+		margin-top: 0px !important;
+	}
 }
