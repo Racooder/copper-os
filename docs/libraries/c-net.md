@@ -29,7 +29,7 @@ The possible types of the [CryptoNet](crypto-net) message event.
 
 ### CttpRequestMethod
 
-The [possible methods](cttp#request-methods) for a [CTTP Request](cttp#requests).
+The [possible methods](../cttp#request-methods) for a [CTTP Request](cttp#requests).
 These change nothing about the functionality of the request, but help to organize them.
 
 ### CttpStatus
