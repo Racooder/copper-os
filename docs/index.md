@@ -6,13 +6,13 @@ layout: default
 
 ## Libraries
 
-- [cNet](libraries/c-net)
-- [CopperUtility](libraries/copper-utility)
-- [CryptoNet](libraries/crypto-net)
+- [cNet](libraries/cNet)
+- [CopperUtility](libraries/CopperUtility)
+- [CryptoNet](libraries/CryptoNet)
 
 ## Protocols
 
-- [CNP (Copper Network Protocol)](protocols/cnp)
-- [CTCP (Copper Transmission Control Protocol)](protocols/ctcp)
-- [CTTP (Copper Text Transfer Protocol)](protocols/cttp)
-- [CLOG (Copper Login Protocol)](protocols/clog)
+- [CNP (Copper Network Protocol)](protocols/CNP)
+- [CTCP (Copper Transmission Control Protocol)](protocols/CTCP)
+- [CTTP (Copper Text Transfer Protocol)](protocols/CTTP)
+- [CLOG (Copper Login Protocol)](protocols/CLOG)

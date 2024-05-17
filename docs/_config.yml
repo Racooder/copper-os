@@ -6,6 +6,6 @@ url: "https://racooder.github.io"
 github_username: Racooder
 
 markdown: kramdown
-remote_theme: jekyll-theme-hacker
+theme: jekyll-theme-hacker
 plugins:
   - jekyll-feed
