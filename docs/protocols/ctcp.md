@@ -99,7 +99,7 @@ For the next message, both the sequence and acknowledgment numbers would be `P2`
 ## Closing the connection
 
 Closing the connection works again with a three-way conversation.
-First, the initiator sends a `FIN` packet with sequence and acknowledgment number, like during a [data exchange](#data-exchange).
+First, the initiator sends a `FIN` packet with sequence and acknowledgment number, like during a [data exchange](#Data-Exchange).
 
 ```
 {
