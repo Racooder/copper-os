@@ -4,7 +4,7 @@ layout: default
 
 # Folder Layout
 
-# Root
+## Root
 
 ```
 root
@@ -17,7 +17,7 @@ root
     └──...
 ```
 
-# Package Layout
+## Package Layout
 
 ```
 package id

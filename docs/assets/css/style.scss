@@ -8,6 +8,7 @@
 		margin-top: 48px;
 		margin-bottom: 10px;
 	}
+
 	h3 {
 		margin-top: 32px;
 		border-bottom: 1px dashed #648e13;
@@ -18,8 +19,8 @@
 	}
 
 	ul {
-		margin-left: -40px;
 		margin-top: 32px;
+		margin-left: -40px;
 	}
 
 	h2 + ul {
@@ -28,5 +29,9 @@
 
 	h4 + ul {
 		margin-top: 0px !important;
+	}
+
+	th {
+		border-bottom: 1px dotted #fff;
 	}
 }
