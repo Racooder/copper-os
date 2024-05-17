@@ -8,8 +8,6 @@ CTTP is used for requesting and sending data between a client and server. It is 
 CTTP differs between requests and responses.
 CTTP is in many points similar to the [HTTP Protocol](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP).
 
----
-
 ## Requests
 
 A CTTP Request consist of a [request method](#request-methods), a path, the [header](#request-headers) and an optional data field.
@@ -27,15 +25,13 @@ A CTTP Request consist of a [request method](#request-methods), a path, the [hea
 
 Possible request methods are
 
-- `GET` - Get information from the server
-- `POST` - Send information to the server
-- `DELETE` - Delete information from the server
+| `GET`    | Get information from the server    |
+| `POST`   | Send information to the server     |
+| `DELETE` | Delete information from the server |
 
 ### Request Headers
 
 Request headers can contain the following fields, but each of them is optional
-
----
 
 ## Responses
 
@@ -52,30 +48,30 @@ A CTTP Response consists of a [status code](#status-codes), its brief meaning, t
 
 ### Status Codes
 
-- `100` - Continue
-- `102` - Processing
-- `103` - Early Hints
-- `200` - OK
-- `201` - Created
-- `202` - Accepted
-- `301` - Moved Permanently
-- `307` - Temporary Redirect
-- `308` - Permanent Redirect
-- `400` - Bad Request
-- `401` - Unauthorized
-- `403` - Forbidden
-- `404` - Not Found
-- `409` - Conflict
-- `410` - Gone
-- `420` - Enhance Your Calm
-- `429` - Too Many Requests
-- `498` - Token Expired
-- `500` - Internal Server Error
-- `501` - Not Implemented
-- `503` - Service Unavailable
-- `507` - Insufficient Storage
-- `521` - Server Is Down
-- `522` - Connection Timed Out
+| `100` | Continue              |
+| `102` | Processing            |
+| `103` | Early Hints           |
+| `200` | OK                    |
+| `201` | Created               |
+| `202` | Accepted              |
+| `301` | Moved Permanently     |
+| `307` | Temporary Redirect    |
+| `308` | Permanent Redirect    |
+| `400` | Bad Request           |
+| `401` | Unauthorized          |
+| `403` | Forbidden             |
+| `404` | Not Found             |
+| `409` | Conflict              |
+| `410` | Gone                  |
+| `420` | Enhance Your Calm     |
+| `429` | Too Many Requests     |
+| `498` | Token Expired         |
+| `500` | Internal Server Error |
+| `501` | Not Implemented       |
+| `503` | Service Unavailable   |
+| `507` | Insufficient Storage  |
+| `521` | Server Is Down        |
+| `522` | Connection Timed Out  |
 
 ### Response Headers
 

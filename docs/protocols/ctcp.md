@@ -7,8 +7,6 @@ layout: default
 CTCP is used for reliably exchanging data. It is contained in a [[CNP]] packet's payload.
 CTCP resembles the [TCP Protocol](https://de.wikipedia.org/wiki/Transmission_Control_Protocol), but is very simplified.
 
----
-
 ## CTCP Handshake
 
 Each CTCP session starts with a three-way handshake.
@@ -41,8 +39,6 @@ Finally, the client answers with a `ACK` packet looking like the following.
 	Flags = {"ACK"}
 }
 ```
-
----
 
 ## Data Exchange
 
@@ -99,8 +95,6 @@ For the next message, both the sequence and acknowledgment numbers would be `P2`
 	Payload = string
 }
 ```
-
----
 
 ## Closing the connection
 
