@@ -4,7 +4,7 @@ layout: default
 
 # CTTP (Copper Text Transfer Protocol)
 
-CTTP is used for requesting and sending data between a client and server. It is contained in a [[CTCP]] packet.
+CTTP is used for requesting and sending data between a client and server. It is contained in a [CTCP](ctcp) packet.
 CTTP differs between requests and responses.
 CTTP is in many points similar to the [HTTP Protocol](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP).
 
