@@ -29,12 +29,12 @@ The possible types of the [CryptoNet](crypto-net) message event.
 
 ### CttpRequestMethod
 
-The [possible methods](../cttp#request-methods) for a [CTTP Request](cttp#requests).
+The [possible methods](../protocols/cttp#request-methods) for a [CTTP Request](../protocols/cttp#requests).
 These change nothing about the functionality of the request, but help to organize them.
 
 ### CttpStatus
 
-The [possible statuses](cttp#status-codes) for [CTTP Responses](cttp#responses).
+The [possible statuses](../protocols/cttp#status-codes) for [CTTP Responses](../protocols/cttp#responses).
 
 ### ModemSide
 
@@ -55,7 +55,7 @@ Possible attachment sides of the modem
 
 | `requestMethod` | The [method](#cttprequestmethod) of the request   |
 | `path`          |                                                   |
-| `header`        | The [header](cttp#request-headers) of the request |
+| `header`        | The [header](../protocols/cttp#request-headers) of the request |
 | `data`          | Any data that is sent with the request            |
 
 #### Functions
@@ -70,7 +70,7 @@ Creates a new CttpRequest
 
 | `statusCode`    | The [method](#cttprequestmethod) of the response    |
 | `statusMessage` |                                                     |
-| `header`        | The [header](cttp#response-headers) of the response |
+| `header`        | The [header](../protocols/cttp#response-headers) of the response |
 | `data`          | Any data that is sent with the response             |
 
 #### Functions
@@ -83,13 +83,13 @@ Creates a new CttpResponse
 
 #### Fields
 
-| `socket`    | The [CryptoNet](CryptoNet) socket           |
-| `seqNumber` | The [CTCP](ctcp) sequence number       |
-| `ackNumber` | The [CTCP](ctcp) acknowledgment number |
+| `socket`    | The [CryptoNet](crypto-net) socket      |
+| `seqNumber` | The [CTCP](../protocols/ctcp) sequence number       |
+| `ackNumber` | The [CTCP](../protocols/ctcp) acknowledgment number |
 
 #### Functions
 
-- new(`socket`: [Socket](CryptoNet#Socket), `seqNumber`: [integer](https://www.lua.org/pil/2.3.html), `ackNumber`: [integer](https://www.lua.org/pil/2.3.html))
+- new(`socket`: [Socket](crypto-net#socket), `seqNumber`: [integer](https://www.lua.org/pil/2.3.html), `ackNumber`: [integer](https://www.lua.org/pil/2.3.html))
 
 Creates a new CtcpConnection
 
@@ -105,47 +105,47 @@ Calculates a checksum for any serializable object
 
 - startEventLoop(`onStart`: [function](https://www.lua.org/pil/2.6.html))
 
-Starts the [CryptoNet](CryptoNet) event loop.
+Starts the [CryptoNet](crypto-net) event loop.
 
-`onStart` is a callback function that is called when [[CryptoNet]] is set up.
-
-```lua
-{% include examples/cNet/host.lua %}
-```
-
-- host(`serverId`: [string](https://www.lua.org/pil/2.4.html), `modemSide?`: [ModemSide](#ModemSide))
+`onStart` is a callback function that is called when [CryptoNet](crypto-net) is set up.
 
 ```lua
 {% include examples/cNet/host.lua %}
 ```
 
-- connectCtcp(`serverId`: [string](https://www.lua.org/pil/2.4.html), `timeout?`: [number](https://www.lua.org/pil/2.3.html), `modemSide?`: [ModemSide](#ModemSide)) : [CtcpConnection](#CtcpConnection)/[nil](https://www.lua.org/pil/2.1.html)
+- host(`serverId`: [string](https://www.lua.org/pil/2.4.html), `modemSide?`: [ModemSide](#modemside))
 
-Opens a connection to a server using the [CTCP Handshake](CTCP#CTCP-Handshake)
+```lua
+{% include examples/cNet/host.lua %}
+```
+
+- connectCtcp(`serverId`: [string](https://www.lua.org/pil/2.4.html), `timeout?`: [number](https://www.lua.org/pil/2.3.html), `modemSide?`: [ModemSide](#modemside)) : [CtcpConnection](#ctcpconnection)/[nil](https://www.lua.org/pil/2.1.html)
+
+Opens a connection to a server using the [CTCP Handshake](../protocols/ctcp#ctcp-handshake)
 
 ```lua
 {% include examples/cNet/cttp_request.lua %}
 ```
 
-- disconnectCtcp(`ctcpConnection`: [CtcpConnection](#CtcpConnection), `timeout?`: [number](https://www.lua.org/pil/2.3.html)) : [boolean](https://www.lua.org/pil/2.2.html)
+- disconnectCtcp(`ctcpConnection`: [CtcpConnection](#ctcpconnection), `timeout?`: [number](https://www.lua.org/pil/2.3.html)) : [boolean](https://www.lua.org/pil/2.2.html)
 
-Closes a [CTCP](ctcp) connection using the [Finishing Handshake](CTCP#Closing the connection).
-
-```lua
-{% include examples/cNet/cttp_request.lua %}
-```
-
-- sendCttpRequest(`ctcpConnection`: [CtcpConnection](#CtcpConnection), `request`: [CttpRequest](#CttpRequest), `timeout`: [number](https://www.lua.org/pil/2.3.html)) : [CttpResponse](#CttpResponse)/[nil](https://www.lua.org/pil/2.1.html), [boolean](https://www.lua.org/pil/2.2.html)
-
-Sends a [CTTP Request](CTTP#Requests) to a server.
+Closes a [CTCP](../protocols/ctcp) connection using the [Finishing Handshake](../protocols/ctcp#closing the connection).
 
 ```lua
 {% include examples/cNet/cttp_request.lua %}
 ```
 
-- connectAndSendCttpRequest(`serverId`: [string](https://www.lua.org/pil/2.4.html), `request`: [CttpRequest](#CttpRequest), `timeout?`: [number](https://www.lua.org/pil/2.3.html), `modemSide?`: [ModemSide](#ModemSide)) : [CttpResponse](#CttpResponse)/[nil](https://www.lua.org/pil/2.1.html), [boolean](https://www.lua.org/pil/2.2.html), [boolean](https://www.lua.org/pil/2.2.html), [boolean](https://www.lua.org/pil/2.2.html)
+- sendCttpRequest(`ctcpConnection`: [CtcpConnection](#ctcpconnection), `request`: [CttpRequest](#cttprequest), `timeout`: [number](https://www.lua.org/pil/2.3.html)) : [CttpResponse](#cttpresponse)/[nil](https://www.lua.org/pil/2.1.html), [boolean](https://www.lua.org/pil/2.2.html)
 
-Connects to a server, sends a [CTTP Request](CTTP#Requests) and disconnects.
+Sends a [CTTP Request](../protocols/cttp#requests) to a server.
+
+```lua
+{% include examples/cNet/cttp_request.lua %}
+```
+
+- connectAndSendCttpRequest(`serverId`: [string](https://www.lua.org/pil/2.4.html), `request`: [CttpRequest](#cttprequest), `timeout?`: [number](https://www.lua.org/pil/2.3.html), `modemSide?`: [ModemSide](#modemside)) : [CttpResponse](#cttpresponse)/[nil](https://www.lua.org/pil/2.1.html), [boolean](https://www.lua.org/pil/2.2.html), [boolean](https://www.lua.org/pil/2.2.html), [boolean](https://www.lua.org/pil/2.2.html)
+
+Connects to a server, sends a [CTTP Request](../protocols/cttp#requests) and disconnects.
 
 Returns the response, if the connection was successful, if the request was acknowledged and if the disconnect was acknowledged.
 
@@ -153,35 +153,35 @@ Returns the response, if the connection was successful, if the request was ackno
 {% include examples/cNet/cttp_request_short.lua %}
 ```
 
-- setMessageHandler(`eventType`: [MessageEventType](#MessageEventType), `handler`: [function](https://www.lua.org/pil/2.6.html))
+- setMessageHandler(`eventType`: [MessageEventType](#messageeventtype), `handler`: [function](https://www.lua.org/pil/2.6.html))
 
-Sets a custom handler for [CryptoNet Message Events](#MessageEventType)
+Sets a custom handler for [CryptoNet Message Events](#messageeventtype)
 
 ```lua
 {% include examples/cNet/message_handler.lua %}
 ```
 
-- setRestApi(`requestMethod`: [CttpRequestMethod](#CttpRequestMethod), `path`: [string](https://www.lua.org/pil/2.4.html), `handler`: [function](https://www.lua.org/pil/2.6.html))
+- setRestApi(`requestMethod`: [CttpRequestMethod](#cttprequestmethod), `path`: [string](https://www.lua.org/pil/2.4.html), `handler`: [function](https://www.lua.org/pil/2.6.html))
 
-Sets a handler for a [CTTP Request](CTTP#Requests)
+Sets a handler for a [CTTP Request](../protocols/cttp#requests)
 
 ```lua
 {% include examples/cNet/host.lua %}
 ```
 
-- register(`serverId`: [string](https://www.lua.org/pil/2.4.html), `username`: [string](https://www.lua.org/pil/2.4.html), `password`: [string](https://www.lua.org/pil/2.4.html), `timeout`: [number](https://www.lua.org/pil/2.3.html), `modemSide`: [ModemSide](#ModemSide)) : [integer](https://www.lua.org/pil/2.3.html)
+- register(`serverId`: [string](https://www.lua.org/pil/2.4.html), `username`: [string](https://www.lua.org/pil/2.4.html), `password`: [string](https://www.lua.org/pil/2.4.html), `timeout`: [number](https://www.lua.org/pil/2.3.html), `modemSide`: [ModemSide](#modemside)) : [integer](https://www.lua.org/pil/2.3.html)
 
 ```lua
 {% include examples/cNet/login.lua %}
 ```
 
-- login(`connection`: [CtcpConnection](#CtcpConnection)/[table](https://www.lua.org/pil/2.5.html), `username`: [string](https://www.lua.org/pil/2.4.html), `password`: [string](https://www.lua.org/pil/2.4.html))
+- login(`connection`: [CtcpConnection](#ctcpconnection)/[table](https://www.lua.org/pil/2.5.html), `username`: [string](https://www.lua.org/pil/2.4.html), `password`: [string](https://www.lua.org/pil/2.4.html))
 
 ```lua
 {% include examples/cNet/login.lua %}
 ```
 
-- logout(`connection`: [CtcpConnection](#CtcpConnection))
+- logout(`connection`: [CtcpConnection](#ctcpconnection))
 
 ```lua
 {% include examples/cNet/login.lua %}
