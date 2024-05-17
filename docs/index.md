@@ -12,7 +12,7 @@ layout: default
 
 ## Protocols
 
-- [CNP (Copper Network Protocol)](protocols/CNP)
-- [CTCP (Copper Transmission Control Protocol)](protocols/CTCP)
-- [CTTP (Copper Text Transfer Protocol)](protocols/CTTP)
-- [CLOG (Copper Login Protocol)](protocols/CLOG)
+- [CNP (Copper Network Protocol)](protocols/cnp)
+- [CTCP (Copper Transmission Control Protocol)](protocols/ctcp)
+- [CTTP (Copper Text Transfer Protocol)](protocols/cttp)
+- [CLOG (Copper Login Protocol)](protocols/clog)

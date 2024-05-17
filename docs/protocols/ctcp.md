@@ -7,7 +7,7 @@ layout: default
 CTCP is used for reliably exchanging data. It is contained in a [[CNP]] packet's payload.
 CTCP resembles the [TCP Protocol](https://de.wikipedia.org/wiki/Transmission_Control_Protocol), but is very simplified.
 
-## CTCP Handshake
+## Connection Handshake
 
 Each CTCP session starts with a three-way handshake.
 First, the client sends a `SYN` packet to the host looking like this.

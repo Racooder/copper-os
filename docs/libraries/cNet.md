@@ -29,12 +29,12 @@ The possible types of the [CryptoNet](CryptoNet) message event.
 
 ### CttpRequestMethod
 
-The [possible methods](../protocols/CTTP#Request-Methods) for a [CTTP Request](../protocols/CTTP#Requests).
+The [possible methods](../protocols/cttp#Request-Methods) for a [CTTP Request](../protocols/cttp#Requests).
 These change nothing about the functionality of the request, but help to organize them.
 
 ### CttpStatus
 
-The [possible statuses](../protocols/CTTP#Status-Codes) for [CTTP Responses](../protocols/CTTP#Responses).
+The [possible statuses](../protocols/cttp#Status-Codes) for [CTTP Responses](../protocols/cttp#Responses).
 
 ### ModemSide
 
@@ -55,7 +55,7 @@ Possible attachment sides of the modem
 
 | `requestMethod` | The [method](#CttpRequestMethod) of the request   |
 | `path`          |                                                   |
-| `header`        | The [header](../protocols/CTTP#request-headers) of the request |
+| `header`        | The [header](../protocols/cttp#request-headers) of the request |
 | `data`          | Any data that is sent with the request            |
 
 #### Functions
@@ -70,7 +70,7 @@ Creates a new CttpRequest
 
 | `statusCode`    | The [method](#CttpRequestMethod) of the response    |
 | `statusMessage` |                                                     |
-| `header`        | The [header](../protocols/CTTP#Response-Headers) of the response |
+| `header`        | The [header](../protocols/cttp#Response-Headers) of the response |
 | `data`          | Any data that is sent with the response             |
 
 #### Functions
@@ -121,7 +121,7 @@ Starts the [CryptoNet](CryptoNet) event loop.
 
 - connectCtcp(`serverId`: [string](https://www.lua.org/pil/2.4.html), `timeout?`: [number](https://www.lua.org/pil/2.3.html), `modemSide?`: [ModemSide](#ModemSide)) : [CtcpConnection](#CtcpConnection)/[nil](https://www.lua.org/pil/2.1.html)
 
-Opens a connection to a server using the [CTCP Handshake](../protocols/CTCP#CTCP-handshake)
+Opens a connection to a server using the [CTCP Handshake](../protocols/cttp#Connection-Handshake)
 
 ```lua
 {% include examples/cNet/cttp_request.lua %}
@@ -129,7 +129,7 @@ Opens a connection to a server using the [CTCP Handshake](../protocols/CTCP#CTCP
 
 - disconnectCtcp(`ctcpConnection`: [CtcpConnection](#CtcpConnection), `timeout?`: [number](https://www.lua.org/pil/2.3.html)) : [boolean](https://www.lua.org/pil/2.2.html)
 
-Closes a [CTCP](../protocols/CTCP) connection using the [Finishing Handshake](../protocols/CTCP#closing the connection).
+Closes a [CTCP](../protocols/ctcp) connection using the [Finishing Handshake](../protocols/CTCP#closing the connection).
 
 ```lua
 {% include examples/cNet/cttp_request.lua %}
@@ -137,7 +137,7 @@ Closes a [CTCP](../protocols/CTCP) connection using the [Finishing Handshake](..
 
 - sendCttpRequest(`ctcpConnection`: [CtcpConnection](#CtcpConnection), `request`: [CttpRequest](#CttpRequest), `timeout`: [number](https://www.lua.org/pil/2.3.html)) : [CttpResponse](#CttpResponse)/[nil](https://www.lua.org/pil/2.1.html), [boolean](https://www.lua.org/pil/2.2.html)
 
-Sends a [CTTP Request](../protocols/CTTP#Requests) to a server.
+Sends a [CTTP Request](../protocols/cttp#Requests) to a server.
 
 ```lua
 {% include examples/cNet/cttp_request.lua %}
@@ -145,7 +145,7 @@ Sends a [CTTP Request](../protocols/CTTP#Requests) to a server.
 
 - connectAndSendCttpRequest(`serverId`: [string](https://www.lua.org/pil/2.4.html), `request`: [CttpRequest](#CttpRequest), `timeout?`: [number](https://www.lua.org/pil/2.3.html), `modemSide?`: [ModemSide](#ModemSide)) : [CttpResponse](#CttpResponse)/[nil](https://www.lua.org/pil/2.1.html), [boolean](https://www.lua.org/pil/2.2.html), [boolean](https://www.lua.org/pil/2.2.html), [boolean](https://www.lua.org/pil/2.2.html)
 
-Connects to a server, sends a [CTTP Request](../protocols/CTTP#Requests) and disconnects.
+Connects to a server, sends a [CTTP Request](../protocols/cttp#Requests) and disconnects.
 
 Returns the response, if the connection was successful, if the request was acknowledged and if the disconnect was acknowledged.
 
@@ -163,7 +163,7 @@ Sets a custom handler for [CryptoNet Message Events](#MessageEventType)
 
 - setRestApi(`requestMethod`: [CttpRequestMethod](#CttpRequestMethod), `path`: [string](https://www.lua.org/pil/2.4.html), `handler`: [function](https://www.lua.org/pil/2.6.html))
 
-Sets a handler for a [CTTP Request](../protocols/CTTP#Requests)
+Sets a handler for a [CTTP Request](../protocols/cttp#Requests)
 
 ```lua
 {% include examples/cNet/host.lua %}
