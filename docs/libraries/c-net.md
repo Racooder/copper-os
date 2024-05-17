@@ -68,14 +68,14 @@ Creates a new CttpRequest
 
 #### Fields
 
-| `statusCode`    | The [method](#CttpRequestMethod) of the response    |
+| `statusCode`    | The [method](#cttprequestmethod) of the response    |
 | `statusMessage` |                                                     |
-| `header`        | The [header](CTTP#Response-Headers) of the response |
+| `header`        | The [header](cttp#response-headers) of the response |
 | `data`          | Any data that is sent with the response             |
 
 #### Functions
 
-- new(`status`: [CttpStatus](#CttpStatus), `header?`: [CttpHeader](#CttpHeader), `data?`: [any](https://www.lua.org/pil/2.html)) : [CttpResponse](#CttpResponse)
+- new(`status`: [CttpStatus](#cttpstatus), `header?`: [CttpHeader](#cttpheader), `data?`: [any](https://www.lua.org/pil/2.html)) : [CttpResponse](#cttpresponse)
 
 Creates a new CttpResponse
 

@@ -5,7 +5,7 @@ baseurl: "/copper-os/"
 url: "https://racooder.github.io"
 github_username: Racooder
 
-markdown: jekyll-theme-hacker
-remote_theme: pages-themes/hacker@v0.2.0
+markdown: kramdown
+remote_theme: jekyll-theme-hacker
 plugins:
   - jekyll-feed
