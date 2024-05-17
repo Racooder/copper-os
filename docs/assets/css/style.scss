@@ -9,6 +9,10 @@
 		margin-bottom: 10px;
 	}
 
+	h1 + h2 {
+		margin-top: 0px !important;
+	}
+
 	h3 {
 		margin-top: 32px;
 		border-bottom: 1px dashed #648e13;
