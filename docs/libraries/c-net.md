@@ -10,13 +10,13 @@ cNet is the networking library of Copper OS.
 
 ### CryptoNet
 
-`cNet.CryptoNet` can be used to access functions of the [CryptoNet](CryptoNet) library. However, this is rarely needed
+`cNet.CryptoNet` can be used to access functions of the [CryptoNet](crypto-net) library. However, this is rarely needed
 
 ## Enums
 
 ### MessageEventType
 
-The possible types of the [CryptoNet](CryptoNet) message event.
+The possible types of the [CryptoNet](crypto-net) message event.
 
 | `CONNECTION_CLOSED` | Triggered when a client disconnected from a server |
 | `CONNECTION_OPENED` | Triggered when a client connected to a server      |
@@ -29,12 +29,12 @@ The possible types of the [CryptoNet](CryptoNet) message event.
 
 ### CttpRequestMethod
 
-The [possible methods](CTTP#request-methods) for a [CTTP Request](CTTP#requests).
+The [possible methods](cttp#request-methods) for a [CTTP Request](cttp#requests).
 These change nothing about the functionality of the request, but help to organize them.
 
 ### CttpStatus
 
-The [possible statuses](CTTP#Status-Codes) for [CTTP Responses](CTTP#Responses).
+The [possible statuses](cttp#status-codes) for [CTTP Responses](cttp#responses).
 
 ### ModemSide
 
@@ -53,14 +53,14 @@ Possible attachment sides of the modem
 
 #### Fields
 
-| `requestMethod` | The [method](#CttpRequestMethod) of the request   |
+| `requestMethod` | The [method](#cttprequestmethod) of the request   |
 | `path`          |                                                   |
-| `header`        | The [header](CTTP#Request-Headers) of the request |
+| `header`        | The [header](cttp#request-headers) of the request |
 | `data`          | Any data that is sent with the request            |
 
 #### Functions
 
-- new(`requestMethod`: [CttpRequestMethod](#CttpRequestMethod), `path`: [string](https://www.lua.org/pil/2.4.html), `header?`: [CttpHeader](#CttpHeader), `data?`: [any](https://www.lua.org/pil/2.html)) : [CttpRequest](#CttpRequest)
+- new(`requestMethod`: [CttpRequestMethod](#cttprequestmethod), `path`: [string](https://www.lua.org/pil/2.4.html), `header?`: [CttpHeader](#cttpheader), `data?`: [any](https://www.lua.org/pil/2.html)) : [CttpRequest](#cttprequest)
 
 Creates a new CttpRequest
 

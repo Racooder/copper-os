@@ -6,9 +6,9 @@ layout: default
 
 ## Libraries
 
-- [cNet](libraries/cNet)
-- [CopperUtility](libraries/CopperUtility)
-- [CryptoNet](libraries/CryptoNet)
+- [cNet](libraries/c-net)
+- [CopperUtility](libraries/copper-utility)
+- [CryptoNet](libraries/crypto-net)
 
 ## Protocols
 
