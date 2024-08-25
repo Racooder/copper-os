@@ -5,169 +5,75 @@ layout: default
 # cNet (Copper Networking)
 
 cNet is the networking library of Copper OS.
+It uses [CryptoNet](CryptoNet) for encrypted messaging.
 
-## Libraries
+## Clients and Servers
 
-### CryptoNet
+#### setup(`onStart`)
 
-`cNet.CryptoNet` can be used to access functions of the [CryptoNet](CryptoNet) library. However, this is rarely needed
+Setup the cNet module.
 
-## Enums
+##### Parameters:
 
-### MessageEventType
+* `onStart` (function) <br>
+    The function to call when the event loop starts.
 
-The possible types of the [CryptoNet](CryptoNet) message event.
+#### host(`serverName`, `discoverable?`, `hideCertificate?`, `modemSide?`, `certificate?`, `privateKey?`, `userTablePath?`)
 
-| Event Type          | Trigger                         |
-|---------------------|---------------------------------|
-| `CONNECTION_CLOSED` | Client disconnected from server |
-| `CONNECTION_OPENED` | Client connected to server      |
-| `ENCRYPTED_MESSAGE` | Encrypted message is received   |
-| `LOGIN`             | Client successfully logged in   |
-| `LOGIN_FAILED`      | Client failed to log in         |
-| `LOGOUT`            | Client logged out               |
-| `MODEM_MESSAGE`     | Modem message is received       |
-| `PLAIN_MESSAGE`     | Unencrypted message is received |
+Setup and host a cNet server.
 
-### CttpRequestMethod
+##### Parameters:
 
-The [possible methods](../protocols/cttp#request-methods) for a [CTTP Request](../protocols/cttp#requests).
-These change nothing about the functionality of the request, but help to organize them.
+* `serverName` (string) <br>
+    The name of the server, which clients will use to connect to it. Also determines the channel that the server communicates on.
+* `discoverable` (boolean) <br>
+    (default: true) Whether this server responds to discover() requests. Disabling this is more secure as it means clients can't connect unless they already know the name of the server.
+* `hideCertificate` (boolean) <br>
+    (default: false) If true the server will not distribute its certificate to clients, either in discover() or connect() requests, meaning clients can only connect if they have already been given the certificate manually. Useful if you only want certain manually authorised clients to be able to connect.
+* `modemSide` (string) <br>
+    The modem the server should use.
+* `certificate` (Certificate | string) <br>
+    (default: "\<serverName\>.crt") The certificate of the server. This can either be the certificate table itself, or the name of a file that contains it. If the certicate and key files do not exist, new ones will be generated and saved to the specified files.
+* `privateKey` (PrivateKey | string) <br>
+    (default: "\<serverName\>_private.key") The private key of the server. This can either be the key table itself, or the name of a file that contains it. If the certicate and key files do not exist, new ones will be generated and saved to the specified files.
+* `userTablePath` (string) <br>
+    (default: "\<serverName\>_users.tbl") Path at which to store the user login details table, if/when users are added to the server.
 
-### CttpStatus
+##### Returns:
 
-The [possible statuses](../protocols/cttp#status-codes) for [CTTP Responses](../protocols/cttp#responses).
+1. `server` (Server) <br>
+    The server object.
 
-## Classes
+#### connect(`serverName?`, `timeout?`, `certTimeout?`, `certificate?`, `modemSide?`, `certAuthKey?`, `allowUnsigned?`)
 
-### CttpRequest
+Open an encrypted connection to a cNet server, returning a socket object that can be used to send and receive messages from the server.
 
-| `requestMethod` | The [method](#cttprequestmethod) of the request                |
-| `path`          |                                                                |
-| `header`        | The [header](../protocols/cttp#request-headers) of the request |
-| `data`          | Any data that is sent with the request                         |
+##### Parameters:
 
-- new(`requestMethod`: [CttpRequestMethod](#cttprequestmethod), `path`: [string](https://www.lua.org/pil/2.4.html), `header?`: [CttpHeader](#cttpheader), `data?`: [any](https://www.lua.org/pil/2.html)) : [CttpRequest](#cttprequest)
+* `serverName` (string) <br>
+    (default: inferred from certificate) The name of the server to connect to.
+* `timeout` (number) <br>
+    (default: 5) The number of seconds to wait for a response to the connection request. Will terminate early if a response is received.
+* `certTimeout` (number) <br>
+    (default: 1) The number of seconds to wait for certificate responses, if no certificate was provided.
+* `certificate` (Certificate | string) <br>
+    (default: "\<serverName\>.crt") The certificate of the server. Can either be the certificate of the server itself, or the name of a file that contains it. If no valid certificate is found a certificate request will be sent to the server.
+* `modemSide` (string) <br>
+    (default: a side with a modem) The modem to use to send and receive messages.
+* `certAuthKey` (PublicKey | string) <br>
+    (default: "certAuth.key") The certificate authority public key used to verify signatures, or the path of the file to load it from. If no valid key is found the connection will still go ahead, but signatures will not be checked.
+* `allowUnsigned` (boolean) <br>
+    (default: false) Whether to accept certificates with no valid signature. If no valid cert auth key is provided this is ignored, as the certificates cannot be checked without a key. This does not apply to the certificate provided by the user (if present), which is never verified (we trust them to get their own certificate right), only to certificates received through a certificate request.
 
-Creates a new cttprequest
+##### Returns:
 
-### CttpResponse
+* `socket` (Socket)
 
-| `statusCode`    | The [method](#cttprequestmethod) of the response                 |
-| `statusMessage` |                                                                  |
-| `header`        | The [header](../protocols/cttp#response-headers) of the response |
-| `data`          | Any data that is sent with the response                          |
+#### send(`socket`, `message`)
 
-- new(`status`: [CttpStatus](#cttpstatus), `header?`: [CttpHeader](#cttpheader), `data?`: [any](https://www.lua.org/pil/2.html)) : [CttpResponse](#cttpresponse)
+Send an encrypted message over the given socket. The message can be pretty much any Lua data type.
 
-Creates a new cttpresponse
+##### Parameters:
 
-### CtcpConnection
-
-| `Socket`    | The [CryptoNet](CryptoNet) Socket                   |
-| `seqNumber` | The [CTCP](../protocols/ctcp) sequence number       |
-| `ackNumber` | The [CTCP](../protocols/ctcp) acknowledgment number |
-
-- new(`Socket`: [Socket](CryptoNet#Socket), `seqNumber`: [integer](https://www.lua.org/pil/2.3.html), `ackNumber`: [integer](https://www.lua.org/pil/2.3.html))
-
-Creates a new ctcpconnection
-
-## Functions
-
-- checksum(`object`: [any](https://www.lua.org/pil/2.html)) : [integer](https://www.lua.org/pil/2.3.html)
-
-Calculates a checksum for any serializable object
-
-```lua
-{% include examples/cNet/checksum.lua %}
-```
-
-- startEventLoop(`onStart`: [function](https://www.lua.org/pil/2.6.html))
-
-Starts the [CryptoNet](CryptoNet) event loop.
-
-`onStart` is a callback function that is called when [CryptoNet](CryptoNet) is set up.
-
-```lua
-{% include examples/cNet/host.lua %}
-```
-
-- host(`serverId`: [string](https://www.lua.org/pil/2.4.html), `modemQuery?`: [string](https://www.lua.org/pil/2.4.html))
-
-```lua
-{% include examples/cNet/host.lua %}
-```
-
-- connectCtcp(`serverId`: [string](https://www.lua.org/pil/2.4.html), `timeout?`: [number](https://www.lua.org/pil/2.3.html), `modemQuery?`: [string](https://www.lua.org/pil/2.4.html)) : [CtcpConnection](#ctcpconnection)/[nil](https://www.lua.org/pil/2.1.html)
-
-Opens a connection to a server using the [CTCP Handshake](../protocols/ctcp#connection-handshake)
-
-```lua
-{% include examples/cNet/cttp_request.lua %}
-```
-
-- disconnectCtcp(`ctcpConnection`: [CtcpConnection](#ctcpconnection), `timeout?`: [number](https://www.lua.org/pil/2.3.html)) : [boolean](https://www.lua.org/pil/2.2.html)
-
-Closes a [CTCP](../protocols/ctcp) connection using the [Finishing Handshake](../protocols/ctcp#closing-the-connection).
-
-```lua
-{% include examples/cNet/cttp_request.lua %}
-```
-
-- sendCttpRequest(`ctcpConnection`: [CtcpConnection](#ctcpconnection), `request`: [CttpRequest](#cttprequest), `timeout`: [number](https://www.lua.org/pil/2.3.html)) : [CttpResponse](#cttpresponse)/[nil](https://www.lua.org/pil/2.1.html), [boolean](https://www.lua.org/pil/2.2.html)
-
-Sends a [CTTP Request](../protocols/cttp#requests) to a server.
-
-```lua
-{% include examples/cNet/cttp_request.lua %}
-```
-
-- connectAndSendCttpRequest(`serverId`: [string](https://www.lua.org/pil/2.4.html), `request`: [CttpRequest](#cttprequest), `timeout?`: [number](https://www.lua.org/pil/2.3.html), `modemQuery?`: [string](https://www.lua.org/pil/2.4.html)) : [CttpResponse](#cttpresponse)/[nil](https://www.lua.org/pil/2.1.html), [boolean](https://www.lua.org/pil/2.2.html), [boolean](https://www.lua.org/pil/2.2.html), [boolean](https://www.lua.org/pil/2.2.html)
-
-Connects to a server, sends a [CTTP Request](../protocols/cttp#requests) and disconnects.
-
-Returns the response, if the connection was successful, if the request was acknowledged and if the disconnect was acknowledged.
-
-```lua
-{% include examples/cNet/cttp_request_short.lua %}
-```
-
-- setMessageHandler(`eventType`: [MessageEventType](#messageeventtype), `handler`: [function](https://www.lua.org/pil/2.6.html))
-
-Sets a custom handler for [CryptoNet Message Events](#messageeventtype)
-
-```lua
-{% include examples/cNet/message_handler.lua %}
-```
-
-- setRestApi(`requestMethod`: [CttpRequestMethod](#cttprequestmethod), `path`: [string](https://www.lua.org/pil/2.4.html), `handler`: [function](https://www.lua.org/pil/2.6.html))
-
-Sets a handler for a [CTTP Request](../protocols/cttp#requests)
-
-```lua
-{% include examples/cNet/host.lua %}
-```
-
-- register(`serverId`: [string](https://www.lua.org/pil/2.4.html), `username`: [string](https://www.lua.org/pil/2.4.html), `password`: [string](https://www.lua.org/pil/2.4.html), `timeout`: [number](https://www.lua.org/pil/2.3.html), `modemQuery`: [string](https://www.lua.org/pil/2.4.html)) : [integer](https://www.lua.org/pil/2.3.html)
-
-```lua
-{% include examples/cNet/login.lua %}
-```
-
-- login(`connection`: [CtcpConnection](#ctcpconnection)/[table](https://www.lua.org/pil/2.5.html), `username`: [string](https://www.lua.org/pil/2.4.html), `password`: [string](https://www.lua.org/pil/2.4.html))
-
-```lua
-{% include examples/cNet/login.lua %}
-```
-
-- logout(`connection`: [CtcpConnection](#ctcpconnection))
-
-```lua
-{% include examples/cNet/login.lua %}
-```
-
-- setLogger(`logger`: [function](https://www.lua.org/pil/2.6.html))
-
-```lua
-{% include examples/cNet/set_logger.lua %}
-```
+* `socket` (Socket) <br>
+* `message` (boolean | number | string | table | nil)
