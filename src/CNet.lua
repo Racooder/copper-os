@@ -12,6 +12,44 @@ local CERT_AUTH_SERVER = "certAuth"
 local messageListeners = {}
 local signedCertificate = false
 local debugMode = false
+local certAuthKey = nil
+
+--* Helper functions
+
+-- TODO: Maybe export
+--- @param o1 any|table First object to compare
+--- @param o2 any|table Second object to compare
+--- @param ignore_mt? boolean True to ignore metatables (a recursive function to tests tables inside tables)
+local function equals(o1, o2, ignore_mt)
+    if o1 == o2 then return true end
+    local o1Type = type(o1)
+    local o2Type = type(o2)
+    if o1Type ~= o2Type then return false end
+    if o1Type ~= 'table' then return false end
+
+    if not ignore_mt then
+        local mt1 = getmetatable(o1)
+        if mt1 and mt1.__eq then
+            -- compare using built in method
+            return o1 == o2
+        end
+    end
+
+    local keySet = {}
+
+    for key1, value1 in pairs(o1) do
+        local value2 = o2[key1]
+        if value2 == nil or equals(value1, value2, ignore_mt) == false then
+            return false
+        end
+        keySet[key1] = true
+    end
+
+    for key2, _ in pairs(o2) do
+        if not keySet[key2] then return false end
+    end
+    return true
+end
 
 --* System Exports
 
@@ -23,6 +61,7 @@ CNet.system = {}
 --- - `server` — The server that sent or received the api call.
 CNet.system.api = {}
 
+-- FIXME: Unsecure
 CNet.system.api["error"] = function (message)
     error(message)
 end
@@ -47,8 +86,10 @@ end
 
 --- Handle a certificate signature response from the CertAuth server.
 --- @param certificate Certificate
-CNet.system.api["certSignature"] = function (certificate)
-    print("signature")
+CNet.system.api["certSignature"] = function (certificate, socket)
+    if not equals(socket.key, certAuthKey, true) then
+        return
+    end
     local file = fs.open(certificate.name .. ".crt", "w")
     file.write(CryptoNet.serializeCertOrKey(certificate))
     file.close()
@@ -59,6 +100,7 @@ end
 --- @param cert Certificate The certificate to request a signature for.
 local function requestCertSignature(cert)
     local socket = CryptoNet.connect(CERT_AUTH_SERVER)
+    certAuthKey = socket.key
     CNet.system.sendApiCall(socket, "signCertificate", cert)
 end
 
@@ -78,26 +120,24 @@ end
 --* Event Handling
 
 local eventHandlers = {
-    ---@param socket Socket
-    ---@param server Server
+    --- @param socket Socket
+    --- @param server Server
     ["connection_opened"] = function (socket, server)
         CNet.eventHandlers.connect(socket, server)
     end,
-    ---@param socket Socket
-    ---@param server Server
+    --- @param socket Socket
+    --- @param server Server
     ["connection_closed"] = function (socket, server)
         CNet.eventHandlers.disconnect(socket, server)
     end,
-    ---@param package table
-    ---@param socket Socket
-    ---@param server? Server
+    --- @param package table
+    --- @param socket Socket
+    --- @param server? Server
     ["encrypted_message"] = function (package, socket, server)
-        print("message")
         local packageType = package[1]
         local message = package[2]
 
         if packageType == "system" then
-            print("System message")
             local apiFunction = message[1]
             if CNet.system.api[apiFunction] then
                 local responseFunction, responseData = CNet.system.api[apiFunction](message[2], socket, server)
@@ -117,27 +157,27 @@ local eventHandlers = {
             end
         end
     end,
-    ---@param message boolean|number|string|table|nil
-    ---@param socket Socket
-    ---@param server? Server
+    --- @param message boolean|number|string|table|nil
+    --- @param socket Socket
+    --- @param server? Server
     ["plain_message"] = function (message, socket, server)
         CNet.eventHandlers.plainMessage(message, socket, server)
     end,
-    ---@param username string
-    ---@param socket Socket
-    ---@param server? Server
+    --- @param username string
+    --- @param socket Socket
+    --- @param server? Server
     ["login"] = function (username, socket, server)
         CNet.eventHandlers.login(username, socket, server)
     end,
-    ---@param username string
-    ---@param socket Socket
-    ---@param server? Server
+    --- @param username string
+    --- @param socket Socket
+    --- @param server? Server
     ["login_failed"] = function (username, socket, server)
         CNet.eventHandlers.loginFailed(username, socket, server)
     end,
-    ---@param username string
-    ---@param socket Socket
-    ---@param server? Server
+    --- @param username string
+    --- @param socket Socket
+    --- @param server? Server
     ["logout"] = function (username, socket, server)
         CNet.eventHandlers.logout(username, socket, server)
     end
@@ -147,7 +187,6 @@ local function onEvent(event)
     if type(event) ~= "table" then
         return
     end
-    print("event")
     if eventHandlers[event[1]] then
         eventHandlers[event[1]](event[2], event[3], event[4])
     end
@@ -239,12 +278,15 @@ end
 --- @param userTablePath? string (default: "<serverName>_users.tbl") Path at which to store the user login details table, if/when users are added to the server.
 --- @return Server # The server object.
 function CNet.host(serverName, discoverable, hideCertificate, modemSide, certificate, privateKey, userTablePath)
+    if serverName == nil or serverName == "" then
+        error("serverName must be a non empty string")
+    end
     local server = CryptoNet.host(serverName, discoverable, hideCertificate, modemSide, certificate, privateKey, userTablePath)
     -- Sign the server's certificate if it is not already signed
     local cert = server.certificate
     if cert.signature == nil then
         requestCertSignature(cert)
-        for i = 1, 50, 1 do
+        for i = 1, 100, 1 do
             if signedCertificate then
                 break
             end
@@ -313,7 +355,6 @@ end
 function CNet.listen(socket, callback, timeout)
     timeout = timeout or 5
     local keyString = keyToString(socket.key)
-    print(keyString)
     if messageListeners[keyString] then
         return false, "Already listening on this socket."
     end
