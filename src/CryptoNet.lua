@@ -4950,7 +4950,7 @@ end
 -- The following code was written by me (SiliconSloth).
 
 
-local cryptoNet = {}
+local CryptoNet = {}
 
 
 -- Channel used to send discovery requests and responses.
@@ -4982,32 +4982,32 @@ end
 --
 
 ---@return boolean
-function cryptoNet.getLoggingEnabled()
+function CryptoNet.getLoggingEnabled()
 	return loggingEnabled
 end
 
 ---@param enabled boolean
-function cryptoNet.setLoggingEnabled(enabled)
+function CryptoNet.setLoggingEnabled(enabled)
 	loggingEnabled = enabled
 end
 
 ---@return boolean
-function cryptoNet.getRepeatMessages()
+function CryptoNet.getRepeatMessages()
 	return repeatMessages
 end
 
 ---@param repMsgs boolean
-function cryptoNet.setRepeatMessages(repMsgs)
+function CryptoNet.setRepeatMessages(repMsgs)
 	repeatMessages = repMsgs
 end
 
 ---@return string
-function cryptoNet.getWorkingDirectory()
+function CryptoNet.getWorkingDirectory()
 	return workingDir
 end
 
 ---@param dir string
-function cryptoNet.setWorkingDirectory(dir)
+function CryptoNet.setWorkingDirectory(dir)
 	if type(dir) ~= "string" then
 		error("Directory must be a string.", 2)
 	end
@@ -5015,12 +5015,12 @@ function cryptoNet.setWorkingDirectory(dir)
 end
 
 --- @return table<Server>
-function cryptoNet.getAllServers()
+function CryptoNet.getAllServers()
 	return allServers
 end
 
 --- @return table<Socket>
-function cryptoNet.getAllClientSockets()
+function CryptoNet.getAllClientSockets()
 	return allClientSockets
 end
 
@@ -5031,7 +5031,7 @@ end
 --- Check that the key is a 16 element table of numbers.
 --- @param key table<number>
 --- @return boolean
-function cryptoNet.keyValid(key)
+function CryptoNet.keyValid(key)
 	if not (type(key) == "table" and #key == 16) then
 		return false
 	end
@@ -5047,14 +5047,14 @@ end
 --- Check that a table has all the parts required to be a valid private key.
 --- @param key? table
 --- @return boolean
-function cryptoNet.privateKeyValid(key)
+function CryptoNet.privateKeyValid(key)
 	return type(key) == "table" and type(key.private) == "string" and type(key.shared) == "string"
 end
 
 --- Check that a table has all the parts required to be a valid public key.
 --- @param key? table
 --- @return boolean
-function cryptoNet.publicKeyValid(key)
+function CryptoNet.publicKeyValid(key)
 	return type(key) == "table" and type(key.public) == "string" and type(key.shared) == "string"
 end
 
@@ -5062,7 +5062,7 @@ end
 --- @param certificate? table
 --- @param ignoreKey? boolean
 --- @return boolean
-function cryptoNet.certificateValid(certificate, ignoreKey)
+function CryptoNet.certificateValid(certificate, ignoreKey)
 	-- All certificates must contain the server name.
 	if type(certificate) ~= "table" or type(certificate.name) ~= "string" then
 		return false
@@ -5073,7 +5073,7 @@ function cryptoNet.certificateValid(certificate, ignoreKey)
 		return false
 	end
 	-- Ensure that the public key is valid, if present.
-	if certificate.key ~= nil and not cryptoNet.publicKeyValid(certificate.key) then
+	if certificate.key ~= nil and not CryptoNet.publicKeyValid(certificate.key) then
 		return false
 	end
 
@@ -5092,11 +5092,11 @@ end
 --- Check that a table has everything it needs to be a valid server.
 --- @param server? table
 --- @return boolean
-function cryptoNet.serverValid(server)
+function CryptoNet.serverValid(server)
 	return type(server) == "table"
 		and type(server.name) == "string"
-		and cryptoNet.certificateValid(server.certificate)
-		and cryptoNet.privateKeyValid(server.privateKey)
+		and CryptoNet.certificateValid(server.certificate)
+		and CryptoNet.privateKeyValid(server.privateKey)
 		and type(server.modemSide) == "string"
 		and type(server.channel) == "number"
 		and type(server.userTable) == "table"
@@ -5107,11 +5107,11 @@ end
 --- Check that a table has everything it needs to be a valid socket.
 --- @param socket? table
 --- @return boolean
-function cryptoNet.socketValid(socket)
+function CryptoNet.socketValid(socket)
 	return type(socket) == "table"
 		and type(socket.sender) == "string"
 		and type(socket.target) == "string"
-		and cryptoNet.keyValid(socket.key)
+		and CryptoNet.keyValid(socket.key)
 		and type(socket.modemSide) == "string"
 		and type(socket.channel) == "number"
 		and type(socket.permissionLevel) == "number"
@@ -5121,7 +5121,7 @@ end
 --- Check that all the entries in a user table are valid.
 --- @param userTable? table
 --- @return boolean
-function cryptoNet.userTableValid(userTable)
+function CryptoNet.userTableValid(userTable)
 	if type(userTable) ~= "table" then
 		return false
 	end
@@ -5140,7 +5140,7 @@ end
 --- Used to process modem side arguments passed to functions.
 --- @param modemSide? string
 --- @return string
-function cryptoNet.resolveModemSide(modemSide)
+function CryptoNet.resolveModemSide(modemSide)
 	-- If no modem side argument is provided, search for a modem and use that side.
 	if modemSide == nil then
 		for _, side in pairs(peripheral.getNames()) do
@@ -5176,7 +5176,7 @@ end
 --- Decides which channel a server should communicate on, based on its name. This function will always return the same channel for a given server name, allowing clients to find out the channel of a server without any prior communications with it.
 --- @param serverName string
 --- @return number
-function cryptoNet.getChannel(serverName)
+function CryptoNet.getChannel(serverName)
 	local nameHash = sha256.digest(serverName)
 	-- Use the first two bytes of the hash as the channel number, so that the full range
 	-- of acceptable channels can be used.
@@ -5197,7 +5197,7 @@ end
 --- @param channel number
 --- @param modemSide string
 --- @return boolean
-function cryptoNet.channelInUse(channel, modemSide)
+function CryptoNet.channelInUse(channel, modemSide)
 	-- Check the client sockets.
 	for _, socket in pairs(allClientSockets) do
 		if socket.channel == channel and socket.modemSide == modemSide then
@@ -5274,7 +5274,7 @@ end
 --- Serialize a certificate or RSA key into a string, for saving to a file. The textutils functions don't seem to like the huge strings of numbers in the keys, so quotation marks must be added to them before serialization, which is what this function does.
 --- @param obj Certificate|Key|nil
 --- @return string
-function cryptoNet.serializeCertOrKey(obj)
+function CryptoNet.serializeCertOrKey(obj)
 	if type(obj) ~= "table" then
 		error("Can only serialize tables.", 2)
 	end
@@ -5319,7 +5319,7 @@ end
 --- Deserialize certificates or RSA keys serialized by serializeCertOrKey(). This involves deserializing as normal and removing the quotation marks added during serialization.
 --- @param str string
 --- @return Certificate|Key|nil
-function cryptoNet.deserializeCertOrKey(str)
+function CryptoNet.deserializeCertOrKey(str)
 	if str == nil then return nil end
 	-- Deserialize as normal.
 	local output = textutils.unserialize(str)
@@ -5360,7 +5360,7 @@ end
 
 --- Generate random 16 byte sequence that can be used as a key or initialization vector for AES encryption.
 --- @return table<number>
-function cryptoNet.generateKey()
+function CryptoNet.generateKey()
 	local iv = {}
 	-- Convert four 4-byte integers into 16 bytes.
 	for j = 1, 4 do
@@ -5376,7 +5376,7 @@ end
 --- Generate an unsigned certificate and corresponding private key for a server with the given name. The certificate is distributed to clients, who can use the public key it contains to encrypt messages using RSA such that only this server can read them, using the private key.
 --- @param name string
 --- @return Certificate, PrivateKey
-function cryptoNet.generateCertificate(name)
+function CryptoNet.generateCertificate(name)
 	log("Generating keys... (may take some time)")
 	local publicKey, privateKey = rsaKeygen.generateKeyPair()
 	print("")
@@ -5388,7 +5388,7 @@ end
 --- Load a certificate authority public key from the specified file and validate it, or just validate the key itself if passed directly as the argument. If key is left nil, a default filename of "certAuth.key" is used.
 --- @param key? string|PublicKey (default: "certAuth.key") The file to load the key from, or the key itself to validate.
 --- @return Certificate|Key|nil
-function cryptoNet.loadCertAuthKey(key)
+function CryptoNet.loadCertAuthKey(key)
 	if key == nil then
 		-- Default value.
 		key = "certAuth.key"
@@ -5408,10 +5408,10 @@ function cryptoNet.loadCertAuthKey(key)
 			return nil
 		else
 			local file = fs.open(keyPath, "r")
-			key = cryptoNet.deserializeCertOrKey(file.readAll())
+			key = CryptoNet.deserializeCertOrKey(file.readAll())
 			file.close()
 
-			if not cryptoNet.publicKeyValid(key) then
+			if not CryptoNet.publicKeyValid(key) then
 				log(keyFilename .. " does not contain a valid cert auth key, will not be able to verify signatures.")
 				return nil
 			else
@@ -5421,7 +5421,7 @@ function cryptoNet.loadCertAuthKey(key)
 		end
 		-- If the argument is not a string it should be the key table itself,
 		-- so just validate it and return unchanged if valid.
-	elseif cryptoNet.publicKeyValid(key) then
+	elseif CryptoNet.publicKeyValid(key) then
 		return key
 	else
 		log("Invalid cert auth key, won't be able to verify signatures.")
@@ -5433,7 +5433,7 @@ end
 --- @param certificate Certificate
 --- @param key PublicKey
 --- @return boolean
-function cryptoNet.verifyCertificate(certificate, key)
+function CryptoNet.verifyCertificate(certificate, key)
 	-- Signatures are made by encrypting the certificate's hash using the cert auth's private key.
 	-- If the signature was generated by the certificate authority that uses the provided public key,
 	-- decrypting the signature with this key should yield the certificate's hash.
@@ -5481,11 +5481,11 @@ local function sendEncryptedInternal(socket, message)
 	if type(message) ~= "string" then
 		error("Message must be a string.", 2)
 	end
-	if not cryptoNet.socketValid(socket) then
+	if not CryptoNet.socketValid(socket) then
 		error("Invalid socket.", 2)
 	end
 	-- Use unique IVs for every message.
-	local iv = cryptoNet.generateKey()
+	local iv = CryptoNet.generateKey()
 	local ok, encrypted = pcall(aes.encrypt_str, message, socket.key, iv)
 	if ok then
 		-- Send the encrypted message and the IVs used to generate it.
@@ -5502,8 +5502,8 @@ end
 --- Send an encrypted message over the given socket. The message can be pretty much any Lua data type.
 --- @param socket Socket
 --- @param message boolean|number|string|table|nil
-function cryptoNet.send(socket, message)
-	if not cryptoNet.socketValid(socket) then
+function CryptoNet.send(socket, message)
+	if not CryptoNet.socketValid(socket) then
 		error("Invalid socket.", 2)
 	end
 	-- Convert the message to a string before sending, so it can be encrypted.
@@ -5514,8 +5514,8 @@ end
 --- Send an unencrypted message over CryptoNet. Useful for streams of high speed, non-sensitive data. Unencrypted messages have no security features applied, so can be easily exploited by attackers. Only use for non-critical messages.
 --- @param socket Socket
 --- @param message boolean|number|string|table|nil
-function cryptoNet.sendUnencrypted(socket, message)
-	if not cryptoNet.socketValid(socket) then
+function CryptoNet.sendUnencrypted(socket, message)
+	if not CryptoNet.socketValid(socket) then
 		error("Invalid socket.", 2)
 	end
 	-- Just send the message as-is.
@@ -5531,7 +5531,7 @@ end
 --- @param password string
 --- @param serverName string
 --- @return string
-function cryptoNet.hashPassword(username, password, serverName)
+function CryptoNet.hashPassword(username, password, serverName)
 	if type(username) ~= "string" then
 		error("Username must be a string.", 2)
 	end
@@ -5548,7 +5548,7 @@ end
 --- Load the user table stored at the given path, defaulting to an empty table if the file does not exist.
 --- @param path string
 --- @return table
-function cryptoNet.loadUserTable(path)
+function CryptoNet.loadUserTable(path)
 	if type(path) ~= "string" then
 		error("Path must be a string.", 2)
 	end
@@ -5564,7 +5564,7 @@ function cryptoNet.loadUserTable(path)
 	local userTable = textutils.unserialize(file.readAll())
 	file.close()
 
-	if not cryptoNet.userTableValid(userTable) then
+	if not CryptoNet.userTableValid(userTable) then
 		error(path .. " does not contain a valid user table, user table could not be loaded.", 2)
 	end
 
@@ -5575,11 +5575,11 @@ end
 --- Save the given user table to the given file.
 --- @param userTable table
 --- @param path string
-function cryptoNet.saveUserTable(userTable, path)
+function CryptoNet.saveUserTable(userTable, path)
 	if type(path) ~= "string" then
 		error("Path must be a string.", 2)
 	end
-	if not cryptoNet.userTableValid(userTable) then
+	if not CryptoNet.userTableValid(userTable) then
 		error("Not a valid user table", 2)
 	end
 
@@ -5598,7 +5598,7 @@ end
 --- @param passHash string
 --- @param permissionLevel? number
 --- @param server? Server
-function cryptoNet.addUserHashed(username, passHash, permissionLevel, server)
+function CryptoNet.addUserHashed(username, passHash, permissionLevel, server)
 	if type(username) ~= "string" then
 		error("Username must be a string.", 2)
 	end
@@ -5620,7 +5620,7 @@ function cryptoNet.addUserHashed(username, passHash, permissionLevel, server)
 		else
 			error("Please specify a server.", 2)
 		end
-	elseif not cryptoNet.serverValid(server) then
+	elseif not CryptoNet.serverValid(server) then
 		error("Invalid server.", 2)
 	end
 
@@ -5635,7 +5635,7 @@ function cryptoNet.addUserHashed(username, passHash, permissionLevel, server)
 	-- to crack.
 	server.userTable[username] = { sha256.pbkdf2(passHash, server.name .. username, 8), permissionLevel }
 	log("Added user " .. username .. ".")
-	cryptoNet.saveUserTable(server.userTable, server.userTablePath)
+	CryptoNet.saveUserTable(server.userTable, server.userTablePath)
 end
 
 --- Add a user to the given (local) server's user table with the provided details. The user table is saved to disk, so is non volatile. The server parameter can be left blank if exactly one server is running.
@@ -5643,7 +5643,7 @@ end
 --- @param password string
 --- @param permissionLevel? number
 --- @param server? Server
-function cryptoNet.addUser(username, password, permissionLevel, server)
+function CryptoNet.addUser(username, password, permissionLevel, server)
 	if type(username) ~= "string" then
 		error("Username must be a string.", 2)
 	end
@@ -5665,7 +5665,7 @@ function cryptoNet.addUser(username, password, permissionLevel, server)
 		else
 			error("Please specify a server.", 2)
 		end
-	elseif not cryptoNet.serverValid(server) then
+	elseif not CryptoNet.serverValid(server) then
 		error("Invalid server.", 2)
 	end
 
@@ -5676,13 +5676,13 @@ function cryptoNet.addUser(username, password, permissionLevel, server)
 	-- When users log into the server remotely their passwords will be hashed
 	-- before being sent, so we must perform the same process here before
 	-- adding it to the table.
-	cryptoNet.addUserHashed(username, cryptoNet.hashPassword(username, password, server.name), permissionLevel, server)
+	CryptoNet.addUserHashed(username, CryptoNet.hashPassword(username, password, server.name), permissionLevel, server)
 end
 
 --- Remove a user from a server. The server parameter can be left blank if exactly one server is running.
 --- @param username string
 --- @param server? Server
-function cryptoNet.deleteUser(username, server)
+function CryptoNet.deleteUser(username, server)
 	if type(username) ~= "string" then
 		error("Username must be a string.", 2)
 	end
@@ -5696,7 +5696,7 @@ function cryptoNet.deleteUser(username, server)
 		else
 			error("Please specify a server.", 2)
 		end
-	elseif not cryptoNet.serverValid(server) then
+	elseif not CryptoNet.serverValid(server) then
 		error("Invalid server.", 2)
 	end
 
@@ -5705,7 +5705,7 @@ function cryptoNet.deleteUser(username, server)
 	else
 		server.userTable[username] = nil
 		log("Deleted user " .. username .. ".")
-		cryptoNet.saveUserTable(server.userTable, server.userTablePath)
+		CryptoNet.saveUserTable(server.userTable, server.userTablePath)
 	end
 end
 
@@ -5713,7 +5713,7 @@ end
 --- @param username string
 --- @param server? Server
 --- @return boolean
-function cryptoNet.userExists(username, server)
+function CryptoNet.userExists(username, server)
 	if type(username) ~= "string" then
 		error("Username must be a string.", 2)
 	end
@@ -5727,7 +5727,7 @@ function cryptoNet.userExists(username, server)
 		else
 			error("Please specify a server.", 2)
 		end
-	elseif not cryptoNet.serverValid(server) then
+	elseif not CryptoNet.serverValid(server) then
 		error("Invalid server.", 2)
 	end
 
@@ -5738,7 +5738,7 @@ end
 --- @param username string
 --- @param server? Server
 --- @return string|nil
-function cryptoNet.getPasswordHash(username, server)
+function CryptoNet.getPasswordHash(username, server)
 	if type(username) ~= "string" then
 		error("Username must be a string.", 2)
 	end
@@ -5752,7 +5752,7 @@ function cryptoNet.getPasswordHash(username, server)
 		else
 			error("Please specify a server.", 2)
 		end
-	elseif not cryptoNet.serverValid(server) then
+	elseif not CryptoNet.serverValid(server) then
 		error("Invalid server.", 2)
 	end
 
@@ -5766,7 +5766,7 @@ end
 --- @param username string
 --- @param server? Server
 --- @return number|nil
-function cryptoNet.getPermissionLevel(username, server)
+function CryptoNet.getPermissionLevel(username, server)
 	if type(username) ~= "string" then
 		error("Username must be a string.", 2)
 	end
@@ -5780,7 +5780,7 @@ function cryptoNet.getPermissionLevel(username, server)
 		else
 			error("Please specify a server.", 2)
 		end
-	elseif not cryptoNet.serverValid(server) then
+	elseif not CryptoNet.serverValid(server) then
 		error("Invalid server.", 2)
 	end
 
@@ -5794,7 +5794,7 @@ end
 --- @param username string
 --- @param passHash string
 --- @param server? Server
-function cryptoNet.setPasswordHashed(username, passHash, server)
+function CryptoNet.setPasswordHashed(username, passHash, server)
 	if type(username) ~= "string" then
 		error("Username must be a string.", 2)
 	end
@@ -5811,7 +5811,7 @@ function cryptoNet.setPasswordHashed(username, passHash, server)
 		else
 			error("Please specify a server.", 2)
 		end
-	elseif not cryptoNet.serverValid(server) then
+	elseif not CryptoNet.serverValid(server) then
 		error("Invalid server.", 2)
 	end
 
@@ -5822,14 +5822,14 @@ function cryptoNet.setPasswordHashed(username, passHash, server)
 	-- Hash the password again before storing.
 	server.userTable[username][1] = sha256.pbkdf2(passHash, server.name .. username, 8)
 	log("Updated password for " .. username .. ".")
-	cryptoNet.saveUserTable(server.userTable, server.userTablePath)
+	CryptoNet.saveUserTable(server.userTable, server.userTablePath)
 end
 
 --- Sets the password of a user in the table. The server parameter can be left blank if exactly one server is running.
 --- @param username string
 --- @param password string
 --- @param server? Server
-function cryptoNet.setPassword(username, password, server)
+function CryptoNet.setPassword(username, password, server)
 	if type(username) ~= "string" then
 		error("Username must be a string.", 2)
 	end
@@ -5846,7 +5846,7 @@ function cryptoNet.setPassword(username, password, server)
 		else
 			error("Please specify a server.", 2)
 		end
-	elseif not cryptoNet.serverValid(server) then
+	elseif not CryptoNet.serverValid(server) then
 		error("Invalid server.", 2)
 	end
 
@@ -5856,14 +5856,14 @@ function cryptoNet.setPassword(username, password, server)
 
 	-- Hash the password before adding, to mimic the hashing performed by clients
 	-- logging in remotely.
-	cryptoNet.setPasswordHashed(username, cryptoNet.hashPassword(username, password, server.name), server)
+	CryptoNet.setPasswordHashed(username, CryptoNet.hashPassword(username, password, server.name), server)
 end
 
 --- Set the permission level of a user in the table. The server parameter can be left blank if exactly one server is running.
 --- @param username string
 --- @param permissionLevel number
 --- @param server? Server
-function cryptoNet.setPermissionLevel(username, permissionLevel, server)
+function CryptoNet.setPermissionLevel(username, permissionLevel, server)
 	if type(username) ~= "string" then
 		error("Username must be a string.", 2)
 	end
@@ -5880,7 +5880,7 @@ function cryptoNet.setPermissionLevel(username, permissionLevel, server)
 		else
 			error("Please specify a server.", 2)
 		end
-	elseif not cryptoNet.serverValid(server) then
+	elseif not CryptoNet.serverValid(server) then
 		error("Invalid server.", 2)
 	end
 
@@ -5890,7 +5890,7 @@ function cryptoNet.setPermissionLevel(username, permissionLevel, server)
 
 	server.userTable[username][2] = permissionLevel
 	log("Updated permission level for " .. username .. ".")
-	cryptoNet.saveUserTable(server.userTable, server.userTablePath)
+	CryptoNet.saveUserTable(server.userTable, server.userTablePath)
 end
 
 --- Check that the given password matches the one in the table. Assumes the password has already been hashed by hashPassword(). The server parameter can be left blank if exactly one server is running.
@@ -5898,7 +5898,7 @@ end
 --- @param passHash string
 --- @param server? Server
 --- @return boolean|nil
-function cryptoNet.checkPasswordHashed(username, passHash, server)
+function CryptoNet.checkPasswordHashed(username, passHash, server)
 	if type(username) ~= "string" then
 		error("Username must be a string.", 2)
 	end
@@ -5915,7 +5915,7 @@ function cryptoNet.checkPasswordHashed(username, passHash, server)
 		else
 			error("Please specify a server.", 2)
 		end
-	elseif not cryptoNet.serverValid(server) then
+	elseif not CryptoNet.serverValid(server) then
 		error("Invalid server.", 2)
 	end
 
@@ -5941,7 +5941,7 @@ end
 --- @param password string
 --- @param server? Server
 --- @return boolean|nil
-function cryptoNet.checkPassword(username, password, server)
+function CryptoNet.checkPassword(username, password, server)
 	if type(username) ~= "string" then
 		error("Username must be a string.", 2)
 	end
@@ -5958,12 +5958,12 @@ function cryptoNet.checkPassword(username, password, server)
 		else
 			error("Please specify a server.", 2)
 		end
-	elseif not cryptoNet.serverValid(server) then
+	elseif not CryptoNet.serverValid(server) then
 		error("Invalid server.", 2)
 	end
 
 	-- Mimic the client-side hashing before checking.
-	return cryptoNet.checkPasswordHashed(username, cryptoNet.hashPassword(username, password, server.name), server)
+	return CryptoNet.checkPasswordHashed(username, CryptoNet.hashPassword(username, password, server.name), server)
 end
 
 --- Log into the server connected to this socket, remote or local, with the specified username and password. Assumes the password has already been hashed by hashPassword(). If executed on a server socket, the event details of the attempt are returned. If successful, the user's details will be stored in the socket. If the socket is already logged in, the username will be overwritten but the permission level will be set to the highest of the old and new one. This allows an admin account to log in then log in as a normal user to temporarily gain elevated privileges as that account.
@@ -5974,8 +5974,8 @@ end
 --- @return string|nil
 --- @return Socket|nil
 --- @return Server|nil
-function cryptoNet.loginHashed(socket, username, passHash)
-	if not cryptoNet.socketValid(socket) then
+function CryptoNet.loginHashed(socket, username, passHash)
+	if not CryptoNet.socketValid(socket) then
 		error("Invalid socket.", 2)
 	end
 	if type(username) ~= "string" then
@@ -5997,13 +5997,13 @@ function cryptoNet.loginHashed(socket, username, passHash)
 			sendEncryptedInternal(socket, "lf" .. username)
 			return "login_failed", username, socket, socket.server
 		else
-			if cryptoNet.checkPasswordHashed(username, passHash, socket.server) then
+			if CryptoNet.checkPasswordHashed(username, passHash, socket.server) then
 				-- If the password was correct, log the user into the socket.
 				socket.username = username
 				-- Set the permission level to the greatest of the socket's original
 				-- permission level and the new one, so admins can temporarily transfer
 				-- their elevated rights to normal accounts.
-				socket.permissionLevel = math.max(socket.permissionLevel, cryptoNet.getPermissionLevel(username, socket.server))
+				socket.permissionLevel = math.max(socket.permissionLevel, CryptoNet.getPermissionLevel(username, socket.server))
 				-- Tell the client-side socket that the attempt was successful, so it can
 				-- change its details as well.
 				sendEncryptedInternal(socket, "ls" .. textutils.serialize({ username, socket.permissionLevel }))
@@ -6026,8 +6026,8 @@ end
 --- @return string|nil
 --- @return Socket|nil
 --- @return Server|nil
-function cryptoNet.login(socket, username, password)
-	if not cryptoNet.socketValid(socket) then
+function CryptoNet.login(socket, username, password)
+	if not CryptoNet.socketValid(socket) then
 		error("Invalid socket.", 2)
 	end
 	if type(username) ~= "string" then
@@ -6040,13 +6040,13 @@ function cryptoNet.login(socket, username, password)
 	-- Get the server name based on whether this is a client or server socket.
 	local serverName = socket.server == nil and socket.target or socket.sender
 	-- Hash the password before sending.
-	return cryptoNet.loginHashed(socket, username, cryptoNet.hashPassword(username, password, serverName))
+	return CryptoNet.loginHashed(socket, username, CryptoNet.hashPassword(username, password, serverName))
 end
 
 --- Log out of the user account currently logged in on this socket. If executed on a server socket, the event details are returned.
 --- @param socket Socket|Server
-function cryptoNet.logout(socket)
-	if not cryptoNet.socketValid(socket) then
+function CryptoNet.logout(socket)
+	if not CryptoNet.socketValid(socket) then
 		error("Invalid socket.", 2)
 	end
 
@@ -6123,7 +6123,7 @@ end
 --- @param privateKey? table|string (default: "<serverName>_private.key") The private key of the server. This can either be the key table itself,  or the name of a file that contains it. If the certicate and key files do not  exist, new ones will be generated and saved to the specified files.
 --- @param userTablePath? string (default: "<serverName>_users.tbl") Path at which to store the user login details table,   if/when users are added to the server.
 --- @return Server # The server table
-function cryptoNet.host(serverName, discoverable, hideCertificate, modemSide, certificate, privateKey, userTablePath)
+function CryptoNet.host(serverName, discoverable, hideCertificate, modemSide, certificate, privateKey, userTablePath)
 	if type(serverName) ~= "string" then
 		error("Server name must be a string.", 2)
 	end
@@ -6134,7 +6134,7 @@ function cryptoNet.host(serverName, discoverable, hideCertificate, modemSide, ce
 		end
 	end
 
-	modemSide = cryptoNet.resolveModemSide(modemSide)
+	modemSide = CryptoNet.resolveModemSide(modemSide)
 	local modem = peripheral.wrap(modemSide)
 
 	-- Generate default file names if none were provided, then get the paths
@@ -6149,10 +6149,10 @@ function cryptoNet.host(serverName, discoverable, hideCertificate, modemSide, ce
 	if type(certificate) == "string" then certificate = nil end
 	if type(privateKey) == "string" then privateKey = nil end
 
-	if certificate ~= nil and not cryptoNet.certificateValid(certificate) then
+	if certificate ~= nil and not CryptoNet.certificateValid(certificate) then
 		error("Invalid certificate.", 2)
 	end
-	if privateKey ~= nil and not cryptoNet.privateKeyValid(privateKey) then
+	if privateKey ~= nil and not CryptoNet.privateKeyValid(privateKey) then
 		error("Invalid private key.", 2)
 	end
 
@@ -6163,10 +6163,10 @@ function cryptoNet.host(serverName, discoverable, hideCertificate, modemSide, ce
 			error(certFilename .. " already exists and is a directory, not a certificate.", 2)
 		elseif fs.exists(certificatePath) then
 			local file = fs.open(certificatePath, "r")
-			certificate = cryptoNet.deserializeCertOrKey(file.readAll())
+			certificate = CryptoNet.deserializeCertOrKey(file.readAll())
 			file.close()
 
-			if not cryptoNet.certificateValid(certificate) then
+			if not CryptoNet.certificateValid(certificate) then
 				error(certFilename .. " already exists and is not a valid certificate.", 2)
 			else
 				log("Loaded certificate from " .. certFilename .. ".")
@@ -6183,10 +6183,10 @@ function cryptoNet.host(serverName, discoverable, hideCertificate, modemSide, ce
 			error(keyFilename .. " already exists and is a directory, not a keyfile.", 2)
 		elseif fs.exists(keyPath) then
 			local file = fs.open(keyPath, "r")
-			privateKey = cryptoNet.deserializeCertOrKey(file.readAll())
+			privateKey = CryptoNet.deserializeCertOrKey(file.readAll())
 			file.close()
 
-			if not cryptoNet.privateKeyValid(privateKey) then
+			if not CryptoNet.privateKeyValid(privateKey) then
 				error(keyFilename .. " already exists and is not a valid keyfile.", 2)
 			else
 				log("Loaded private key from " .. keyFilename .. ".")
@@ -6201,15 +6201,15 @@ function cryptoNet.host(serverName, discoverable, hideCertificate, modemSide, ce
 	-- keys must be generated as a pair.
 	if certificate == nil and privateKey == nil then
 		log("No certificate or private key found, generating new ones.")
-		certificate, privateKey = cryptoNet.generateCertificate(serverName)
+		certificate, privateKey = CryptoNet.generateCertificate(serverName)
 
 		local file = fs.open(certificatePath, "w")
-		file.write(cryptoNet.serializeCertOrKey(certificate))
+		file.write(CryptoNet.serializeCertOrKey(certificate))
 		file.close()
 		log("Saved certificate to " .. certificatePath .. ".")
 
 		file = fs.open(keyPath, "w")
-		file.write(cryptoNet.serializeCertOrKey(privateKey))
+		file.write(CryptoNet.serializeCertOrKey(privateKey))
 		file.close()
 		log("Saved private key to " .. keyPath .. ".  Do not share this with anyone!")
 	elseif certificate ~= nil and privateKey == nil then
@@ -6229,7 +6229,7 @@ function cryptoNet.host(serverName, discoverable, hideCertificate, modemSide, ce
 
 	-- Open the server's channel (derived from the server name) so it can be used
 	-- for communication.
-	local channel = cryptoNet.getChannel(serverName)
+	local channel = CryptoNet.getChannel(serverName)
 	modem.open(channel)
 	log("Hosting on channel " .. channel .. ".")
 
@@ -6254,7 +6254,7 @@ function cryptoNet.host(serverName, discoverable, hideCertificate, modemSide, ce
 	if type(userTablePath) == "string" then
 		-- Append the current working directory to the table path.
 		userTablePath = workingDir == "" and userTablePath or workingDir .. "/" .. userTablePath
-		userTable = cryptoNet.loadUserTable(userTablePath)
+		userTable = CryptoNet.loadUserTable(userTablePath)
 	else
 		error("userTablePath must be a string.", 2)
 	end
@@ -6280,8 +6280,8 @@ end
 
 --- Close a socket or server, such that it will not listen for messages anymore. Closing a server closes all its sockets.
 --- @param socket Socket|Server The socket or server to close.
-function cryptoNet.close(socket)
-	if cryptoNet.socketValid(socket) then
+function CryptoNet.close(socket)
+	if CryptoNet.socketValid(socket) then
 		-- Let the other end of the socket know it has been closed.
 		-- Don't send if this one was closed remotely, since the other end clearly
 		-- already knows.
@@ -6305,12 +6305,12 @@ function cryptoNet.close(socket)
 
 		-- If this was the only socket communicating on its channel, close the channel
 		-- on the modem. Don't close the channel if another socket is still using it.
-		if not cryptoNet.channelInUse(socket.channel, socket.modemSide) then
+		if not CryptoNet.channelInUse(socket.channel, socket.modemSide) then
 			peripheral.wrap(socket.modemSide).close(socket.channel)
 			log("Closed socket channel " .. socket.channel .. " on modem " .. socket.modemSide .. ".")
 		end
 		log("Closed socket.")
-	elseif cryptoNet.serverValid(socket) then
+	elseif CryptoNet.serverValid(socket) then
 		-- If this is a server being closed...
 		local server = socket
 		-- Create a copy of the server's socket list and close them all.
@@ -6322,7 +6322,7 @@ function cryptoNet.close(socket)
 			table.insert(socketsCopy, soc)
 		end
 		for _, soc in pairs(socketsCopy) do
-			cryptoNet.close(soc)
+			CryptoNet.close(soc)
 		end
 
 		-- Remove the closed server from the server list.
@@ -6336,7 +6336,7 @@ function cryptoNet.close(socket)
 
 		-- If this was the only server/socket communicating on its channel, close the channel
 		-- on the modem. Don't close the channel if another socket is still using it.
-		if not cryptoNet.channelInUse(server.channel, server.modemSide) then
+		if not CryptoNet.channelInUse(server.channel, server.modemSide) then
 			peripheral.wrap(server.modemSide).close(server.channel)
 			log("Closed server channel " .. server.channel .. " on modem " .. server.modemSide .. ".")
 		end
@@ -6361,13 +6361,13 @@ function cryptoNet.close(socket)
 end
 
 -- Close all sockets and servers on this machine.
-function cryptoNet.closeAll()
+function CryptoNet.closeAll()
 	-- Iteratve backwards so the list isn't chaning in front of us.
 	for i = #allClientSockets, 1, -1 do
-		cryptoNet.close(allClientSockets[i])
+		CryptoNet.close(allClientSockets[i])
 	end
 	for i = #allServers, 1, -1 do
-		cryptoNet.close(allServers[i])
+		CryptoNet.close(allServers[i])
 	end
 	log("Closed all sockets and servers.")
 end
@@ -6386,7 +6386,7 @@ local function handleDecryptedMessage(socket, message)
 		log("Connection closed by other end.")
 		socket.closedRemotely = true
 		-- Close our end of the socket too.
-		cryptoNet.close(socket)
+		CryptoNet.close(socket)
 		socket.closedRemotely = nil
 		result = { "connection_closed", socket, socket.server }
 	elseif message:sub(1, 2) == "lr" then
@@ -6395,7 +6395,7 @@ local function handleDecryptedMessage(socket, message)
 		-- by the client before sending.
 		local request = textutils.unserialize(message:sub(3))
 		if type(request) == "table" and type(request[1]) == "string" and type(request[2]) == "string" then
-			result = { cryptoNet.loginHashed(socket, request[1], request[2]) }
+			result = { CryptoNet.loginHashed(socket, request[1], request[2]) }
 		else
 			ok = false
 		end
@@ -6434,7 +6434,7 @@ local function handleDecryptedMessage(socket, message)
 		else
 			-- On server side call logout() to also send a message to the client
 			-- to tell it to log out.
-			result = { cryptoNet.logout(socket) }
+			result = { CryptoNet.logout(socket) }
 		end
 	else
 		-- If the message had none of the above internal message types,
@@ -6492,7 +6492,7 @@ local function handleServerMessage(server, message, messageChannel)
 					local response = tostring(sha256.digest(server.name ..
 					server.certificate.key.public .. server.certificate.key.shared .. numKey))
 					-- Encrypt the message.
-					local iv = cryptoNet.generateKey()
+					local iv = CryptoNet.generateKey()
 					response = aes.encrypt_str(response, sessKey, iv)
 					-- From now on the client will be identified by it's encrypted session key.
 					sendInternal(server.modemSide, server.channel, encryptedKey,
@@ -6644,7 +6644,7 @@ end
 -- It is recommended that users use startEventLoop() over a listen() loop,
 -- as it creates a new thread for each event received, allowing for calls to sleep()
 -- and pullEvent() in event handling code without freezing the rest of the server.
-function cryptoNet.listen()
+function CryptoNet.listen()
 	-- Message IDs recently received by this machine that we don't want to
 	-- process repeat copies of.
 	local receivedIDs = {}
@@ -6665,11 +6665,11 @@ end
 --- @param allowUnsigned? boolean (default: false) Whether to include certificates with no valid signature in the results.   If no valid cert auth key is provided this is ignored, as the certificates   cannot be checked without a key.
 --- @param modemSide? string (default: a side with a modem) The modem to use to send and receive messages.
 --- @return table # a table of the certificates received, all of which will include the name of server and possibly also the public key and signature.
-function cryptoNet.discover(timeout, certAuthKey, allowUnsigned, modemSide)
+function CryptoNet.discover(timeout, certAuthKey, allowUnsigned, modemSide)
 	-- Load and validate the key.
-	certAuthKey = cryptoNet.loadCertAuthKey(certAuthKey)
+	certAuthKey = CryptoNet.loadCertAuthKey(certAuthKey)
 
-	modemSide = cryptoNet.resolveModemSide(modemSide)
+	modemSide = CryptoNet.resolveModemSide(modemSide)
 	local modem = peripheral.wrap(modemSide)
 	-- Remember if the modem was already open so we can
 	-- close it afterwards if it wasn't.
@@ -6693,7 +6693,7 @@ function cryptoNet.discover(timeout, certAuthKey, allowUnsigned, modemSide)
 			-- See if this is a CryptoNet-formatted message and exract its contents.
 			local message = extractMessage(event[5], receivedIDs)
 			-- If this is a discovery_response with a correctly formatted certifiate...
-			if message ~= nil and message.msgType == "discovery_response" and cryptoNet.certificateValid(message.message, true) then
+			if message ~= nil and message.msgType == "discovery_response" and CryptoNet.certificateValid(message.message, true) then
 				local certificate = message.message
 				local found = false
 				-- If we have already received an identical certificate don't add this one.
@@ -6735,7 +6735,7 @@ function cryptoNet.discover(timeout, certAuthKey, allowUnsigned, modemSide)
 					table.remove(certificates, i)
 				end
 			else
-				local ok, valid = pcall(cryptoNet.verifyCertificate, certificate, certAuthKey)
+				local ok, valid = pcall(CryptoNet.verifyCertificate, certificate, certAuthKey)
 				if ok and valid then
 					-- Keep the certificate.
 					log(certificate.name .. " has a valid signature.")
@@ -6758,15 +6758,15 @@ end
 --- @param modemSide? string (default: a side with a modem) The modem to use to send and receive messages.
 --- @return Certificate|nil # certificate of the server if exactly one is received, or nil if zero or more than one acceptable certificates are found.
 --- @return table # a table of all acceptable certificates received.
-function cryptoNet.requestCertificate(serverName, timeout, certAuthKey, allowUnsigned, modemSide)
+function CryptoNet.requestCertificate(serverName, timeout, certAuthKey, allowUnsigned, modemSide)
 	if type(serverName) ~= "string" then
 		error("Server name must be a string.", 2)
 	end
-	certAuthKey = cryptoNet.loadCertAuthKey(certAuthKey)
+	certAuthKey = CryptoNet.loadCertAuthKey(certAuthKey)
 
-	modemSide = cryptoNet.resolveModemSide(modemSide)
+	modemSide = CryptoNet.resolveModemSide(modemSide)
 	local modem = peripheral.wrap(modemSide)
-	local channel = cryptoNet.getChannel(serverName)
+	local channel = CryptoNet.getChannel(serverName)
 	-- Remember if the modem was already open so we can
 	-- close it afterwards if it wasn't.
 	local wasOpen = modem.isOpen(channel)
@@ -6790,7 +6790,7 @@ function cryptoNet.requestCertificate(serverName, timeout, certAuthKey, allowUns
 			local message = extractMessage(event[5], receivedIDs)
 			-- If this is a certificate_response with a correctly formatted certifiate,
 			-- for the correct server...
-			if message ~= nil and message.msgType == "certificate_response" and cryptoNet.certificateValid(message.message) and message.message.name == serverName then
+			if message ~= nil and message.msgType == "certificate_response" and CryptoNet.certificateValid(message.message) and message.message.name == serverName then
 				local certificate = message.message
 				local found = false
 				-- If we have already received an identical certificate don't add this one.
@@ -6832,7 +6832,7 @@ function cryptoNet.requestCertificate(serverName, timeout, certAuthKey, allowUns
 					table.remove(certificates, i)
 				end
 			else
-				local ok, valid = pcall(cryptoNet.verifyCertificate, certificate, certAuthKey)
+				local ok, valid = pcall(CryptoNet.verifyCertificate, certificate, certAuthKey)
 				if ok and valid then
 					-- Keep the certificate.
 					log("This certificate has a valid signature.")
@@ -6871,7 +6871,7 @@ end
 --- @param certAuthKey? table|string (default: "certAuth.key") The certificate authority public key used to verify signatures, or the path of the file to load it from. If no valid key is found the connection will still go ahead, but signatures will not be checked.
 --- @param allowUnsigned? boolean (default: false) Whether to accept certificates with no valid signature. If no valid cert auth key is provided this is ignored, as the certificates cannot be checked without a key. This does not apply to the certificate provided by the user (if present), which is never verified (we trust them to get their own certificate right), only to certificates received through a certificate request.
 --- @return Socket # a socket object that can be used to communicate with the server.
-function cryptoNet.connect(serverName, timeout, certTimeout, certificate, modemSide, certAuthKey, allowUnsigned)
+function CryptoNet.connect(serverName, timeout, certTimeout, certificate, modemSide, certAuthKey, allowUnsigned)
 	if serverName ~= nil and type(serverName) ~= "string" then
 		error("Server name must be a string or nil.", 2)
 	end
@@ -6901,17 +6901,17 @@ function cryptoNet.connect(serverName, timeout, certTimeout, certificate, modemS
 			certificate = nil
 		else
 			local file = fs.open(certPath, "r")
-			certificate = cryptoNet.deserializeCertOrKey(file.readAll())
+			certificate = CryptoNet.deserializeCertOrKey(file.readAll())
 			file.close()
 
-			if not cryptoNet.certificateValid(certificate) then
+			if not CryptoNet.certificateValid(certificate) then
 				log(certFilename .. " does not contain a valid certificate, will need to request certificate.")
 				certificate = nil
 			else
 				log("Loaded certificate from " .. certFilename .. ".")
 			end
 		end
-	elseif not cryptoNet.certificateValid(certificate) then
+	elseif not CryptoNet.certificateValid(certificate) then
 		-- If certificate was not a string, it should be a valid certificate.
 		error("Invalid certificate.", 2)
 	end
@@ -6925,9 +6925,9 @@ function cryptoNet.connect(serverName, timeout, certTimeout, certificate, modemS
 		end
 	end
 
-	modemSide = cryptoNet.resolveModemSide(modemSide)
+	modemSide = CryptoNet.resolveModemSide(modemSide)
 	local modem = peripheral.wrap(modemSide)
-	local channel = cryptoNet.getChannel(serverName)
+	local channel = CryptoNet.getChannel(serverName)
 	-- Remember if the modem was already open so we can
 	-- close it afterwards if it wasn't.
 	local wasOpen = modem.isOpen(channel)
@@ -6935,7 +6935,7 @@ function cryptoNet.connect(serverName, timeout, certTimeout, certificate, modemS
 
 	-- If we have no certificate yet, request it from the server.
 	if certificate == nil then
-		certificate = cryptoNet.requestCertificate(serverName, certTimeout, certAuthKey, allowUnsigned, modemSide)
+		certificate = CryptoNet.requestCertificate(serverName, certTimeout, certAuthKey, allowUnsigned, modemSide)
 		if certificate == nil then
 			-- Close the modem channel if it wasn't open before we started.
 			if not wasOpen then
@@ -6951,7 +6951,7 @@ function cryptoNet.connect(serverName, timeout, certTimeout, certificate, modemS
 	-- (contained in its certificate) is used to send the session key;
 	-- the server will use its private key to decrypt the message.
 	log("Generating session key...")
-	local sessKey = cryptoNet.generateKey()
+	local sessKey = CryptoNet.generateKey()
 	local numKey = rsaCrypt.bytesToNumber(sessKey, 16 * 8, 8)
 	local encryptedKey = rsaCrypt.crypt(certificate.key, numKey)
 	-- The server will send a response encrypted with the session key to prove
@@ -7072,7 +7072,7 @@ end
 --- The onStart function is called once after the loop starts, after the threading system has been started. onStart and onEvent are both optional. os.startThread() can be called from within onStart and onEvent (and any functions called by them) to start new threads without blocking the current one.
 --- @param onStart function The function to call once after the loop starts. Optional.
 --- @param onEvent function The function to call on every event. Optional.
-function cryptoNet.startEventLoop(onStart, onEvent)
+function CryptoNet.startEventLoop(onStart, onEvent)
 	if onStart ~= nil and type(onStart) ~= "function" then
 		error("onStart is not a function.", 2)
 	end
@@ -7102,7 +7102,7 @@ end
 --- Generate the public and private keys used by a certificate authority to sign certificates. The keys will be written to the specified files, which both have sensible default names.
 --- @param publicFilename string The name of the file to save the public key to. Defaults to "certAuth.key".
 --- @param privateFilename string The name of the file to save the private key to. Defaults to "certAuth_private.key".
-function cryptoNet.initCertificateAuthority(publicFilename, privateFilename)
+function CryptoNet.initCertificateAuthority(publicFilename, privateFilename)
 	if publicFilename == nil then
 		publicFilename = "certAuth.key"
 	end
@@ -7128,12 +7128,12 @@ function cryptoNet.initCertificateAuthority(publicFilename, privateFilename)
 	log("Done!")
 
 	local file = fs.open(publicPath, "w")
-	file.write(cryptoNet.serializeCertOrKey(publicKey))
+	file.write(CryptoNet.serializeCertOrKey(publicKey))
 	file.close()
 	log("Saved public key to " .. publicPath .. ".  Give this to client users.")
 
 	file = fs.open(privatePath, "w")
-	file.write(cryptoNet.serializeCertOrKey(privateKey))
+	file.write(CryptoNet.serializeCertOrKey(privateKey))
 	file.close()
 	log("Saved private key to " .. privatePath .. ".  Do not share this with anyone!")
 
@@ -7143,7 +7143,7 @@ end
 --- Sign a certificate using the certificate authority's private key. Both arguments can either be the certificate/key itself, or a path to a file that contains it. The signed certificate is returned, and written to the path the certificate was stored in, if it was loaded from file.
 --- @param certificate Certificate|string The certificate to sign, or the path to the file that contains it.
 --- @param privateKey PrivateKey|string The private key to sign the certificate with, or the path to the file that contains it.
-function cryptoNet.signCertificate(certificate, privateKey)
+function CryptoNet.signCertificate(certificate, privateKey)
 	local certPath = nil
 	if type(certificate) == "string" then
 		-- Make paths relative to the current CryptoNet working directory.
@@ -7156,14 +7156,14 @@ function cryptoNet.signCertificate(certificate, privateKey)
 		end
 
 		local file = fs.open(certPath, "r")
-		certificate = cryptoNet.deserializeCertOrKey(file.readAll())
+		certificate = CryptoNet.deserializeCertOrKey(file.readAll())
 		file.close()
 
-		if not cryptoNet.certificateValid(certificate) then
+		if not CryptoNet.certificateValid(certificate) then
 			error(certPath .. " does not contain a valid certificate.", 2)
 		end
 		log("Loaded certificate from " .. certPath .. ".")
-	elseif not cryptoNet.certificateValid(certificate) then
+	elseif not CryptoNet.certificateValid(certificate) then
 		-- If certificate is not a file path it should be a valid certificate.
 		error("Not a valid certificate or file.", 2)
 	end
@@ -7183,14 +7183,14 @@ function cryptoNet.signCertificate(certificate, privateKey)
 		end
 
 		local file = fs.open(keyPath, "r")
-		privateKey = cryptoNet.deserializeCertOrKey(file.readAll())
+		privateKey = CryptoNet.deserializeCertOrKey(file.readAll())
 		file.close()
 
-		if not cryptoNet.privateKeyValid(privateKey) then
+		if not CryptoNet.privateKeyValid(privateKey) then
 			error(keyPath .. " does not contain a valid private key.", 2)
 		end
 		log("Loaded private key from " .. keyPath .. ".")
-	elseif not cryptoNet.privateKeyValid(privateKey) then
+	elseif not CryptoNet.privateKeyValid(privateKey) then
 		-- If privateKey is not a file path it should be a valid private key.
 		error("Not a valid private key or file.", 2)
 	end
@@ -7205,7 +7205,7 @@ function cryptoNet.signCertificate(certificate, privateKey)
 	-- If the certificate was loaded from a file, save it back there.
 	if certPath ~= nil then
 		local file = fs.open(certPath, "w")
-		file.write(cryptoNet.serializeCertOrKey(certificate))
+		file.write(CryptoNet.serializeCertOrKey(certificate))
 		file.close()
 		log("Saved certificate to " .. certPath .. ".")
 	end
@@ -7229,9 +7229,9 @@ end
 
 -- Only run if executed on the command line, not when imported with os.loadAPI().
 if not pcall(debug.getlocal, 4, 1) then
-	cryptoNet.setLoggingEnabled(true)
+	CryptoNet.setLoggingEnabled(true)
 	-- Set the CryptoNet working directory to match the system one.
-	cryptoNet.setWorkingDirectory(shell.dir())
+	CryptoNet.setWorkingDirectory(shell.dir())
 
 	local args = { ... }
 	if args[1] == "signCert" then
@@ -7246,7 +7246,7 @@ if not pcall(debug.getlocal, 4, 1) then
 		certPath = workingDir == "" and certPath or workingDir .. "/" .. certPath
 		-- Optional private key file argument, can be omitted to use default.
 		local keyPath = args[3]
-		local ok, msg = pcall(cryptoNet.signCertificate, certPath, keyPath)
+		local ok, msg = pcall(CryptoNet.signCertificate, certPath, keyPath)
 
 		if not ok then
 			log("Error: " .. msg:sub(8))
@@ -7254,7 +7254,7 @@ if not pcall(debug.getlocal, 4, 1) then
 	elseif args[1] == "initCertAuth" then
 		-- Generate the cert auth key pair and save them to the specified files.
 		-- The file arguments can be omitted to use the default values.
-		local ok, msg = pcall(cryptoNet.initCertificateAuthority, args[2], args[3])
+		local ok, msg = pcall(CryptoNet.initCertificateAuthority, args[2], args[3])
 		if not ok then
 			log("Error: " .. msg:sub(8))
 		end
@@ -7305,4 +7305,4 @@ end
 --- @class PublicKey : Key
 --- @field public public string The public key of the certificate
 
-return cryptoNet
+return CryptoNet
