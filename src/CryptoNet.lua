@@ -7100,8 +7100,8 @@ end
 --
 
 --- Generate the public and private keys used by a certificate authority to sign certificates. The keys will be written to the specified files, which both have sensible default names.
---- @param publicFilename string The name of the file to save the public key to. Defaults to "certAuth.key".
---- @param privateFilename string The name of the file to save the private key to. Defaults to "certAuth_private.key".
+--- @param publicFilename string? The name of the file to save the public key to. Defaults to "certAuth.key".
+--- @param privateFilename string? The name of the file to save the private key to. Defaults to "certAuth_private.key".
 function CryptoNet.initCertificateAuthority(publicFilename, privateFilename)
 	if publicFilename == nil then
 		publicFilename = "certAuth.key"
@@ -7141,8 +7141,8 @@ function CryptoNet.initCertificateAuthority(publicFilename, privateFilename)
 end
 
 --- Sign a certificate using the certificate authority's private key. Both arguments can either be the certificate/key itself, or a path to a file that contains it. The signed certificate is returned, and written to the path the certificate was stored in, if it was loaded from file.
---- @param certificate Certificate|string The certificate to sign, or the path to the file that contains it.
---- @param privateKey PrivateKey|string The private key to sign the certificate with, or the path to the file that contains it.
+--- @param certificate? Certificate|string The certificate to sign, or the path to the file that contains it.
+--- @param privateKey? PrivateKey|string The private key to sign the certificate with, or the path to the file that contains it.
 function CryptoNet.signCertificate(certificate, privateKey)
 	local certPath = nil
 	if type(certificate) == "string" then
