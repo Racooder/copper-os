@@ -1,9 +1,9 @@
-CNet = require "cNet"
+CNet = require "CNet"
 
 --- WARNING: This module is not compatible with the cNet module. Please use the cNet module integrated in this module.
 ---
 --- The cttp module provides a simple way to create a REST API server and send requests to it.
-local cttp = {}
+local Cttp = {}
 
 --* Class Definitions
 
@@ -73,61 +73,61 @@ CNet.eventHandlers.message = function (message, socket, server)
     if type(message) ~= "table" or not isValidRequest(message) then
         return
     end
-    local res = cttp.Response(handleRequest(message))
+    local res = Cttp.Response(handleRequest(message))
     CNet.send(socket, res)
 end
 
 --* Module Exports
 
-cttp.cNet = {
+Cttp.cNet = {
     send = CNet.send,
     sendUnencrypted = CNet.sendUnencrypted,
     listen = CNet.listen
 }
-cttp.auth = CNet.auth
-cttp.close = CNet.close
-cttp.closeAll = CNet.closeAll
-cttp.connect = CNet.connect
+Cttp.auth = CNet.auth
+Cttp.close = CNet.close
+Cttp.closeAll = CNet.closeAll
+Cttp.connect = CNet.connect
 --- WARNING: Don't override the message event. Use the rest API functionality instead.
-cttp.eventHandlers = CNet.eventHandlers
-cttp.host = CNet.host
-cttp.setup = CNet.setup
-cttp.system = CNet.system
+Cttp.eventHandlers = CNet.eventHandlers
+Cttp.host = CNet.host
+Cttp.setup = CNet.setup
+Cttp.system = CNet.system
 
 --- Registers a rest API path.
 --- @param method "GET"|"POST"|"DELETE"
 --- @param path string
 --- @param handler function A function that takes a CttpRequest as input and returns a status code and a response body.
-function cttp.ApiMapping(method, path, handler)
+function Cttp.ApiMapping(method, path, handler)
     restApi[method][path] = handler
 end
 
 --- Registers a GET rest API path.
 --- @param path string
 --- @param handler function A function that takes a CttpRequest as input and returns a status code and a response body.
-function cttp.GetMapping(path, handler)
-    cttp.ApiMapping("GET", path, handler)
+function Cttp.GetMapping(path, handler)
+    Cttp.ApiMapping("GET", path, handler)
 end
 
 --- Registers a POST rest API path.
 --- @param path string
 --- @param handler function A function that takes a CttpRequest as input and returns a status code and a response body.
-function cttp.PostMapping(path, handler)
-    cttp.ApiMapping("POST", path, handler)
+function Cttp.PostMapping(path, handler)
+    Cttp.ApiMapping("POST", path, handler)
 end
 
 --- Registers a DELETE rest API path.
 --- @param path string
 --- @param handler function A function that takes a CttpRequest as input and returns a status code and a response body.
-function cttp.DeleteMapping(path, handler)
-    cttp.ApiMapping("DELETE", path, handler)
+function Cttp.DeleteMapping(path, handler)
+    Cttp.ApiMapping("DELETE", path, handler)
 end
 
 --- Creates a new response object.
 --- @param status number
 --- @param body? boolean|number|string|table
 --- @return CttpResponse
-function cttp.Response(status, body)
+function Cttp.Response(status, body)
     return {
         status = status,
         body = body
@@ -139,7 +139,7 @@ end
 --- @param path string
 --- @param body? boolean|number|string|table
 --- @return CttpRequest
-function cttp.Request(method, path, body)
+function Cttp.Request(method, path, body)
     return {
         method = method,
         path = path,
@@ -151,24 +151,24 @@ end
 ---@param path string
 ---@param body? boolean|number|string|table
 ---@return CttpRequest
-function cttp.GetRequest(path, body)
-    return cttp.Request("GET", path, body)
+function Cttp.GetRequest(path, body)
+    return Cttp.Request("GET", path, body)
 end
 
 --- Creates a new POST request object.
 --- @param path string
 --- @param body? boolean|number|string|table
 --- @return CttpRequest
-function cttp.PostRequest(path, body)
-    return cttp.Request("POST", path, body)
+function Cttp.PostRequest(path, body)
+    return Cttp.Request("POST", path, body)
 end
 
 --- Creates a new DELETE request object.
 --- @param path string
 --- @param body? boolean|number|string|table
 --- @return CttpRequest
-function cttp.DeleteRequest(path, body)
-    return cttp.Request("DELETE", path, body)
+function Cttp.DeleteRequest(path, body)
+    return Cttp.Request("DELETE", path, body)
 end
 
 --- Sends a request to a server. The callback is called when the response is received. If no callback is provided, the function will block until a response is received or the timeout is reached.
@@ -178,7 +178,7 @@ end
 --- @param timeout? number (default = 5)
 --- @return boolean success
 --- @return CttpResponse|nil result
-function cttp.sendRequest(socket, req, callback, timeout)
+function Cttp.sendRequest(socket, req, callback, timeout)
     if not isValidRequest(req) then
         return false
     end
@@ -203,9 +203,9 @@ end
 --- @param allowUnsigned? boolean
 --- @return boolean success
 --- @return CttpResponse|nil result
-function cttp.connectAndRequest(serverName, req, callback, responseTimeout, connectTimeout, certTimeout, certificate, modemSide, certAuthKey, allowUnsigned)
+function Cttp.connectAndRequest(serverName, req, callback, responseTimeout, connectTimeout, certTimeout, certificate, modemSide, certAuthKey, allowUnsigned)
     local socket = CNet.connect(serverName, connectTimeout, certTimeout, certificate, modemSide, certAuthKey, allowUnsigned)
-    return cttp.sendRequest(socket, req, callback, responseTimeout)
+    return Cttp.sendRequest(socket, req, callback, responseTimeout)
 end
 
-return cttp
+return Cttp
