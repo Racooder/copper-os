@@ -1,4 +1,4 @@
----@diagnostic disable: duplicate-set-field, cast-local-type, undefined-global, undefined-field, need-check-nil
+--- @diagnostic disable: duplicate-set-field, cast-local-type, undefined-global, undefined-field, need-check-nil
 -- CryptoNet Networking Framework by SiliconSloth
 -- Licensed under the MIT license.
 --
@@ -1556,7 +1556,7 @@ isaac.extract_mt = function(min, max)  -- Get one number from the Mersenne Twist
 	local y = isaac.MT[isaac.index]
 	min = min or 0
 	max = max or 2 ^ 32 - 1
-	--print("Accessing: isaac.MT["..isaac.index.."]...")
+	-- print("Accessing: isaac.MT["..isaac.index.."]...")
 	y = bit.bxor(y, bit.brshift(y, 11))
 	y = bit.bxor(y, bit.band(bit.blshift(y, 7), 0x9D2C5680))
 	y = bit.bxor(y, bit.band(bit.blshift(y, 15), 0xEFC60000))
@@ -4149,7 +4149,7 @@ aes.finite_field_mul = function(a, b) -- Multiply two numbers in GF(256), assumi
 	local product = 0
 	local mulA, mulB = a, b
 	for i = 1, 8 do
-		--print("FFMul: MulA: "..mulA.." MulB: "..mulB)
+		-- print("FFMul: MulA: "..mulA.." MulB: "..mulB)
 		if mulA == 0 or mulB == 0 then
 			break
 		end
@@ -4168,7 +4168,7 @@ end
 
 aes.mixColumn = function(column)
 	local output = {}
-	--print("MixColumn: #column: "..#column)
+	-- print("MixColumn: #column: "..#column)
 	output[1] = aes.bxor(aes.mul_2[column[1]], aes.bxor(aes.mul_3[column[2]], aes.bxor(column[3], column[4])))
 	output[2] = aes.bxor(column[1], aes.bxor(aes.mul_2[column[2]], aes.bxor(aes.mul_3[column[3]], column[4])))
 	output[3] = aes.bxor(column[1], aes.bxor(column[2], aes.bxor(aes.mul_2[column[3]], aes.mul_3[column[4]])))
@@ -4178,7 +4178,7 @@ end
 
 aes.invMixColumn = function(column)
 	local output = {}
-	--print("InvMixColumn: #column: "..#column)
+	-- print("InvMixColumn: #column: "..#column)
 	output[1] = aes.bxor(aes.mul_14[column[1]],
 		aes.bxor(aes.mul_11[column[2]], aes.bxor(aes.mul_13[column[3]], aes.mul_9[column[4]])))
 	output[2] = aes.bxor(aes.mul_9[column[1]],
@@ -4191,7 +4191,7 @@ aes.invMixColumn = function(column)
 end
 
 aes.mixColumns = function(input, invert)
-	--print("MixColumns: #input: "..#input)
+	-- print("MixColumns: #input: "..#input)
 	-- Ooops. I mixed the ROWS instead of the COLUMNS on accident.
 	local output = {}
 	--[[
@@ -4297,15 +4297,15 @@ aes.key_schedule = function(enc_key)
 	elseif #enc_key >= 16 and #enc_key < 24 then
 		n = 16
 		b = 176
-		--key_type = 1
+		-- key_type = 1
 	elseif #enc_key >= 24 and #enc_key < 32 then
 		n = 24
 		b = 208
-		--key_type = 2
+		-- key_type = 2
 	else
 		n = 32
 		b = 240
-		--key_type = 3
+		-- key_type = 3
 	end
 
 	local exp_key = {}
@@ -4624,7 +4624,7 @@ aes.encrypt_bytestream = function(data, key, init_vector)
 			block[j] = data[((i - 1) * 16) + j] or 0
 			block[j] = aes.bxor(block[j], blocks[i][j]) -- XOR this block with the previous one
 		end
-		--print("#bytes: "..#block)
+		-- print("#bytes: "..#block)
 		block = aes.encrypt_block_customExpKey(block, exp_key)
 		table.insert(blocks, block)
 		for j = 1, 16 do
@@ -4981,32 +4981,32 @@ end
 -- ACCESSORS
 --
 
----@return boolean
+--- @return boolean
 function CryptoNet.getLoggingEnabled()
 	return loggingEnabled
 end
 
----@param enabled boolean
+--- @param enabled boolean
 function CryptoNet.setLoggingEnabled(enabled)
 	loggingEnabled = enabled
 end
 
----@return boolean
+--- @return boolean
 function CryptoNet.getRepeatMessages()
 	return repeatMessages
 end
 
----@param repMsgs boolean
+--- @param repMsgs boolean
 function CryptoNet.setRepeatMessages(repMsgs)
 	repeatMessages = repMsgs
 end
 
----@return string
+--- @return string
 function CryptoNet.getWorkingDirectory()
 	return workingDir
 end
 
----@param dir string
+--- @param dir string
 function CryptoNet.setWorkingDirectory(dir)
 	if type(dir) ~= "string" then
 		error("Directory must be a string.", 2)
@@ -7100,8 +7100,8 @@ end
 --
 
 --- Generate the public and private keys used by a certificate authority to sign certificates. The keys will be written to the specified files, which both have sensible default names.
---- @param publicFilename string? The name of the file to save the public key to. Defaults to "certAuth.key".
---- @param privateFilename string? The name of the file to save the private key to. Defaults to "certAuth_private.key".
+--- @param publicFilename string The name of the file to save the public key to. Defaults to "certAuth.key".
+--- @param privateFilename string The name of the file to save the private key to. Defaults to "certAuth_private.key".
 function CryptoNet.initCertificateAuthority(publicFilename, privateFilename)
 	if publicFilename == nil then
 		publicFilename = "certAuth.key"
@@ -7141,8 +7141,8 @@ function CryptoNet.initCertificateAuthority(publicFilename, privateFilename)
 end
 
 --- Sign a certificate using the certificate authority's private key. Both arguments can either be the certificate/key itself, or a path to a file that contains it. The signed certificate is returned, and written to the path the certificate was stored in, if it was loaded from file.
---- @param certificate? Certificate|string The certificate to sign, or the path to the file that contains it.
---- @param privateKey? PrivateKey|string The private key to sign the certificate with, or the path to the file that contains it.
+--- @param certificate Certificate|string The certificate to sign, or the path to the file that contains it.
+--- @param privateKey PrivateKey|string The private key to sign the certificate with, or the path to the file that contains it.
 function CryptoNet.signCertificate(certificate, privateKey)
 	local certPath = nil
 	if type(certificate) == "string" then
