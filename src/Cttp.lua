@@ -173,12 +173,12 @@ function Cttp.DeleteRequest(path, body)
 end
 
 --- Sends a request to a server. The callback is called when the response is received. If no callback is provided, the function will block until a response is received or the timeout is reached.
---- @param req CttpRequest
---- @param socket Socket
+--- @param socket Socket The socket to send the request on.
+--- @param req CttpRequest The request to send.
 --- @param callback? function A function that takes a CttpResponse as input.
 --- @param timeout? number (default = 5)
---- @return boolean success
---- @return CttpResponse|nil result
+--- @return boolean success If a callback is provided, `false`. Otherwise, `true` if a message was received or `false` if the timeout was reached.
+--- @return CttpResponse|nil result The response if it was received or the reason for failure.
 function Cttp.sendRequest(socket, req, callback, timeout)
     if not isValidRequest(req) then
         return false
@@ -192,21 +192,15 @@ function Cttp.sendRequest(socket, req, callback, timeout)
 end
 
 --- Connects to a server and sends a request. The callback is called when the response is received. If no callback is provided, the function will block until a response is received or the timeout is reached.
---- @param serverName? string
---- @param req CttpRequest
---- @param callback function
---- @param responseTimeout? number (default = 5)
---- @param connectTimeout? number (default = 5)
---- @param certTimeout? number (default = 5)
---- @param certificate? string|Certificate
---- @param modemSide? string
---- @param certAuthKey? string|PublicKey
---- @param allowUnsigned? boolean
---- @return boolean success
---- @return CttpResponse|nil result
-function Cttp.connectAndRequest(serverName, req, callback, responseTimeout, connectTimeout, certTimeout, certificate, modemSide, certAuthKey, allowUnsigned)
-    local socket = CNet.connect(serverName, connectTimeout, certTimeout, certificate, modemSide, certAuthKey, allowUnsigned)
-    return Cttp.sendRequest(socket, req, callback, responseTimeout)
+--- @param serverName string The name of the server to connect to.
+--- @param req CttpRequest The request to send.
+--- @param callback function The function to call when a response is received.
+--- @param timeout? number (default: 5) The number of seconds to wait for a response to be received. If no response is received in this time, the function will return nil.
+--- @return boolean success If a callback is provided, `false`. Otherwise, `true` if a message was received or `false` if the timeout was reached.
+--- @return CttpResponse|nil result The response if it was received or the reason for failure.
+function Cttp.connectAndRequest(serverName, req, callback, timeout)
+    local socket = CNet.connect(serverName)
+    return Cttp.sendRequest(socket, req, callback, timeout)
 end
 
 return Cttp
