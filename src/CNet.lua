@@ -1,7 +1,7 @@
-CryptoNet = require "cryptoNet"
+CryptoNet = require "CryptoNet"
 
 --- The cNet module provides a simple way to create a secure network connection between two computers.
-local cNet = {}
+local CNet = {}
 
 --* Constants
 
@@ -14,15 +14,15 @@ local signedCertificate = false
 
 --* System Exports
 
-cNet.system = {}
+CNet.system = {}
 
 --- Api functions get the parameters:
 --- - `data` — The data sent with the api call.
 --- - `socket` — The socket that sent or received the api call.
 --- - `server` — The server that sent or received the api call.
-cNet.system.api = {}
+CNet.system.api = {}
 
-cNet.system.api["error"] = function (message)
+CNet.system.api["error"] = function (message)
     error(message)
 end
 
@@ -30,7 +30,7 @@ end
 --- @param socket Socket
 --- @param message boolean|number|string|table|nil
 --- @param type string
-function cNet.system.sendPackage(socket, message, type)
+function CNet.system.sendPackage(socket, message, type)
     CryptoNet.send(socket, {type, message})
 end
 
@@ -38,15 +38,15 @@ end
 --- @param socket Socket
 --- @param apiFunction string
 --- @param data boolean|number|string|table|nil
-function cNet.system.sendApiCall(socket, apiFunction, data)
-    cNet.system.sendPackage(socket, {apiFunction, data}, "system")
+function CNet.system.sendApiCall(socket, apiFunction, data)
+    CNet.system.sendPackage(socket, {apiFunction, data}, "system")
 end
 
 --* Certificate Signature
 
 --- Handle a certificate signature response from the CertAuth server.
 --- @param certificate Certificate
-cNet.system.api["certSignature"] = function (certificate)
+CNet.system.api["certSignature"] = function (certificate)
     local file = fs.open(certificate.name .. ".crt", "w")
     file.write(CryptoNet.serializeCertOrKey(certificate))
     file.close()
@@ -57,7 +57,7 @@ end
 --- @param cert Certificate The certificate to request a signature for.
 local function requestCertSignature(cert)
     local socket = CryptoNet.connect(CERT_AUTH_SERVER)
-    cNet.system.sendApiCall(socket, "signCertificate", cert)
+    CNet.system.sendApiCall(socket, "signCertificate", cert)
 end
 
 --* Helper Functions
@@ -79,12 +79,12 @@ local eventHandlers = {
     ---@param socket Socket
     ---@param server Server
     ["connection_opened"] = function (socket, server)
-        cNet.eventHandlers.connect(socket, server)
+        CNet.eventHandlers.connect(socket, server)
     end,
     ---@param socket Socket
     ---@param server Server
     ["connection_closed"] = function (socket, server)
-        cNet.eventHandlers.disconnect(socket, server)
+        CNet.eventHandlers.disconnect(socket, server)
     end,
     ---@param package table
     ---@param socket Socket
@@ -95,13 +95,13 @@ local eventHandlers = {
 
         if packageType == "system" then
             local apiFunction = message[1]
-            if cNet.system.api[apiFunction] then
-                local responseFunction, responseData = cNet.system.api[apiFunction](message[2], socket, server)
+            if CNet.system.api[apiFunction] then
+                local responseFunction, responseData = CNet.system.api[apiFunction](message[2], socket, server)
                 if type(responseFunction) == "string" then
-                    cNet.system.sendApiCall(socket, responseFunction, responseData)
+                    CNet.system.sendApiCall(socket, responseFunction, responseData)
                 end
             else
-                cNet.system.sendApiCall(socket, "error", "Invalid API function: " .. apiFunction)
+                CNet.system.sendApiCall(socket, "error", "Invalid API function: " .. apiFunction)
             end
         elseif packageType == "normal" then
             local keyString = keyToString(socket.key)
@@ -109,7 +109,7 @@ local eventHandlers = {
                 messageListeners[keyString](message, socket, server)
                 messageListeners[keyString] = nil
             else
-                cNet.eventHandlers.message(message, socket, server)
+                CNet.eventHandlers.message(message, socket, server)
             end
         end
     end,
@@ -117,25 +117,25 @@ local eventHandlers = {
     ---@param socket Socket
     ---@param server? Server
     ["plain_message"] = function (message, socket, server)
-        cNet.eventHandlers.plainMessage(message, socket, server)
+        CNet.eventHandlers.plainMessage(message, socket, server)
     end,
     ---@param username string
     ---@param socket Socket
     ---@param server? Server
     ["login"] = function (username, socket, server)
-        cNet.eventHandlers.login(username, socket, server)
+        CNet.eventHandlers.login(username, socket, server)
     end,
     ---@param username string
     ---@param socket Socket
     ---@param server? Server
     ["login_failed"] = function (username, socket, server)
-        cNet.eventHandlers.loginFailed(username, socket, server)
+        CNet.eventHandlers.loginFailed(username, socket, server)
     end,
     ---@param username string
     ---@param socket Socket
     ---@param server? Server
     ["logout"] = function (username, socket, server)
-        cNet.eventHandlers.logout(username, socket, server)
+        CNet.eventHandlers.logout(username, socket, server)
     end
 }
 
@@ -150,7 +150,7 @@ end
 
 --* Module Exports
 
-cNet.eventHandlers = {
+CNet.eventHandlers = {
     --- Invoked on a server when a client successfully opens a connection.
     --- @param socket Socket
     --- @param server Server
@@ -186,7 +186,7 @@ cNet.eventHandlers = {
     logout = function (username, socket, server) end,
 }
 
-cNet.auth = {
+CNet.auth = {
     addUser = CryptoNet.addUser,
     addUserHashed = CryptoNet.addUserHashed,
     checkPassword = CryptoNet.checkPassword,
@@ -207,12 +207,12 @@ cNet.auth = {
     userTableValid = CryptoNet.userTableValid,
 }
 
-cNet.close = CryptoNet.close
-cNet.closeAll = CryptoNet.closeAll
+CNet.close = CryptoNet.close
+CNet.closeAll = CryptoNet.closeAll
 
 --- Setup the cNet module.
 --- @param onStart function The function to call when the event loop starts.
-function cNet.setup(onStart)
+function CNet.setup(onStart)
     CryptoNet.startEventLoop(onStart, onEvent)
 end
 
@@ -225,7 +225,7 @@ end
 --- @param privateKey? PrivateKey|string (default: "<serverName>_private.key") The private key of the server. This can either be the key table itself, or the name of a file that contains it. If the certicate and key files do not exist, new ones will be generated and saved to the specified files.
 --- @param userTablePath? string (default: "<serverName>_users.tbl") Path at which to store the user login details table, if/when users are added to the server.
 --- @return Server # The server object.
-function cNet.host(serverName, discoverable, hideCertificate, modemSide, certificate, privateKey, userTablePath)
+function CNet.host(serverName, discoverable, hideCertificate, modemSide, certificate, privateKey, userTablePath)
     local server = CryptoNet.host(serverName, discoverable, hideCertificate, modemSide, certificate, privateKey, userTablePath)
     -- Sign the server's certificate if it is not already signed
     local cert = server.certificate
@@ -255,15 +255,15 @@ end
 --- @param certAuthKey? PublicKey|string (default: "certAuth.key") The certificate authority public key used to verify signatures, or the path of the file to load it from. If no valid key is found the connection will still go ahead, but signatures will not be checked.
 --- @param allowUnsigned? boolean (default: false) Whether to accept certificates with no valid signature. If no valid cert auth key is provided this is ignored, as the certificates cannot be checked without a key. This does not apply to the certificate provided by the user (if present), which is never verified (we trust them to get their own certificate right), only to certificates received through a certificate request.
 --- @return Socket
-function cNet.connect(serverName, timeout, certTimeout, certificate, modemSide, certAuthKey, allowUnsigned)
+function CNet.connect(serverName, timeout, certTimeout, certificate, modemSide, certAuthKey, allowUnsigned)
     return CryptoNet.connect(serverName, timeout, certTimeout, certificate, modemSide, certAuthKey, allowUnsigned)
 end
 
 -- Send an encrypted message over the given socket. The message can be pretty much any Lua data type.
 --- @param socket Socket
 --- @param message boolean|number|string|table|nil
-function cNet.send(socket, message)
-    cNet.system.sendPackage(socket, message, "normal")
+function CNet.send(socket, message)
+    CNet.system.sendPackage(socket, message, "normal")
 end
 
 --- Send an unencrypted message over cNet. Useful for streams of high speed, non-sensitive data. Unencrypted messages have no security features applied, so can be easily exploited by attackers. Only use for non-critical messages.
@@ -271,7 +271,7 @@ end
 --- Unencrypted messages can't be received using `listen()`. Use the `plainMessage` event handler instead.
 --- @param socket Socket
 --- @param message boolean|number|string|table|nil
-function cNet.sendUnencrypted(socket, message)
+function CNet.sendUnencrypted(socket, message)
     CryptoNet.sendUnencrypted(socket, message)
 end
 
@@ -284,10 +284,10 @@ end
 --- @param modemSide? string (default: a side with a modem) The modem to use to send and receive messages.
 --- @param certAuthKey? PublicKey|string (default: "certAuth.key") The certificate authority public key used to verify signatures, or the path of the file to load it from. If no valid key is found the connection will still go ahead, but signatures will not be checked.
 --- @param allowUnsigned? boolean (default: false) Whether to accept certificates with no valid signature. If no valid cert auth key is provided this is ignored, as the certificates cannot be checked without a key. This does not apply to the certificate provided by the user (if present), which is never verified (we trust them to get their own certificate right), only to certificates received through a certificate request.
---- @return Socket
-function cNet.connectAndSend(serverName, message, timeout, certTimeout, certificate, modemSide, certAuthKey, allowUnsigned)
-    local socket = cNet.connect(serverName, timeout, certTimeout, certificate, modemSide, certAuthKey, allowUnsigned)
-    cNet.send(socket, message)
+--- @return Socket socket The connection socket
+function CNet.connectAndSend(serverName, message, timeout, certTimeout, certificate, modemSide, certAuthKey, allowUnsigned)
+    local socket = CNet.connect(serverName, timeout, certTimeout, certificate, modemSide, certAuthKey, allowUnsigned)
+    CNet.send(socket, message)
     return socket
 end
 
@@ -297,9 +297,10 @@ end
 --- @param timeout? number (default: 5) The number of seconds to wait for a message to be received. If no message is received in this time, the function will return nil.
 --- @return boolean success If a callback is provided, `false`. Otherwise, `true` if a message was received or `false` if the timeout was reached.
 --- @return boolean|number|string|table|nil message The message if it was received or the reason for failure.
-function cNet.listen(socket, callback, timeout)
+function CNet.listen(socket, callback, timeout)
     timeout = timeout or 5
     local keyString = keyToString(socket.key)
+    print(keyString)
     if messageListeners[keyString] then
         return false, "Already listening on this socket."
     end
@@ -325,4 +326,4 @@ function cNet.listen(socket, callback, timeout)
     return success, result
 end
 
-return cNet
+return CNet
