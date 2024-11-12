@@ -12,7 +12,7 @@ local CERT_AUTH_SERVER = "certAuth"
 local messageListeners = {}
 local signedCertificate = false
 local debugMode = false
-local certAuthKey = nil
+local signatureSocketKey = nil
 
 --* Helper functions
 
@@ -87,7 +87,7 @@ end
 --- Handle a certificate signature response from the CertAuth server.
 --- @param certificate Certificate
 CNet.system.api["certSignature"] = function (certificate, socket)
-    if not equals(socket.key, certAuthKey, true) then
+    if not equals(socket.key, signatureSocketKey, true) then
         return
     end
     local file = fs.open(certificate.name .. ".crt", "w")
@@ -100,7 +100,7 @@ end
 --- @param cert Certificate The certificate to request a signature for.
 local function requestCertSignature(cert)
     local socket = CryptoNet.connect(CERT_AUTH_SERVER)
-    certAuthKey = socket.key
+    signatureSocketKey = socket.key
     CNet.system.sendApiCall(socket, "signCertificate", cert)
 end
 
@@ -281,6 +281,9 @@ function CNet.host(serverName, discoverable, hideCertificate, modemSide, certifi
     if serverName == nil or serverName == "" then
         error("serverName must be a non empty string")
     end
+    if serverName:gmatch("[^%w%-%_%.]")() then
+        error("serverName must only contain alphanumeric characters, hyphens, underscores, and periods")
+    end
     local server = CryptoNet.host(serverName, discoverable, hideCertificate, modemSide, certificate, privateKey, userTablePath)
     -- Sign the server's certificate if it is not already signed
     local cert = server.certificate
@@ -331,17 +334,11 @@ function CNet.sendUnencrypted(socket, message)
 end
 
 --- Connect to a server and send a message in one function call. Returns the socket object for the connection.
---- @param serverName? string (default: inferred from certificate) The name of the server to connect to.
+--- @param serverName string The name of the server to connect to.
 --- @param message boolean|number|string|table|nil The message to send.
---- @param timeout? number (default: 5) The number of seconds to wait for a response to the connection request. Will terminate early if a response is received.
---- @param certTimeout? number (default: 1) The number of seconds to wait for certificate responses, if no certificate was provided.
---- @param certificate? Certificate|string (default: "<serverName>.crt") The certificate of the server. Can either be the certificate of the server itself, or the name of a file that contains it. If no valid certificate is found a certificate request will be sent to the server.
---- @param modemSide? string (default: a side with a modem) The modem to use to send and receive messages.
---- @param certAuthKey? PublicKey|string (default: "certAuth.key") The certificate authority public key used to verify signatures, or the path of the file to load it from. If no valid key is found the connection will still go ahead, but signatures will not be checked.
---- @param allowUnsigned? boolean (default: false) Whether to accept certificates with no valid signature. If no valid cert auth key is provided this is ignored, as the certificates cannot be checked without a key. This does not apply to the certificate provided by the user (if present), which is never verified (we trust them to get their own certificate right), only to certificates received through a certificate request.
 --- @return Socket socket The connection socket
-function CNet.connectAndSend(serverName, message, timeout, certTimeout, certificate, modemSide, certAuthKey, allowUnsigned)
-    local socket = CNet.connect(serverName, timeout, certTimeout, certificate, modemSide, certAuthKey, allowUnsigned)
+function CNet.connectAndSend(serverName, message)
+    local socket = CNet.connect(serverName)
     CNet.send(socket, message)
     return socket
 end
@@ -378,6 +375,19 @@ function CNet.listen(socket, callback, timeout)
         os.sleep(0.1)
     end
     return success, result
+end
+
+--- Connect to a server, send a message and listen for a response in one function call. Returns the response message.
+--- @param serverName string The name of the server to connect to.
+--- @param message boolean|number|string|table|nil The message to send.
+--- @param callback function The function to call when a response is received.
+--- @param timeout number (default: 5) The number of seconds to wait for a response to be received. If no response is received in this time, the function will return nil.
+--- @return boolean success If a callback is provided, `false`. Otherwise, `true` if a message was received or `false` if the timeout was reached.
+--- @return boolean|number|string|table|nil message The message if it was received or the reason for failure.
+function CNet.connectSendAndListen(serverName, message, callback, timeout)
+    local socket = CNet.connect(serverName)
+    CNet.send(socket, message)
+    return CNet.listen(socket, callback, timeout)
 end
 
 return CNet
