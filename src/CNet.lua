@@ -30,7 +30,7 @@ end
 --- @param socket Socket
 --- @param message boolean|number|string|table|nil
 --- @param type string
-function CNet.system.sendPackage(socket, message, type)
+function CNet.system.sendPackage(socket, type, message)
     CryptoNet.send(socket, {type, message})
 end
 
@@ -39,7 +39,7 @@ end
 --- @param apiFunction string
 --- @param data boolean|number|string|table|nil
 function CNet.system.sendApiCall(socket, apiFunction, data)
-    CNet.system.sendPackage(socket, {apiFunction, data}, "system")
+    CNet.system.sendPackage(socket, "system", {apiFunction, data})
 end
 
 --* Certificate Signature
@@ -263,7 +263,7 @@ end
 --- @param socket Socket
 --- @param message boolean|number|string|table|nil
 function CNet.send(socket, message)
-    CNet.system.sendPackage(socket, message, "normal")
+    CNet.system.sendPackage(socket, "normal", message)
 end
 
 --- Send an unencrypted message over cNet. Useful for streams of high speed, non-sensitive data. Unencrypted messages have no security features applied, so can be easily exploited by attackers. Only use for non-critical messages.
