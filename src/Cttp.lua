@@ -79,7 +79,8 @@ end
 
 --* Module Exports
 
-Cttp.cNet = {
+Cttp.setDebugMode = CNet.setDebugMode
+Cttp.CNet = {
     send = CNet.send,
     sendUnencrypted = CNet.sendUnencrypted,
     listen = CNet.listen
@@ -148,9 +149,9 @@ function Cttp.Request(method, path, body)
 end
 
 --- Creates a new GET request object.
----@param path string
----@param body? boolean|number|string|table
----@return CttpRequest
+--- @param path string
+--- @param body? boolean|number|string|table
+--- @return CttpRequest
 function Cttp.GetRequest(path, body)
     return Cttp.Request("GET", path, body)
 end
