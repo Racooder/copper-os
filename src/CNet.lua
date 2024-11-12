@@ -11,6 +11,7 @@ local CERT_AUTH_SERVER = "certAuth"
 
 local messageListeners = {}
 local signedCertificate = false
+local debugMode = false
 
 --* System Exports
 
@@ -47,6 +48,7 @@ end
 --- Handle a certificate signature response from the CertAuth server.
 --- @param certificate Certificate
 CNet.system.api["certSignature"] = function (certificate)
+    print("signature")
     local file = fs.open(certificate.name .. ".crt", "w")
     file.write(CryptoNet.serializeCertOrKey(certificate))
     file.close()
@@ -90,10 +92,12 @@ local eventHandlers = {
     ---@param socket Socket
     ---@param server? Server
     ["encrypted_message"] = function (package, socket, server)
+        print("message")
         local packageType = package[1]
         local message = package[2]
 
         if packageType == "system" then
+            print("System message")
             local apiFunction = message[1]
             if CNet.system.api[apiFunction] then
                 local responseFunction, responseData = CNet.system.api[apiFunction](message[2], socket, server)
@@ -143,6 +147,7 @@ local function onEvent(event)
     if type(event) ~= "table" then
         return
     end
+    print("event")
     if eventHandlers[event[1]] then
         eventHandlers[event[1]](event[2], event[3], event[4])
     end
@@ -210,9 +215,15 @@ CNet.auth = {
 CNet.close = CryptoNet.close
 CNet.closeAll = CryptoNet.closeAll
 
+function CNet.setDebugMode(enabled)
+    debugMode = enabled
+    CryptoNet.setLoggingEnabled(enabled)
+end
+
 --- Setup the cNet module.
 --- @param onStart function The function to call when the event loop starts.
 function CNet.setup(onStart)
+    CryptoNet.setLoggingEnabled(debugMode)
     CryptoNet.startEventLoop(onStart, onEvent)
 end
 
