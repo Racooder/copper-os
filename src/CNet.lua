@@ -215,6 +215,8 @@ CNet.auth = {
 CNet.close = CryptoNet.close
 CNet.closeAll = CryptoNet.closeAll
 
+--- Enable or disable debug logs
+--- @param enabled boolean The new state of debug mode
 function CNet.setDebugMode(enabled)
     debugMode = enabled
     CryptoNet.setLoggingEnabled(enabled)
