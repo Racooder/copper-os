@@ -4,16 +4,16 @@ layout: default
 
 # Folder Layout
 
-## Root
+## OS
 
 ```
-root
-├── system
-├── packages
+os
+├── sys
+├── pkg
 │   └──...
-├── libs
+├── lib
 │   └──...
-└── user
+└── usr
     └──...
 ```
 
