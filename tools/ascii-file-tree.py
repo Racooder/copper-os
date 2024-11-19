@@ -60,3 +60,4 @@ if __name__ == "__main__":
     tree = read_folder(None, folder_name)
     print("\nFinal folder structure:")
     print(tree_string(tree, folder_name))
+    input("Press enter to close the programm.")

@@ -4,7 +4,6 @@ description: A operating system for computercraft and what goes with it.
 baseurl: "/copper-os/"
 url: "https://racooder.github.io"
 github_username: Racooder
-
 markdown: kramdown
 theme: jekyll-theme-hacker
 plugins:

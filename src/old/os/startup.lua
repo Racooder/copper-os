@@ -1,0 +1,1 @@
+dofile("/system/os.lua")

@@ -1,1 +1,0 @@
--- Custom Message Handler Example

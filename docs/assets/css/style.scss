@@ -3,6 +3,10 @@
 
 @import 'jekyll-theme-hacker';
 
+body {
+    min-height: 100vh;
+}
+
 #main_content {
 	h2 {
 		margin-top: 48px;
@@ -31,6 +35,10 @@
 		margin-top: 0px !important;
 	}
 
+	h3 + ul {
+		margin-top: 0px !important;
+	}
+
 	th {
 		border-bottom: 1px dotted #fff;
 	}
@@ -47,5 +55,12 @@
 
 	li a {
 		text-decoration: none;
+	}
+
+	summary {
+		cursor: pointer;
+		-webkit-user-select: none; /* Safari */
+		-ms-user-select: none; /* IE 10 and IE 11 */
+		user-select: none; /* Standard syntax */
 	}
 }
