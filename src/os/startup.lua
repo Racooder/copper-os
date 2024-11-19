@@ -1,1 +1,1 @@
-package.path = "?;?.lua;?/init.lua;os/lib/?;os/lib/?.lua;os/lib/?/init.lua"
+package.path = "?;?.lua;?/init.lua;os/pkg/?;os/pkg/?.lua;os/pkg/?/init.lua"

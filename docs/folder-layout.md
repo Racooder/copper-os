@@ -4,26 +4,18 @@ layout: default
 
 # Folder Layout
 
-## OS
-
 ```
 os
 ├── sys
+│   └── packages.tbl
 ├── pkg
-│   └──...
-├── lib
-│   └──...
+│   └── package id
+│       ├── meta.tbl
+│       ├── init.lua
+│       └── ...
 └── usr
-    └──...
-```
-
-## Package Layout
-
-```
-package id
-├── app.meta
-├── main.lua
-├── appdata
-│   └──...
-└── ...
+    ├── appdata
+    │   └── package id
+    │       └── ...
+    └── ...
 ```
