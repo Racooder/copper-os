@@ -1,6 +1,6 @@
 local CryptoNet = require "CryptoNet"
 
---- The cNet module provides a simple way to create a secure network connection between two computers.
+---The cNet module provides a simple way to create a secure network connection between two computers.
 local CNet = {}
 
 --* Constants
@@ -17,9 +17,9 @@ local signatureSocketKey = nil
 --* Helper functions
 
 -- TODO: Maybe export
---- @param o1 any|table First object to compare
---- @param o2 any|table Second object to compare
---- @param ignore_mt? boolean True to ignore metatables (a recursive function to tests tables inside tables)
+---@param o1 any|table First object to compare
+---@param o2 any|table Second object to compare
+---@param ignore_mt? boolean True to ignore metatables (a recursive function to tests tables inside tables)
 local function equals(o1, o2, ignore_mt)
     if o1 == o2 then return true end
     local o1Type = type(o1)
@@ -55,10 +55,10 @@ end
 
 CNet.system = {}
 
---- Api functions get the parameters:
---- - `data` — The data sent with the api call.
---- - `socket` — The socket that sent or received the api call.
---- - `server` — The server that sent or received the api call.
+---Api functions get the parameters:
+---- `data` — The data sent with the api call.
+---- `socket` — The socket that sent or received the api call.
+---- `server` — The server that sent or received the api call.
 CNet.system.api = {}
 
 -- FIXME: Unsecure
@@ -66,26 +66,26 @@ CNet.system.api["error"] = function (message)
     error(message)
 end
 
---- Send a package over the given socket.
---- @param socket Socket
---- @param message boolean|number|string|table|nil
---- @param type string
+---Send a package over the given socket.
+---@param socket Socket
+---@param message boolean|number|string|table|nil
+---@param type string
 function CNet.system.sendPackage(socket, type, message)
     CryptoNet.send(socket, {type, message})
 end
 
---- Send a system message over the given socket.
---- @param socket Socket
---- @param apiFunction string
---- @param data boolean|number|string|table|nil
+---Send a system message over the given socket.
+---@param socket Socket
+---@param apiFunction string
+---@param data boolean|number|string|table|nil
 function CNet.system.sendApiCall(socket, apiFunction, data)
     CNet.system.sendPackage(socket, "system", {apiFunction, data})
 end
 
 --* Certificate Signature
 
---- Handle a certificate signature response from the CertAuth server.
---- @param certificate Certificate
+---Handle a certificate signature response from the CertAuth server.
+---@param certificate Certificate
 CNet.system.api["certSignature"] = function (certificate, socket)
     if not equals(socket.key, signatureSocketKey, true) then
         return
@@ -96,8 +96,8 @@ CNet.system.api["certSignature"] = function (certificate, socket)
     signedCertificate = true
 end
 
---- Request a signature for a certificate from the CertAuth server.
---- @param cert Certificate The certificate to request a signature for.
+---Request a signature for a certificate from the CertAuth server.
+---@param cert Certificate The certificate to request a signature for.
 local function requestCertSignature(cert)
     local socket = CryptoNet.connect(CERT_AUTH_SERVER)
     signatureSocketKey = socket.key
@@ -120,19 +120,19 @@ end
 --* Event Handling
 
 local eventHandlers = {
-    --- @param socket Socket
-    --- @param server Server
+    ---@param socket Socket
+    ---@param server Server
     ["connection_opened"] = function (socket, server)
         CNet.eventHandlers.connect(socket, server)
     end,
-    --- @param socket Socket
-    --- @param server Server
+    ---@param socket Socket
+    ---@param server Server
     ["connection_closed"] = function (socket, server)
         CNet.eventHandlers.disconnect(socket, server)
     end,
-    --- @param package table
-    --- @param socket Socket
-    --- @param server? Server
+    ---@param package table
+    ---@param socket Socket
+    ---@param server? Server
     ["encrypted_message"] = function (package, socket, server)
         local packageType = package[1]
         local message = package[2]
@@ -157,27 +157,27 @@ local eventHandlers = {
             end
         end
     end,
-    --- @param message boolean|number|string|table|nil
-    --- @param socket Socket
-    --- @param server? Server
+    ---@param message boolean|number|string|table|nil
+    ---@param socket Socket
+    ---@param server? Server
     ["plain_message"] = function (message, socket, server)
         CNet.eventHandlers.plainMessage(message, socket, server)
     end,
-    --- @param username string
-    --- @param socket Socket
-    --- @param server? Server
+    ---@param username string
+    ---@param socket Socket
+    ---@param server? Server
     ["login"] = function (username, socket, server)
         CNet.eventHandlers.login(username, socket, server)
     end,
-    --- @param username string
-    --- @param socket Socket
-    --- @param server? Server
+    ---@param username string
+    ---@param socket Socket
+    ---@param server? Server
     ["login_failed"] = function (username, socket, server)
         CNet.eventHandlers.loginFailed(username, socket, server)
     end,
-    --- @param username string
-    --- @param socket Socket
-    --- @param server? Server
+    ---@param username string
+    ---@param socket Socket
+    ---@param server? Server
     ["logout"] = function (username, socket, server)
         CNet.eventHandlers.logout(username, socket, server)
     end
@@ -195,38 +195,38 @@ end
 --* Module Exports
 
 CNet.eventHandlers = {
-    --- Invoked on a server when a client successfully opens a connection.
-    --- @param socket Socket
-    --- @param server Server
+    ---Invoked on a server when a client successfully opens a connection.
+    ---@param socket Socket
+    ---@param server Server
     connect = function (socket, server) end,
-    --- Invoked on a client or server when a socket is closed by the other end.
-    --- @param socket Socket
-    --- @param server? Server
+    ---Invoked on a client or server when a socket is closed by the other end.
+    ---@param socket Socket
+    ---@param server? Server
     disconnect = function (socket, server) end,
-    --- Invoked when a message sent by the send() function is received.
-    --- @param message boolean|number|string|table|nil
-    --- @param socket Socket
-    --- @param server? Server
+    ---Invoked when a message sent by the send() function is received.
+    ---@param message boolean|number|string|table|nil
+    ---@param socket Socket
+    ---@param server? Server
     message = function (message, socket, server) end,
-    --- Invoked when a message sent by the sendUnencrypted() function is received.
-    --- @param message boolean|number|string|table|nil
-    --- @param socket Socket
-    --- @param server? Server
+    ---Invoked when a message sent by the sendUnencrypted() function is received.
+    ---@param message boolean|number|string|table|nil
+    ---@param socket Socket
+    ---@param server? Server
     plainMessage = function (message, socket, server) end,
-    --- Invoked on both client and server when a user logs in successfully. The username and permission level of the logged in user are also stored in the socket.
-    --- @param username string
-    --- @param socket Socket
-    --- @param server? Server
+    ---Invoked on both client and server when a user logs in successfully. The username and permission level of the logged in user are also stored in the socket.
+    ---@param username string
+    ---@param socket Socket
+    ---@param server? Server
     login = function (username, socket, server) end,
-    --- Invoked on both client and server when a user makes a failed login attempt.
-    --- @param username string
-    --- @param socket Socket
-    --- @param server? Server
+    ---Invoked on both client and server when a user makes a failed login attempt.
+    ---@param username string
+    ---@param socket Socket
+    ---@param server? Server
     loginFailed = function (username, socket, server) end,
-    --- Invoked when a user logs out.
-    --- @param username string
-    --- @param socket Socket
-    --- @param server? Server
+    ---Invoked when a user logs out.
+    ---@param username string
+    ---@param socket Socket
+    ---@param server? Server
     logout = function (username, socket, server) end,
 }
 
@@ -254,29 +254,29 @@ CNet.auth = {
 CNet.close = CryptoNet.close
 CNet.closeAll = CryptoNet.closeAll
 
---- Enable or disable debug logs
---- @param enabled boolean The new state of debug mode
+---Enable or disable debug logs
+---@param enabled boolean The new state of debug mode
 function CNet.setDebugMode(enabled)
     debugMode = enabled
     CryptoNet.setLoggingEnabled(enabled)
 end
 
---- Setup the cNet module.
---- @param onStart function The function to call when the event loop starts.
+---Setup the cNet module.
+---@param onStart function The function to call when the event loop starts.
 function CNet.setup(onStart)
     CryptoNet.setLoggingEnabled(debugMode)
     CryptoNet.startEventLoop(onStart, onEvent)
 end
 
---- Setup and host a cNet server.
---- @param serverName string The name of the server, which clients will use to connect to it. Also determines the channel that the server communicates on.
---- @param discoverable? boolean (default: true) Whether this server responds to discover() requests. Disabling this is more secure as it means clients can't connect unless they already know the name of the server.
---- @param hideCertificate? boolean (default: false) If true the server will not distribute its certificate to clients, either in discover() or connect() requests, meaning clients can only connect if they have already been given the certificate manually. Useful if you only want certain manually authorised clients to be able to connect.
---- @param modemSide? string The modem the server should use.
---- @param certificate? Certificate|string (default: "<serverName>.crt") The certificate of the server. This can either be the certificate table itself, or the name of a file that contains it. If the certicate and key files do not exist, new ones will be generated and saved to the specified files.
---- @param privateKey? PrivateKey|string (default: "<serverName>_private.key") The private key of the server. This can either be the key table itself, or the name of a file that contains it. If the certicate and key files do not exist, new ones will be generated and saved to the specified files.
---- @param userTablePath? string (default: "<serverName>_users.tbl") Path at which to store the user login details table, if/when users are added to the server.
---- @return Server # The server object.
+---Setup and host a cNet server.
+---@param serverName string The name of the server, which clients will use to connect to it. Also determines the channel that the server communicates on.
+---@param discoverable? boolean (default: true) Whether this server responds to discover() requests. Disabling this is more secure as it means clients can't connect unless they already know the name of the server.
+---@param hideCertificate? boolean (default: false) If true the server will not distribute its certificate to clients, either in discover() or connect() requests, meaning clients can only connect if they have already been given the certificate manually. Useful if you only want certain manually authorised clients to be able to connect.
+---@param modemSide? string The modem the server should use.
+---@param certificate? Certificate|string (default: "<serverName>.crt") The certificate of the server. This can either be the certificate table itself, or the name of a file that contains it. If the certicate and key files do not exist, new ones will be generated and saved to the specified files.
+---@param privateKey? PrivateKey|string (default: "<serverName>_private.key") The private key of the server. This can either be the key table itself, or the name of a file that contains it. If the certicate and key files do not exist, new ones will be generated and saved to the specified files.
+---@param userTablePath? string (default: "<serverName>_users.tbl") Path at which to store the user login details table, if/when users are added to the server.
+---@return Server # The server object.
 function CNet.host(serverName, discoverable, hideCertificate, modemSide, certificate, privateKey, userTablePath)
     if serverName == nil or serverName == "" then
         error("serverName must be a non empty string")
@@ -304,51 +304,51 @@ function CNet.host(serverName, discoverable, hideCertificate, modemSide, certifi
     return server
 end
 
---- Open an encrypted connection to a cNet server, returning a socket object that can be used to send and receive messages from the server.
---- @param serverName? string (default: inferred from certificate) The name of the server to connect to.
---- @param timeout? number (default: 5) The number of seconds to wait for a response to the connection request. Will terminate early if a response is received.
---- @param certTimeout? number (default: 1) The number of seconds to wait for certificate responses, if no certificate was provided.
---- @param certificate? Certificate|string (default: "<serverName>.crt") The certificate of the server. Can either be the certificate of the server itself, or the name of a file that contains it. If no valid certificate is found a certificate request will be sent to the server.
---- @param modemSide? string (default: a side with a modem) The modem to use to send and receive messages.
---- @param certAuthKey? PublicKey|string (default: "certAuth.key") The certificate authority public key used to verify signatures, or the path of the file to load it from. If no valid key is found the connection will still go ahead, but signatures will not be checked.
---- @param allowUnsigned? boolean (default: false) Whether to accept certificates with no valid signature. If no valid cert auth key is provided this is ignored, as the certificates cannot be checked without a key. This does not apply to the certificate provided by the user (if present), which is never verified (we trust them to get their own certificate right), only to certificates received through a certificate request.
---- @return Socket
+---Open an encrypted connection to a cNet server, returning a socket object that can be used to send and receive messages from the server.
+---@param serverName? string (default: inferred from certificate) The name of the server to connect to.
+---@param timeout? number (default: 5) The number of seconds to wait for a response to the connection request. Will terminate early if a response is received.
+---@param certTimeout? number (default: 1) The number of seconds to wait for certificate responses, if no certificate was provided.
+---@param certificate? Certificate|string (default: "<serverName>.crt") The certificate of the server. Can either be the certificate of the server itself, or the name of a file that contains it. If no valid certificate is found a certificate request will be sent to the server.
+---@param modemSide? string (default: a side with a modem) The modem to use to send and receive messages.
+---@param certAuthKey? PublicKey|string (default: "certAuth.key") The certificate authority public key used to verify signatures, or the path of the file to load it from. If no valid key is found the connection will still go ahead, but signatures will not be checked.
+---@param allowUnsigned? boolean (default: false) Whether to accept certificates with no valid signature. If no valid cert auth key is provided this is ignored, as the certificates cannot be checked without a key. This does not apply to the certificate provided by the user (if present), which is never verified (we trust them to get their own certificate right), only to certificates received through a certificate request.
+---@return Socket
 function CNet.connect(serverName, timeout, certTimeout, certificate, modemSide, certAuthKey, allowUnsigned)
     return CryptoNet.connect(serverName, timeout, certTimeout, certificate, modemSide, certAuthKey, allowUnsigned)
 end
 
 -- Send an encrypted message over the given socket. The message can be pretty much any Lua data type.
---- @param socket Socket
---- @param message boolean|number|string|table|nil
+---@param socket Socket
+---@param message boolean|number|string|table|nil
 function CNet.send(socket, message)
     CNet.system.sendPackage(socket, "normal", message)
 end
 
---- Send an unencrypted message over cNet. Useful for streams of high speed, non-sensitive data. Unencrypted messages have no security features applied, so can be easily exploited by attackers. Only use for non-critical messages.
+---Send an unencrypted message over cNet. Useful for streams of high speed, non-sensitive data. Unencrypted messages have no security features applied, so can be easily exploited by attackers. Only use for non-critical messages.
 ---
---- Unencrypted messages can't be received using `listen()`. Use the `plainMessage` event handler instead.
---- @param socket Socket
---- @param message boolean|number|string|table|nil
+---Unencrypted messages can't be received using `listen()`. Use the `plainMessage` event handler instead.
+---@param socket Socket
+---@param message boolean|number|string|table|nil
 function CNet.sendUnencrypted(socket, message)
     CryptoNet.sendUnencrypted(socket, message)
 end
 
---- Connect to a server and send a message in one function call. Returns the socket object for the connection.
---- @param serverName string The name of the server to connect to.
---- @param message boolean|number|string|table|nil The message to send.
---- @return Socket socket The connection socket
+---Connect to a server and send a message in one function call. Returns the socket object for the connection.
+---@param serverName string The name of the server to connect to.
+---@param message boolean|number|string|table|nil The message to send.
+---@return Socket socket The connection socket
 function CNet.connectAndSend(serverName, message)
     local socket = CNet.connect(serverName)
     CNet.send(socket, message)
     return socket
 end
 
---- Listen for incoming messages on the given socket. If no callback is provided, the function will block until a message is received or the timeout is reached. If a callback is provided, the function will return immediately, and the callback will be called when a message is received.
---- @param socket Socket The socket to listen on.
---- @param callback? function The function to call when a message is received.
---- @param timeout? number (default: 5) The number of seconds to wait for a message to be received. If no message is received in this time, the function will return nil.
---- @return boolean success If a callback is provided, `false`. Otherwise, `true` if a message was received or `false` if the timeout was reached.
---- @return boolean|number|string|table|nil message The message if it was received or the reason for failure.
+---Listen for incoming messages on the given socket. If no callback is provided, the function will block until a message is received or the timeout is reached. If a callback is provided, the function will return immediately, and the callback will be called when a message is received.
+---@param socket Socket The socket to listen on.
+---@param callback? function The function to call when a message is received.
+---@param timeout? number (default: 5) The number of seconds to wait for a message to be received. If no message is received in this time, the function will return nil.
+---@return boolean success If a callback is provided, `false`. Otherwise, `true` if a message was received or `false` if the timeout was reached.
+---@return boolean|number|string|table|nil message The message if it was received or the reason for failure.
 function CNet.listen(socket, callback, timeout)
     timeout = timeout or 5
     local keyString = keyToString(socket.key)
@@ -377,13 +377,13 @@ function CNet.listen(socket, callback, timeout)
     return success, result
 end
 
---- Connect to a server, send a message and listen for a response in one function call. Returns the response message.
---- @param serverName string The name of the server to connect to.
---- @param message boolean|number|string|table|nil The message to send.
---- @param callback? function The function to call when a response is received.
---- @param timeout? number (default: 5) The number of seconds to wait for a response to be received. If no response is received in this time, the function will return nil.
---- @return boolean success If a callback is provided, `false`. Otherwise, `true` if a message was received or `false` if the timeout was reached.
---- @return boolean|number|string|table|nil message The message if it was received or the reason for failure.
+---Connect to a server, send a message and listen for a response in one function call. Returns the response message.
+---@param serverName string The name of the server to connect to.
+---@param message boolean|number|string|table|nil The message to send.
+---@param callback? function The function to call when a response is received.
+---@param timeout? number (default: 5) The number of seconds to wait for a response to be received. If no response is received in this time, the function will return nil.
+---@return boolean success If a callback is provided, `false`. Otherwise, `true` if a message was received or `false` if the timeout was reached.
+---@return boolean|number|string|table|nil message The message if it was received or the reason for failure.
 function CNet.connectSendAndListen(serverName, message, callback, timeout)
     local socket = CNet.connect(serverName)
     CNet.send(socket, message)

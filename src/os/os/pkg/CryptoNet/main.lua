@@ -1,7 +1,8 @@
 local Console = require "Console"
-local sha256 = require "sha256"
+local sha256 = require "Sha256"
+local Threading = require "Threading"
 
---- @diagnostic disable: duplicate-set-field, cast-local-type, undefined-global, undefined-field, need-check-nil
+---@diagnostic disable: duplicate-set-field, cast-local-type, undefined-global, undefined-field, need-check-nil
 -- CryptoNet Networking Framework by SiliconSloth
 -- Licensed under the MIT license.
 --
@@ -37,7 +38,6 @@ local sha256 = require "sha256"
 -- 1256  - RSA Key Generator by 1lann
 -- 1468	 - Mersenne Twister RNG and ISAAC algorithm by KillaVanilla
 -- 1725  - AES implementation by KillaVanilla
--- 2692  - Simple thread API by immibis
 -- 2772 CryptoNet
 -- 2801  - Accessors
 -- 2848  - Validity Checks
@@ -4636,6 +4636,8 @@ end
 
 local CryptoNet = {}
 
+local mainThread
+
 
 -- Channel used to send discovery requests and responses.
 DISCOVERY_CHANNEL = 65531
@@ -4665,32 +4667,32 @@ end
 -- ACCESSORS
 --
 
---- @return boolean
+---@return boolean
 function CryptoNet.getLoggingEnabled()
 	return loggingEnabled
 end
 
---- @param enabled boolean
+---@param enabled boolean
 function CryptoNet.setLoggingEnabled(enabled)
 	loggingEnabled = enabled
 end
 
---- @return boolean
+---@return boolean
 function CryptoNet.getRepeatMessages()
 	return repeatMessages
 end
 
---- @param repMsgs boolean
+---@param repMsgs boolean
 function CryptoNet.setRepeatMessages(repMsgs)
 	repeatMessages = repMsgs
 end
 
---- @return string
+---@return string
 function CryptoNet.getWorkingDirectory()
 	return workingDir
 end
 
---- @param dir string
+---@param dir string
 function CryptoNet.setWorkingDirectory(dir)
 	if type(dir) ~= "string" then
 		error("Directory must be a string.", 2)
@@ -4698,12 +4700,12 @@ function CryptoNet.setWorkingDirectory(dir)
 	workingDir = dir
 end
 
---- @return table<Server>
+---@return table<Server>
 function CryptoNet.getAllServers()
 	return allServers
 end
 
---- @return table<Socket>
+---@return table<Socket>
 function CryptoNet.getAllClientSockets()
 	return allClientSockets
 end
@@ -4712,9 +4714,9 @@ end
 -- VALIDITY CHECKS
 --
 
---- Check that the key is a 16 element table of numbers.
---- @param key table<number>
---- @return boolean
+---Check that the key is a 16 element table of numbers.
+---@param key table<number>
+---@return boolean
 function CryptoNet.keyValid(key)
 	if not (type(key) == "table" and #key == 16) then
 		return false
@@ -4728,24 +4730,24 @@ function CryptoNet.keyValid(key)
 	return true
 end
 
---- Check that a table has all the parts required to be a valid private key.
---- @param key? table
---- @return boolean
+---Check that a table has all the parts required to be a valid private key.
+---@param key? table
+---@return boolean
 function CryptoNet.privateKeyValid(key)
 	return type(key) == "table" and type(key.private) == "string" and type(key.shared) == "string"
 end
 
---- Check that a table has all the parts required to be a valid public key.
---- @param key? table
---- @return boolean
+---Check that a table has all the parts required to be a valid public key.
+---@param key? table
+---@return boolean
 function CryptoNet.publicKeyValid(key)
 	return type(key) == "table" and type(key.public) == "string" and type(key.shared) == "string"
 end
 
---- Check that a table has all the parts required to be a valid server certificate. If ignoreKey is true it is acceptable for a server to have no key, but if present it must be valid. The signature is always optional but must be valid (syntactically, it isn't actually verified here) if present.
---- @param certificate? table
---- @param ignoreKey? boolean
---- @return boolean
+---Check that a table has all the parts required to be a valid server certificate. If ignoreKey is true it is acceptable for a server to have no key, but if present it must be valid. The signature is always optional but must be valid (syntactically, it isn't actually verified here) if present.
+---@param certificate? table
+---@param ignoreKey? boolean
+---@return boolean
 function CryptoNet.certificateValid(certificate, ignoreKey)
 	-- All certificates must contain the server name.
 	if type(certificate) ~= "table" or type(certificate.name) ~= "string" then
@@ -4773,9 +4775,9 @@ function CryptoNet.certificateValid(certificate, ignoreKey)
 	return true
 end
 
---- Check that a table has everything it needs to be a valid server.
---- @param server? table
---- @return boolean
+---Check that a table has everything it needs to be a valid server.
+---@param server? table
+---@return boolean
 function CryptoNet.serverValid(server)
 	return type(server) == "table"
 		and type(server.name) == "string"
@@ -4788,9 +4790,9 @@ function CryptoNet.serverValid(server)
 		and type(server.sockets) == "table"
 end
 
---- Check that a table has everything it needs to be a valid socket.
---- @param socket? table
---- @return boolean
+---Check that a table has everything it needs to be a valid socket.
+---@param socket? table
+---@return boolean
 function CryptoNet.socketValid(socket)
 	return type(socket) == "table"
 		and type(socket.sender) == "string"
@@ -4802,9 +4804,9 @@ function CryptoNet.socketValid(socket)
 		and type(socket.receivedMessages) == "table"
 end
 
---- Check that all the entries in a user table are valid.
---- @param userTable? table
---- @return boolean
+---Check that all the entries in a user table are valid.
+---@param userTable? table
+---@return boolean
 function CryptoNet.userTableValid(userTable)
 	if type(userTable) ~= "table" then
 		return false
@@ -4821,9 +4823,9 @@ end
 -- HELPERS
 --
 
---- Used to process modem side arguments passed to functions.
---- @param modemSide? string
---- @return string
+---Used to process modem side arguments passed to functions.
+---@param modemSide? string
+---@return string
 function CryptoNet.resolveModemSide(modemSide)
 	-- If no modem side argument is provided, search for a modem and use that side.
 	if modemSide == nil then
@@ -4857,9 +4859,9 @@ function CryptoNet.resolveModemSide(modemSide)
 	return modemSide
 end
 
---- Decides which channel a server should communicate on, based on its name. This function will always return the same channel for a given server name, allowing clients to find out the channel of a server without any prior communications with it.
---- @param serverName string
---- @return number
+---Decides which channel a server should communicate on, based on its name. This function will always return the same channel for a given server name, allowing clients to find out the channel of a server without any prior communications with it.
+---@param serverName string
+---@return number
 function CryptoNet.getChannel(serverName)
 	local nameHash = sha256.digest(serverName)
 	-- Use the first two bytes of the hash as the channel number, so that the full range
@@ -4877,10 +4879,10 @@ function CryptoNet.getChannel(serverName)
 	return channel
 end
 
---- Check if any servers or sockets on this machine are using the specified channel on the specified modem.
---- @param channel number
---- @param modemSide string
---- @return boolean
+---Check if any servers or sockets on this machine are using the specified channel on the specified modem.
+---@param channel number
+---@param modemSide string
+---@return boolean
 function CryptoNet.channelInUse(channel, modemSide)
 	-- Check the client sockets.
 	for _, socket in pairs(allClientSockets) do
@@ -4955,9 +4957,9 @@ local function deserializeAny(str)
 end
 
 
---- Serialize a certificate or RSA key into a string, for saving to a file. The textutils functions don't seem to like the huge strings of numbers in the keys, so quotation marks must be added to them before serialization, which is what this function does.
---- @param obj Certificate|Key|nil
---- @return string
+---Serialize a certificate or RSA key into a string, for saving to a file. The textutils functions don't seem to like the huge strings of numbers in the keys, so quotation marks must be added to them before serialization, which is what this function does.
+---@param obj Certificate|Key|nil
+---@return string
 function CryptoNet.serializeCertOrKey(obj)
 	if type(obj) ~= "table" then
 		error("Can only serialize tables.", 2)
@@ -5000,9 +5002,9 @@ function CryptoNet.serializeCertOrKey(obj)
 	return textutils.serialize(output)
 end
 
---- Deserialize certificates or RSA keys serialized by serializeCertOrKey(). This involves deserializing as normal and removing the quotation marks added during serialization.
---- @param str string
---- @return Certificate|Key|nil
+---Deserialize certificates or RSA keys serialized by serializeCertOrKey(). This involves deserializing as normal and removing the quotation marks added during serialization.
+---@param str string
+---@return Certificate|Key|nil
 function CryptoNet.deserializeCertOrKey(str)
 	if str == nil then return nil end
 	-- Deserialize as normal.
@@ -5042,8 +5044,8 @@ function CryptoNet.deserializeCertOrKey(str)
 	return output
 end
 
---- Generate random 16 byte sequence that can be used as a key or initialization vector for AES encryption.
---- @return table<number>
+---Generate random 16 byte sequence that can be used as a key or initialization vector for AES encryption.
+---@return table<number>
 function CryptoNet.generateKey()
 	local iv = {}
 	-- Convert four 4-byte integers into 16 bytes.
@@ -5057,9 +5059,9 @@ function CryptoNet.generateKey()
 	return iv
 end
 
---- Generate an unsigned certificate and corresponding private key for a server with the given name. The certificate is distributed to clients, who can use the public key it contains to encrypt messages using RSA such that only this server can read them, using the private key.
---- @param name string
---- @return Certificate, PrivateKey
+---Generate an unsigned certificate and corresponding private key for a server with the given name. The certificate is distributed to clients, who can use the public key it contains to encrypt messages using RSA such that only this server can read them, using the private key.
+---@param name string
+---@return Certificate, PrivateKey
 function CryptoNet.generateCertificate(name)
 	log("Generating keys... (may take some time)")
 	local publicKey, privateKey = rsaKeygen.generateKeyPair()
@@ -5069,9 +5071,9 @@ function CryptoNet.generateCertificate(name)
 	return { name = name, key = publicKey }, privateKey
 end
 
---- Load a certificate authority public key from the specified file and validate it, or just validate the key itself if passed directly as the argument. If key is left nil, a default filename of "certAuth.key" is used.
---- @param key? string|PublicKey (default: "certAuth.key") The file to load the key from, or the key itself to validate.
---- @return Certificate|Key|nil
+---Load a certificate authority public key from the specified file and validate it, or just validate the key itself if passed directly as the argument. If key is left nil, a default filename of "certAuth.key" is used.
+---@param key? string|PublicKey (default: "certAuth.key") The file to load the key from, or the key itself to validate.
+---@return Certificate|Key|nil
 function CryptoNet.loadCertAuthKey(key)
 	if key == nil then
 		-- Default value.
@@ -5113,10 +5115,10 @@ function CryptoNet.loadCertAuthKey(key)
 	end
 end
 
---- Verify that the signature on a certificate is valid, using the public key of the trusted certificate authority.
---- @param certificate Certificate
---- @param key PublicKey
---- @return boolean
+---Verify that the signature on a certificate is valid, using the public key of the trusted certificate authority.
+---@param certificate Certificate
+---@param key PublicKey
+---@return boolean
 function CryptoNet.verifyCertificate(certificate, key)
 	-- Signatures are made by encrypting the certificate's hash using the cert auth's private key.
 	-- If the signature was generated by the certificate authority that uses the provided public key,
@@ -5183,9 +5185,9 @@ local function sendEncryptedInternal(socket, message)
 end
 
 
---- Send an encrypted message over the given socket. The message can be pretty much any Lua data type.
---- @param socket Socket
---- @param message boolean|number|string|table|nil
+---Send an encrypted message over the given socket. The message can be pretty much any Lua data type.
+---@param socket Socket
+---@param message boolean|number|string|table|nil
 function CryptoNet.send(socket, message)
 	if not CryptoNet.socketValid(socket) then
 		error("Invalid socket.", 2)
@@ -5195,9 +5197,9 @@ function CryptoNet.send(socket, message)
 	sendEncryptedInternal(socket, serializeAny(message))
 end
 
---- Send an unencrypted message over CryptoNet. Useful for streams of high speed, non-sensitive data. Unencrypted messages have no security features applied, so can be easily exploited by attackers. Only use for non-critical messages.
---- @param socket Socket
---- @param message boolean|number|string|table|nil
+---Send an unencrypted message over CryptoNet. Useful for streams of high speed, non-sensitive data. Unencrypted messages have no security features applied, so can be easily exploited by attackers. Only use for non-critical messages.
+---@param socket Socket
+---@param message boolean|number|string|table|nil
 function CryptoNet.sendUnencrypted(socket, message)
 	if not CryptoNet.socketValid(socket) then
 		error("Invalid socket.", 2)
@@ -5210,11 +5212,11 @@ end
 -- LOGIN SYSTEM
 --
 
---- Hash a password using the username and server name as a salt. Used to secure passwords before they are sent over CryptoNet to a server. Technically this is unnecessary as the connection is encrypted anyway, but it means that even if this is somehow compromised (e.g. with a spoof attack) the attacker won't know the actual password and be able to use it on the user's other accounts, if they use the same password for multiple things.
---- @param username string
---- @param password string
---- @param serverName string
---- @return string
+---Hash a password using the username and server name as a salt. Used to secure passwords before they are sent over CryptoNet to a server. Technically this is unnecessary as the connection is encrypted anyway, but it means that even if this is somehow compromised (e.g. with a spoof attack) the attacker won't know the actual password and be able to use it on the user's other accounts, if they use the same password for multiple things.
+---@param username string
+---@param password string
+---@param serverName string
+---@return string
 function CryptoNet.hashPassword(username, password, serverName)
 	if type(username) ~= "string" then
 		error("Username must be a string.", 2)
@@ -5229,9 +5231,9 @@ function CryptoNet.hashPassword(username, password, serverName)
 	return tostring(sha256.digest(serverName .. username .. password))
 end
 
---- Load the user table stored at the given path, defaulting to an empty table if the file does not exist.
---- @param path string
---- @return table
+---Load the user table stored at the given path, defaulting to an empty table if the file does not exist.
+---@param path string
+---@return table
 function CryptoNet.loadUserTable(path)
 	if type(path) ~= "string" then
 		error("Path must be a string.", 2)
@@ -5256,9 +5258,9 @@ function CryptoNet.loadUserTable(path)
 	return userTable
 end
 
---- Save the given user table to the given file.
---- @param userTable table
---- @param path string
+---Save the given user table to the given file.
+---@param userTable table
+---@param path string
 function CryptoNet.saveUserTable(userTable, path)
 	if type(path) ~= "string" then
 		error("Path must be a string.", 2)
@@ -5277,11 +5279,11 @@ function CryptoNet.saveUserTable(userTable, path)
 	log("Saved user table to " .. path .. ".")
 end
 
---- Add a user to the given server with the provided details. The provided password should already have been hashed by hashPassword(). Default permission level is 1. If there is only one server running, that server will be used by default.
---- @param username string
---- @param passHash string
---- @param permissionLevel? number
---- @param server? Server
+---Add a user to the given server with the provided details. The provided password should already have been hashed by hashPassword(). Default permission level is 1. If there is only one server running, that server will be used by default.
+---@param username string
+---@param passHash string
+---@param permissionLevel? number
+---@param server? Server
 function CryptoNet.addUserHashed(username, passHash, permissionLevel, server)
 	if type(username) ~= "string" then
 		error("Username must be a string.", 2)
@@ -5322,11 +5324,11 @@ function CryptoNet.addUserHashed(username, passHash, permissionLevel, server)
 	CryptoNet.saveUserTable(server.userTable, server.userTablePath)
 end
 
---- Add a user to the given (local) server's user table with the provided details. The user table is saved to disk, so is non volatile. The server parameter can be left blank if exactly one server is running.
---- @param username string
---- @param password string
---- @param permissionLevel? number
---- @param server? Server
+---Add a user to the given (local) server's user table with the provided details. The user table is saved to disk, so is non volatile. The server parameter can be left blank if exactly one server is running.
+---@param username string
+---@param password string
+---@param permissionLevel? number
+---@param server? Server
 function CryptoNet.addUser(username, password, permissionLevel, server)
 	if type(username) ~= "string" then
 		error("Username must be a string.", 2)
@@ -5363,9 +5365,9 @@ function CryptoNet.addUser(username, password, permissionLevel, server)
 	CryptoNet.addUserHashed(username, CryptoNet.hashPassword(username, password, server.name), permissionLevel, server)
 end
 
---- Remove a user from a server. The server parameter can be left blank if exactly one server is running.
---- @param username string
---- @param server? Server
+---Remove a user from a server. The server parameter can be left blank if exactly one server is running.
+---@param username string
+---@param server? Server
 function CryptoNet.deleteUser(username, server)
 	if type(username) ~= "string" then
 		error("Username must be a string.", 2)
@@ -5393,10 +5395,10 @@ function CryptoNet.deleteUser(username, server)
 	end
 end
 
---- Check if a user exists on the server. The server parameter can be left blank if exactly one server is running.
---- @param username string
---- @param server? Server
---- @return boolean
+---Check if a user exists on the server. The server parameter can be left blank if exactly one server is running.
+---@param username string
+---@param server? Server
+---@return boolean
 function CryptoNet.userExists(username, server)
 	if type(username) ~= "string" then
 		error("Username must be a string.", 2)
@@ -5418,10 +5420,10 @@ function CryptoNet.userExists(username, server)
 	return server.userTable[username] ~= nil
 end
 
---- Get the hashed password of a user from the users table. The original password cannot be (easily) retrieved from this hash. Returns nil if the user does not exist. The server parameter can be left blank if exactly one server is running.
---- @param username string
---- @param server? Server
---- @return string|nil
+---Get the hashed password of a user from the users table. The original password cannot be (easily) retrieved from this hash. Returns nil if the user does not exist. The server parameter can be left blank if exactly one server is running.
+---@param username string
+---@param server? Server
+---@return string|nil
 function CryptoNet.getPasswordHash(username, server)
 	if type(username) ~= "string" then
 		error("Username must be a string.", 2)
@@ -5446,10 +5448,10 @@ function CryptoNet.getPasswordHash(username, server)
 	return server.userTable[username][1]
 end
 
---- Get the permission level of a user. Returns nil if the user does not exist. The server parameter can be left blank if exactly one server is running.
---- @param username string
---- @param server? Server
---- @return number|nil
+---Get the permission level of a user. Returns nil if the user does not exist. The server parameter can be left blank if exactly one server is running.
+---@param username string
+---@param server? Server
+---@return number|nil
 function CryptoNet.getPermissionLevel(username, server)
 	if type(username) ~= "string" then
 		error("Username must be a string.", 2)
@@ -5474,10 +5476,10 @@ function CryptoNet.getPermissionLevel(username, server)
 	return server.userTable[username][2]
 end
 
---- Set the hashed password of a user in the table. Assumes the provided passowrd has already been hashed with hashPassword(). The server parameter can be left blank if exactly one server is running.
---- @param username string
---- @param passHash string
---- @param server? Server
+---Set the hashed password of a user in the table. Assumes the provided passowrd has already been hashed with hashPassword(). The server parameter can be left blank if exactly one server is running.
+---@param username string
+---@param passHash string
+---@param server? Server
 function CryptoNet.setPasswordHashed(username, passHash, server)
 	if type(username) ~= "string" then
 		error("Username must be a string.", 2)
@@ -5509,10 +5511,10 @@ function CryptoNet.setPasswordHashed(username, passHash, server)
 	CryptoNet.saveUserTable(server.userTable, server.userTablePath)
 end
 
---- Sets the password of a user in the table. The server parameter can be left blank if exactly one server is running.
---- @param username string
---- @param password string
---- @param server? Server
+---Sets the password of a user in the table. The server parameter can be left blank if exactly one server is running.
+---@param username string
+---@param password string
+---@param server? Server
 function CryptoNet.setPassword(username, password, server)
 	if type(username) ~= "string" then
 		error("Username must be a string.", 2)
@@ -5543,10 +5545,10 @@ function CryptoNet.setPassword(username, password, server)
 	CryptoNet.setPasswordHashed(username, CryptoNet.hashPassword(username, password, server.name), server)
 end
 
---- Set the permission level of a user in the table. The server parameter can be left blank if exactly one server is running.
---- @param username string
---- @param permissionLevel number
---- @param server? Server
+---Set the permission level of a user in the table. The server parameter can be left blank if exactly one server is running.
+---@param username string
+---@param permissionLevel number
+---@param server? Server
 function CryptoNet.setPermissionLevel(username, permissionLevel, server)
 	if type(username) ~= "string" then
 		error("Username must be a string.", 2)
@@ -5577,11 +5579,11 @@ function CryptoNet.setPermissionLevel(username, permissionLevel, server)
 	CryptoNet.saveUserTable(server.userTable, server.userTablePath)
 end
 
---- Check that the given password matches the one in the table. Assumes the password has already been hashed by hashPassword(). The server parameter can be left blank if exactly one server is running.
---- @param username string
---- @param passHash string
---- @param server? Server
---- @return boolean|nil
+---Check that the given password matches the one in the table. Assumes the password has already been hashed by hashPassword(). The server parameter can be left blank if exactly one server is running.
+---@param username string
+---@param passHash string
+---@param server? Server
+---@return boolean|nil
 function CryptoNet.checkPasswordHashed(username, passHash, server)
 	if type(username) ~= "string" then
 		error("Username must be a string.", 2)
@@ -5620,11 +5622,11 @@ function CryptoNet.checkPasswordHashed(username, passHash, server)
 	return true
 end
 
---- Check that the given password matches the one in the table. The server parameter can be left blank if exactly one server is running.
---- @param username string
---- @param password string
---- @param server? Server
---- @return boolean|nil
+---Check that the given password matches the one in the table. The server parameter can be left blank if exactly one server is running.
+---@param username string
+---@param password string
+---@param server? Server
+---@return boolean|nil
 function CryptoNet.checkPassword(username, password, server)
 	if type(username) ~= "string" then
 		error("Username must be a string.", 2)
@@ -5650,14 +5652,14 @@ function CryptoNet.checkPassword(username, password, server)
 	return CryptoNet.checkPasswordHashed(username, CryptoNet.hashPassword(username, password, server.name), server)
 end
 
---- Log into the server connected to this socket, remote or local, with the specified username and password. Assumes the password has already been hashed by hashPassword(). If executed on a server socket, the event details of the attempt are returned. If successful, the user's details will be stored in the socket. If the socket is already logged in, the username will be overwritten but the permission level will be set to the highest of the old and new one. This allows an admin account to log in then log in as a normal user to temporarily gain elevated privileges as that account.
---- @param socket Socket
---- @param username string
---- @param passHash string
---- @return string|nil
---- @return string|nil
---- @return Socket|nil
---- @return Server|nil
+---Log into the server connected to this socket, remote or local, with the specified username and password. Assumes the password has already been hashed by hashPassword(). If executed on a server socket, the event details of the attempt are returned. If successful, the user's details will be stored in the socket. If the socket is already logged in, the username will be overwritten but the permission level will be set to the highest of the old and new one. This allows an admin account to log in then log in as a normal user to temporarily gain elevated privileges as that account.
+---@param socket Socket
+---@param username string
+---@param passHash string
+---@return string|nil
+---@return string|nil
+---@return Socket|nil
+---@return Server|nil
 function CryptoNet.loginHashed(socket, username, passHash)
 	if not CryptoNet.socketValid(socket) then
 		error("Invalid socket.", 2)
@@ -5702,14 +5704,14 @@ function CryptoNet.loginHashed(socket, username, passHash)
 	end
 end
 
---- Log into the server connected to this socket, remote or local, with the specified username and password. The password will be hashed before sending for extra security. If executed on a server socket, the event details of the attempt are returned. If successful, the user's details will be stored in the socket. If the socket is already logged in, the username will be overwritten but the permission level will be set to the highest of the old and new one. This allows an admin account to log in then log in as a normal user to temporarily gain elevated privileges as that account.
---- @param socket Socket
---- @param username string
---- @param password string
---- @return string|nil
---- @return string|nil
---- @return Socket|nil
---- @return Server|nil
+---Log into the server connected to this socket, remote or local, with the specified username and password. The password will be hashed before sending for extra security. If executed on a server socket, the event details of the attempt are returned. If successful, the user's details will be stored in the socket. If the socket is already logged in, the username will be overwritten but the permission level will be set to the highest of the old and new one. This allows an admin account to log in then log in as a normal user to temporarily gain elevated privileges as that account.
+---@param socket Socket
+---@param username string
+---@param password string
+---@return string|nil
+---@return string|nil
+---@return Socket|nil
+---@return Server|nil
 function CryptoNet.login(socket, username, password)
 	if not CryptoNet.socketValid(socket) then
 		error("Invalid socket.", 2)
@@ -5727,8 +5729,8 @@ function CryptoNet.login(socket, username, password)
 	return CryptoNet.loginHashed(socket, username, CryptoNet.hashPassword(username, password, serverName))
 end
 
---- Log out of the user account currently logged in on this socket. If executed on a server socket, the event details are returned.
---- @param socket Socket|Server
+---Log out of the user account currently logged in on this socket. If executed on a server socket, the event details are returned.
+---@param socket Socket|Server
 function CryptoNet.logout(socket)
 	if not CryptoNet.socketValid(socket) then
 		error("Invalid socket.", 2)
@@ -5799,14 +5801,14 @@ local function extractMessage(message, receivedIDs)
 end
 
 
---- Create and host a CryptoNet server, which other machines can remotely connect to. This function will load the certificate and private key of the server from the specified files, or generate new ones if no existing files are found. Note that serverName is the only required parameter; all the others have sensible defaults.
---- @param serverName string The name of the server, which clients will use to connect to it. 	Also determines the channel that the server communicates on.
---- @param discoverable? boolean (default: true) Whether this server responds to discover() requests. Disabling this is more secure as it means clients can't connect unless they already know the name of the server.
---- @param hideCertificate? boolean (default: false) If true the server will not distribute its certificate to clients,  either in discover() or connect() requests, meaning clients can only  connect if they have already been given the certificate manually.  Useful if you only want certain manually authorised clients to be able to connect.
---- @param modemSide? string (default: a side that has a modem) The modem the server should use. certificate (table or string, default: "<serverName>.crt") The certificate of the server. This can either be the certificate table itself, or the name of a file that contains it. If the certicate and key files do not  exist, new ones will be generated and saved to the specified files.
---- @param privateKey? table|string (default: "<serverName>_private.key") The private key of the server. This can either be the key table itself,  or the name of a file that contains it. If the certicate and key files do not  exist, new ones will be generated and saved to the specified files.
---- @param userTablePath? string (default: "<serverName>_users.tbl") Path at which to store the user login details table,   if/when users are added to the server.
---- @return Server # The server table
+---Create and host a CryptoNet server, which other machines can remotely connect to. This function will load the certificate and private key of the server from the specified files, or generate new ones if no existing files are found. Note that serverName is the only required parameter; all the others have sensible defaults.
+---@param serverName string The name of the server, which clients will use to connect to it. 	Also determines the channel that the server communicates on.
+---@param discoverable? boolean (default: true) Whether this server responds to discover() requests. Disabling this is more secure as it means clients can't connect unless they already know the name of the server.
+---@param hideCertificate? boolean (default: false) If true the server will not distribute its certificate to clients,  either in discover() or connect() requests, meaning clients can only  connect if they have already been given the certificate manually.  Useful if you only want certain manually authorised clients to be able to connect.
+---@param modemSide? string (default: a side that has a modem) The modem the server should use. certificate (table or string, default: "<serverName>.crt") The certificate of the server. This can either be the certificate table itself, or the name of a file that contains it. If the certicate and key files do not  exist, new ones will be generated and saved to the specified files.
+---@param privateKey? table|string (default: "<serverName>_private.key") The private key of the server. This can either be the key table itself,  or the name of a file that contains it. If the certicate and key files do not  exist, new ones will be generated and saved to the specified files.
+---@param userTablePath? string (default: "<serverName>_users.tbl") Path at which to store the user login details table,   if/when users are added to the server.
+---@return Server # The server table
 function CryptoNet.host(serverName, discoverable, hideCertificate, modemSide, certificate, privateKey, userTablePath)
 	if type(serverName) ~= "string" then
 		error("Server name must be a string.", 2)
@@ -5962,8 +5964,8 @@ function CryptoNet.host(serverName, discoverable, hideCertificate, modemSide, ce
 	return server
 end
 
---- Close a socket or server, such that it will not listen for messages anymore. Closing a server closes all its sockets.
---- @param socket Socket|Server The socket or server to close.
+---Close a socket or server, such that it will not listen for messages anymore. Closing a server closes all its sockets.
+---@param socket Socket|Server The socket or server to close.
 function CryptoNet.close(socket)
 	if CryptoNet.socketValid(socket) then
 		-- Let the other end of the socket know it has been closed.
@@ -6343,12 +6345,12 @@ function CryptoNet.listen()
 	end
 end
 
---- Request the certificates of all online CryptoNet servers on the network. Some servers may have been set to not respond to discovery requests, and some will only contain the server name in the certificate, excluding the public key required to connect to the server. This function can optionally use a certificate authority public key to verify the signatures of certificates, only returning certificates with valid signatures. By default discover() looks for the public key in "certAuth.key".
---- @param timeout? number (default: 1) The time in seconds to spend listening for responses.
---- @param certAuthKey? PublicKey|string (default: "certAuth.key") The certificate authority public key used to verify signatures,   or the path of the file to load it from. If no valid key is found   the discovery will still go ahead, but signatures will not be checked.
---- @param allowUnsigned? boolean (default: false) Whether to include certificates with no valid signature in the results.   If no valid cert auth key is provided this is ignored, as the certificates   cannot be checked without a key.
---- @param modemSide? string (default: a side with a modem) The modem to use to send and receive messages.
---- @return table # a table of the certificates received, all of which will include the name of server and possibly also the public key and signature.
+---Request the certificates of all online CryptoNet servers on the network. Some servers may have been set to not respond to discovery requests, and some will only contain the server name in the certificate, excluding the public key required to connect to the server. This function can optionally use a certificate authority public key to verify the signatures of certificates, only returning certificates with valid signatures. By default discover() looks for the public key in "certAuth.key".
+---@param timeout? number (default: 1) The time in seconds to spend listening for responses.
+---@param certAuthKey? PublicKey|string (default: "certAuth.key") The certificate authority public key used to verify signatures,   or the path of the file to load it from. If no valid key is found   the discovery will still go ahead, but signatures will not be checked.
+---@param allowUnsigned? boolean (default: false) Whether to include certificates with no valid signature in the results.   If no valid cert auth key is provided this is ignored, as the certificates   cannot be checked without a key.
+---@param modemSide? string (default: a side with a modem) The modem to use to send and receive messages.
+---@return table # a table of the certificates received, all of which will include the name of server and possibly also the public key and signature.
 function CryptoNet.discover(timeout, certAuthKey, allowUnsigned, modemSide)
 	-- Load and validate the key.
 	certAuthKey = CryptoNet.loadCertAuthKey(certAuthKey)
@@ -6434,14 +6436,14 @@ function CryptoNet.discover(timeout, certAuthKey, allowUnsigned, modemSide)
 	return certificates
 end
 
---- Request the certificate of a server with the given name. Note that some servers may not respond to these requests, expecting trusted clients to have been given the certificate manually. All the certificates returned will contain the public key of their server. If multiple certificates are received with the same server name, there is no way to tell which one is the real server (the others are probably malicious fakes), so none of them are returned. To avoid this situation, this function can optionally use a certificate authority public key to verify the signatures of received certificates, ignoring any with invalid signatures. By default requestCertificate() looks in "certAuth.key" for the key. If multiple signed certificates are received, this implies that the certificate authority has authorized an impersonator, so none of them are returned as we don't know which is the real one.
---- @param serverName string (required) The name of the server to request the certificate of.
---- @param timeout? number (default: 1) The length of time in seconds to wait for responses.   The function will always wait the full time (to allow for duplicates.
---- @param certAuthKey? table|string (default: "certAuth.key") The certificate authority public key used to verify signatures,   or the path of the file to load it from. If no valid key is found   the request will still go ahead, but signatures will not be checked.
---- @param allowUnsigned? boolean (default: false) Whether to accept certificates with no valid signature.   If no valid cert auth key is provided this is ignored, as the certificates cannot be checked without a key.
---- @param modemSide? string (default: a side with a modem) The modem to use to send and receive messages.
---- @return Certificate|nil # certificate of the server if exactly one is received, or nil if zero or more than one acceptable certificates are found.
---- @return table # a table of all acceptable certificates received.
+---Request the certificate of a server with the given name. Note that some servers may not respond to these requests, expecting trusted clients to have been given the certificate manually. All the certificates returned will contain the public key of their server. If multiple certificates are received with the same server name, there is no way to tell which one is the real server (the others are probably malicious fakes), so none of them are returned. To avoid this situation, this function can optionally use a certificate authority public key to verify the signatures of received certificates, ignoring any with invalid signatures. By default requestCertificate() looks in "certAuth.key" for the key. If multiple signed certificates are received, this implies that the certificate authority has authorized an impersonator, so none of them are returned as we don't know which is the real one.
+---@param serverName string (required) The name of the server to request the certificate of.
+---@param timeout? number (default: 1) The length of time in seconds to wait for responses.   The function will always wait the full time (to allow for duplicates.
+---@param certAuthKey? table|string (default: "certAuth.key") The certificate authority public key used to verify signatures,   or the path of the file to load it from. If no valid key is found   the request will still go ahead, but signatures will not be checked.
+---@param allowUnsigned? boolean (default: false) Whether to accept certificates with no valid signature.   If no valid cert auth key is provided this is ignored, as the certificates cannot be checked without a key.
+---@param modemSide? string (default: a side with a modem) The modem to use to send and receive messages.
+---@return Certificate|nil # certificate of the server if exactly one is received, or nil if zero or more than one acceptable certificates are found.
+---@return table # a table of all acceptable certificates received.
 function CryptoNet.requestCertificate(serverName, timeout, certAuthKey, allowUnsigned, modemSide)
 	if type(serverName) ~= "string" then
 		error("Server name must be a string.", 2)
@@ -6546,15 +6548,15 @@ function CryptoNet.requestCertificate(serverName, timeout, certAuthKey, allowUns
 	end
 end
 
---- Open an encrypted connection to a CryptoNet server, returning a socket object that can be used to send and receive messages from the server.
---- @param serverName? string (default: inferred from certificate) The name of the server to connect to.
---- @param timeout? number (default: 5) The number of seconds to wait for a response to the connection request. Will terminate early if a response is received.
---- @param certTimeout? number (default: 1) The number of seconds to wait for certificate responses, if no certificate was provided.
---- @param certificate? table|string (default: "<serverName>.crt") The certificate of the server. Can either be the certificate of the server itself, or the name of a file that contains it. If no valid certificate is found a certificate request will be sent to the server.
---- @param modemSide? string (default: a side with a modem) The modem to use to send and receive messages.
---- @param certAuthKey? table|string (default: "certAuth.key") The certificate authority public key used to verify signatures, or the path of the file to load it from. If no valid key is found the connection will still go ahead, but signatures will not be checked.
---- @param allowUnsigned? boolean (default: false) Whether to accept certificates with no valid signature. If no valid cert auth key is provided this is ignored, as the certificates cannot be checked without a key. This does not apply to the certificate provided by the user (if present), which is never verified (we trust them to get their own certificate right), only to certificates received through a certificate request.
---- @return Socket # a socket object that can be used to communicate with the server.
+---Open an encrypted connection to a CryptoNet server, returning a socket object that can be used to send and receive messages from the server.
+---@param serverName? string (default: inferred from certificate) The name of the server to connect to.
+---@param timeout? number (default: 5) The number of seconds to wait for a response to the connection request. Will terminate early if a response is received.
+---@param certTimeout? number (default: 1) The number of seconds to wait for certificate responses, if no certificate was provided.
+---@param certificate? table|string (default: "<serverName>.crt") The certificate of the server. Can either be the certificate of the server itself, or the name of a file that contains it. If no valid certificate is found a certificate request will be sent to the server.
+---@param modemSide? string (default: a side with a modem) The modem to use to send and receive messages.
+---@param certAuthKey? table|string (default: "certAuth.key") The certificate authority public key used to verify signatures, or the path of the file to load it from. If no valid key is found the connection will still go ahead, but signatures will not be checked.
+---@param allowUnsigned? boolean (default: false) Whether to accept certificates with no valid signature. If no valid cert auth key is provided this is ignored, as the certificates cannot be checked without a key. This does not apply to the certificate provided by the user (if present), which is never verified (we trust them to get their own certificate right), only to certificates received through a certificate request.
+---@return Socket # a socket object that can be used to communicate with the server.
 function CryptoNet.connect(serverName, timeout, certTimeout, certificate, modemSide, certAuthKey, allowUnsigned)
 	if serverName ~= nil and type(serverName) ~= "string" then
 		error("Server name must be a string or nil.", 2)
@@ -6696,10 +6698,10 @@ end
 -- EVENT LOOP
 --
 
---- Run a background loop that listens for events of any kind, and calls an optional event handler on every event. The event handler is always called in a new thread, so it is okay to use blocking functions such as sleep() and pullEvent() within onEvent without freezing the whole program. Errors raised during event handling are printed without terminating the whole program, so errors processing one event won't bring down the entire system.
+---Run a background loop that listens for events of any kind, and calls an optional event handler on every event. The event handler is always called in a new thread, so it is okay to use blocking functions such as sleep() and pullEvent() within onEvent without freezing the whole program. Errors raised during event handling are printed without terminating the whole program, so errors processing one event won't bring down the entire system.
 ---
---- Any modem_message events are also sent to CryptoNet for handling, allowing all sockets and servers on this machine to listen for messages in the background. Both the modem_message itself and any CryptoNet events invoked by it are sent to the event handler, on seperate iterations of the event loop.
---- @param onEvent function The function to call on every event. Optional.
+---Any modem_message events are also sent to CryptoNet for handling, allowing all sockets and servers on this machine to listen for messages in the background. Both the modem_message itself and any CryptoNet events invoked by it are sent to the event handler, on seperate iterations of the event loop.
+---@param onEvent function The function to call on every event. Optional.
 local function eventLoop(onEvent)
 	-- List of response message IDs we've already received
 	-- so we can ignore duplicates.
@@ -6719,7 +6721,8 @@ local function eventLoop(onEvent)
 			end
 			-- Call the event handler in a new thread.
 			if onEvent ~= nil then
-				os.startThread(function()
+				-- TODO: Implement new T
+				local eventThread = Threading.create(function()
 					-- We need another pcall here since this is in a different thread
 					-- to the outer pcall, so that one won't be able to catch errors
 					-- from the handler.
@@ -6734,6 +6737,7 @@ local function eventLoop(onEvent)
 						end
 					end
 				end)
+				mainThread:attach(eventThread)
 			end
 		end)
 		if not ok then
@@ -6749,13 +6753,13 @@ local function eventLoop(onEvent)
 end
 
 
---- Run a background loop that listens for events of any kind, and calls the given event handler (which should take one argument) on them. The event handler is always called in a new thread, so it is okay to use blocking functions such as sleep() and pullEvent() within onEvent without freezing the whole program. Errors raised during event handling are printed without terminating the whole program, so errors processing one event won't bring down the entire system.
+---Run a background loop that listens for events of any kind, and calls the given event handler (which should take one argument) on them. The event handler is always called in a new thread, so it is okay to use blocking functions such as sleep() and pullEvent() within onEvent without freezing the whole program. Errors raised during event handling are printed without terminating the whole program, so errors processing one event won't bring down the entire system.
 ---
---- Any modem_message events are also sent to CryptoNet for handling, allowing all sockets and servers on this machine to listen for messages in the background. Both the modem_message itself and any CryptoNet events invoked by it are sent to the event handler, on separate iterations of the event loop.
+---Any modem_message events are also sent to CryptoNet for handling, allowing all sockets and servers on this machine to listen for messages in the background. Both the modem_message itself and any CryptoNet events invoked by it are sent to the event handler, on separate iterations of the event loop.
 ---
---- The onStart function is called once after the loop starts, after the threading system has been started. onStart and onEvent are both optional. os.startThread() can be called from within onStart and onEvent (and any functions called by them) to start new threads without blocking the current one.
---- @param onStart function The function to call once after the loop starts. Optional.
---- @param onEvent function The function to call on every event. Optional.
+---The onStart function is called once after the loop starts, after the threading system has been started. onStart and onEvent are both optional. os.startThread() can be called from within onStart and onEvent (and any functions called by them) to start new threads without blocking the current one.
+---@param onStart function The function to call once after the loop starts. Optional.
+---@param onEvent function The function to call on every event. Optional.
 function CryptoNet.startEventLoop(onStart, onEvent)
 	if onStart ~= nil and type(onStart) ~= "function" then
 		error("onStart is not a function.", 2)
@@ -6765,9 +6769,9 @@ function CryptoNet.startEventLoop(onStart, onEvent)
 	end
 
 	-- Start the threading system so os.startThread() can be used.
-	threadAPI.startThreading(function()
+	Threading.create(function()
 		-- Start the actual event loop in a different thread.
-		os.startThread(function() eventLoop(onEvent) end)
+		mainThread = Threading.create(function() eventLoop(onEvent) end)
 		-- Call onStart in this thread.
 		if onStart ~= nil then
 			local ok, msg = pcall(onStart)
@@ -6783,9 +6787,9 @@ end
 -- CERTIFICATE AUTHORITY
 --
 
---- Generate the public and private keys used by a certificate authority to sign certificates. The keys will be written to the specified files, which both have sensible default names.
---- @param publicFilename? string The name of the file to save the public key to. Defaults to "certAuth.key".
---- @param privateFilename? string The name of the file to save the private key to. Defaults to "certAuth_private.key".
+---Generate the public and private keys used by a certificate authority to sign certificates. The keys will be written to the specified files, which both have sensible default names.
+---@param publicFilename? string The name of the file to save the public key to. Defaults to "certAuth.key".
+---@param privateFilename? string The name of the file to save the private key to. Defaults to "certAuth_private.key".
 function CryptoNet.initCertificateAuthority(publicFilename, privateFilename)
 	if publicFilename == nil then
 		publicFilename = "certAuth.key"
@@ -6824,9 +6828,9 @@ function CryptoNet.initCertificateAuthority(publicFilename, privateFilename)
 	log("Initialization successful.")
 end
 
---- Sign a certificate using the certificate authority's private key. Both arguments can either be the certificate/key itself, or a path to a file that contains it. The signed certificate is returned, and written to the path the certificate was stored in, if it was loaded from file.
---- @param certificate? Certificate|string The certificate to sign, or the path to the file that contains it.
---- @param privateKey? PrivateKey|string The private key to sign the certificate with, or the path to the file that contains it.
+---Sign a certificate using the certificate authority's private key. Both arguments can either be the certificate/key itself, or a path to a file that contains it. The signed certificate is returned, and written to the path the certificate was stored in, if it was loaded from file.
+---@param certificate? Certificate|string The certificate to sign, or the path to the file that contains it.
+---@param privateKey? PrivateKey|string The private key to sign the certificate with, or the path to the file that contains it.
 function CryptoNet.signCertificate(certificate, privateKey)
 	local certPath = nil
 	if type(certificate) == "string" then
@@ -6951,41 +6955,41 @@ return CryptoNet
 
 --* Class Definitions
 
---- @class Socket
---- @field sender string The encrypted session key of this socket, which acts as the client's temporary identity to the server
---- @field target string The name of the server
---- @field key table<number> The session key for this socket's session
---- @field modemSide string The modem used by the socket
---- @field channel number The channel the server (and this socket) use to communicate
---- @field permissionLevel number The permission level of the user logged into the socket, initialized to 0.
---- @field receivedMessages table The encrypted messages received by this socket, used to prevent replay attacks using duplicate messages. Every time a message is encrypted the encrypted version will be different due to randomness in the algorithm, so if the socket gets the exact same message twice it is probably a malicious duplicate.
---- @field username string The username of the user logged into the socket, initialized to nil.
+---@class Socket
+---@field sender string The encrypted session key of this socket, which acts as the client's temporary identity to the server
+---@field target string The name of the server
+---@field key table<number> The session key for this socket's session
+---@field modemSide string The modem used by the socket
+---@field channel number The channel the server (and this socket) use to communicate
+---@field permissionLevel number The permission level of the user logged into the socket, initialized to 0.
+---@field receivedMessages table The encrypted messages received by this socket, used to prevent replay attacks using duplicate messages. Every time a message is encrypted the encrypted version will be different due to randomness in the algorithm, so if the socket gets the exact same message twice it is probably a malicious duplicate.
+---@field username string The username of the user logged into the socket, initialized to nil.
 
---- @class Server
---- @field name string The server name
---- @field certificate Certificate The server's certificate
---- @field privateKey string The server's private key
---- @field modemSide string The modem used by the server
---- @field channel number The channel number the server communicates on
---- @field hideCertificate boolean Whether the server distributes its certificate to clients
---- @field discoverable boolean Whether the server responds to discover() requests
---- @field userTable table The table of user login details for the server, loaded from file or empty by default
---- @field userTablePath string The name of the user table file
---- @field sockets table<Socket> The table of the server's sockets, used to communicate with clients. Starts empty and is populated as clients connect.
+---@class Server
+---@field name string The server name
+---@field certificate Certificate The server's certificate
+---@field privateKey string The server's private key
+---@field modemSide string The modem used by the server
+---@field channel number The channel number the server communicates on
+---@field hideCertificate boolean Whether the server distributes its certificate to clients
+---@field discoverable boolean Whether the server responds to discover() requests
+---@field userTable table The table of user login details for the server, loaded from file or empty by default
+---@field userTablePath string The name of the user table file
+---@field sockets table<Socket> The table of the server's sockets, used to communicate with clients. Starts empty and is populated as clients connect.
 
---- @class Certificate
---- @field key string The public key of the certificate
---- @field name string The name of the certificate
---- @field public private string The private key of the certificate
---- @field public public string The public key of the certificate
---- @field shared string The shared key of the certificate
---- @field signature string The signature of the certificate
+---@class Certificate
+---@field key string The public key of the certificate
+---@field name string The name of the certificate
+---@field public private string The private key of the certificate
+---@field public public string The public key of the certificate
+---@field shared string The shared key of the certificate
+---@field signature string The signature of the certificate
 
---- @class Key
---- @field shared string The public key of the certificate
+---@class Key
+---@field shared string The public key of the certificate
 
---- @class PrivateKey : Key
---- @field public private string The private key of the certificate
+---@class PrivateKey : Key
+---@field public private string The private key of the certificate
 
---- @class PublicKey : Key
---- @field public public string The public key of the certificate
+---@class PublicKey : Key
+---@field public public string The public key of the certificate

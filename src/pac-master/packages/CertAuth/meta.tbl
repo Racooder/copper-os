@@ -1,0 +1,8 @@
+{
+    title = "Certificate Authority",
+    type = "application",
+    dependencies = {
+        "CryptoNet"
+    },
+    gui = false,
+}

@@ -1,8 +1,11 @@
 package.path = "?.lua;/os/sys/?.lua;/os/pkg/?/main.lua"
 
+Copper = {}
+
 local main = require "main"
 local ThreadApi = require "ThreadApi"
 local UserManager = require "UserManager"
+local Console = require "Console"
 
 local function login()
     if #UserManager.list() == 0 then
@@ -12,8 +15,13 @@ local function login()
     end
 end
 
+function Copper.logout()
+    UserManager.logout()
+    login()
+end
+
 local function boot()
-    print("Booting up...")
+    Console.print("Booting up...")
 
     login()
 

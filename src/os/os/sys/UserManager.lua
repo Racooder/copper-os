@@ -1,4 +1,4 @@
-local sha256 = require "sha256"
+local Sha256 = require "sha256"
 local Console = require "Console"
 
 local UserManager = {}
@@ -14,7 +14,7 @@ function UserManager.list()
 end
 
 local function hashPassword(username, password)
-    return tostring(sha256.digest(username .. password))
+    return tostring(Sha256.digest(username .. password))
 end
 
 function UserManager.add(username, password)
@@ -44,6 +44,10 @@ function UserManager.login(username, password)
     end
 
     return false
+end
+
+function UserManager.logout()
+    activeUser = nil
 end
 
 function UserManager.getActiveUser()

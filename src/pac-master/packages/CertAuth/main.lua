@@ -2,9 +2,9 @@ local CryptoNet = require "CryptoNet"
 local Console = require "Console"
 
 -- TODO: Maybe export
---- @param o1 any|table First object to compare
---- @param o2 any|table Second object to compare
---- @param ignore_mt? boolean True to ignore metatables (a recursive function to tests tables inside tables)
+---@param o1 any|table First object to compare
+---@param o2 any|table Second object to compare
+---@param ignore_mt? boolean True to ignore metatables (a recursive function to tests tables inside tables)
 local function equals(o1, o2, ignore_mt)
     if o1 == o2 then return true end
     local o1Type = type(o1)
@@ -49,7 +49,7 @@ local function loadCertMap()
     return {}
 end
 
---- A map of hostnames to their public key
+---A map of hostnames to their public key
 local certMap = loadCertMap()
 
 local function saveCertMap()

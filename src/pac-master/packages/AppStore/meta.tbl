@@ -4,6 +4,5 @@
     dependencies = {
         "Cttp"
     },
-    system = true,
-    gui = false,
+    gui = true,
 }

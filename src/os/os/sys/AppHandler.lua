@@ -2,15 +2,14 @@
 -- The App handler should be responsible for starting and stopping applications.
 -- It should pass them a term and a api for writing to appdata
 
-local appHandler = {}
+local AppHandler = {}
 
-
-function appHandler.init()
+function AppHandler.init()
 
 end
 
-function appHandler.startApp(appName)
+function AppHandler.startApp(appName)
     
 end
 
-return appHandler
+return AppHandler

@@ -25,7 +25,7 @@ local api = {
     end
 }
 
---- @param args string[]
+---@param args string[]
 local function main(args)
     print("App Store Debug")
 end
