@@ -1,0 +1,9 @@
+{
+    title = "App Store",
+    type = "application",
+    dependencies = {
+        "Cttp"
+    },
+    system = true,
+    gui = false,
+}

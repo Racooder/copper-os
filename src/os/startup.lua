@@ -1,1 +1,1 @@
-package.path = "?;?.lua;?/init.lua;os/pkg/?;os/pkg/?.lua;os/pkg/?/init.lua"
+shell.run("/os/sys/boot.lua")

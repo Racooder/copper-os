@@ -1,0 +1,6 @@
+{
+    title = "sha256",
+    type = "library",
+    dependencies = {},
+    system = true
+}

@@ -1,5 +1,0 @@
--- TODO:
--- The App store should be responsible for installing and uninstalilng applications.
--- It should later get a gui
--- It should also seperate between apps and libraries
--- It should also download dependencies for apps automatically

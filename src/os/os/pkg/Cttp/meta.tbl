@@ -1,0 +1,8 @@
+{
+    title = "Cttp",
+    type = "library",
+    dependencies = {
+        "CNet"
+    },
+    system = true
+}

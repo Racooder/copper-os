@@ -1,0 +1,5 @@
+- Prevent users from setting the meta field system
+- Forbidden pkg names:
+  - sys
+- libs cant have appdata
+- package table should seperate libraries and apps somehow

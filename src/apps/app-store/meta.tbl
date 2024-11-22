@@ -1,7 +1,0 @@
-{
-    title = "App Store",
-    type = "application",
-    dependencies = {
-        "Cttp"
-    }
-}

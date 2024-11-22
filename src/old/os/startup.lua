@@ -1,1 +1,0 @@
-dofile("/system/os.lua")

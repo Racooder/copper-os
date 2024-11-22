@@ -1,0 +1,6 @@
+{
+    title = "CryptoNet",
+    type = "library",
+    dependencies = {},
+    system = true
+}

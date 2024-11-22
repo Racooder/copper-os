@@ -1,0 +1,9 @@
+{
+    title = "PacMan",
+    type = "application",
+    dependencies = {
+        "Cttp"
+    },
+    system = true,
+    gui = false,
+}
