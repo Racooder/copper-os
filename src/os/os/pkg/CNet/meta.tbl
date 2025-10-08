@@ -1,8 +1,0 @@
-{
-    title = "CNet",
-    type = "library",
-    dependencies = {
-        "CryptoNet"
-    },
-    system = true
-}

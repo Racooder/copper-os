@@ -1,6 +1,0 @@
-{
-    title = "Console",
-    type = "library",
-    dependencies = {},
-    system = true
-}
