@@ -1,4 +1,4 @@
-local ErrorUtils = require("error_utils")
+local ErrorUtils = require("error")
 
 local HOME_PATH = "/home"
 

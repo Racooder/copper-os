@@ -1,4 +1,4 @@
-local CryptoNet = require "CryptoNet"
+local CryptoNet = require "cryptonet"
 
 ---The cNet module provides a simple way to create a secure network connection between two computers.
 local CNet = {}

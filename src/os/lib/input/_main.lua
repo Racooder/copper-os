@@ -1,5 +1,5 @@
 local Threading = require("threading")
-local ErrorUtils = require("error_utils")
+local ErrorUtils = require("error")
 
 local Package = {}
 

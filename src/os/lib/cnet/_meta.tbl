@@ -1,0 +1,10 @@
+{
+    dependencies = {
+        apps = [
+
+        ],
+        libs = [
+            "cryptonet",
+        ],
+    },
+}
