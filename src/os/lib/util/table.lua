@@ -1,11 +1,11 @@
-local ErrorUtils = require("error")
+local ErrorUtil = require("error")
 
 local Package = {}
 
 --- Reverses the order of elements in a table.
 --- @param tbl table The string to split.
 function Package.reverse(tbl)
-    ErrorUtils.mustBeOfType(tbl, "table", "tbl")
+    ErrorUtil.must_be_of_type(tbl, "table", "tbl")
 
     local reversed = {}
     for i = #tbl, 1, -1 do
@@ -19,9 +19,9 @@ end
 --- @param start number The starting index.
 --- @param stop number The ending index. If negative, it counts from the end of the table.
 function Package.slice(tbl, start, stop)
-    ErrorUtils.mustBeOfType(tbl, "table", "tbl")
-    ErrorUtils.mustBeOfType(start, "number", "start")
-    ErrorUtils.mustBeOfType(stop, "number", "stop")
+    ErrorUtil.must_be_of_type(tbl, "table", "tbl")
+    ErrorUtil.must_be_of_type(start, "number", "start")
+    ErrorUtil.must_be_of_type(stop, "number", "stop")
 
     if stop < 0 then
         stop = #tbl - stop + 1

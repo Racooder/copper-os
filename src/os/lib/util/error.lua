@@ -5,8 +5,8 @@ local Package = {}
 ---@param v any
 ---@param t string
 ---@param name string The name of the variable (used in the error message)
----@param level? integer (default = 2)
-function Package.mustBeOfType(v, t, name, level)
+---@param level? integer (default = 2) The stack level to throw the error at
+function Package.must_be_of_type(v, t, name, level)
     level = level or 2
 
     if t ~= "nil" and t ~= "number" and t ~= "string" and t ~= "boolean" and t ~= "table" and t ~= "function" and t ~= "thread" and t ~= "userdata" and t ~= "integer" then
@@ -32,14 +32,33 @@ end
 ---@param v any
 ---@param valid any[]
 ---@param name string The name of the variable (used in the error message)
----@param level? integer (default = 2)
-function Package.mustBeOneOf(v, valid, name, level)
+---@param level? integer (default = 2) The stack level to throw the error at
+function Package.must_be_one_of(v, valid, name, level)
+    level = level or 2
+
     for _, value in ipairs(valid) do
         if value == v then
             return
         end
     end
-    error(name .. " must be one of the following values: " .. textutils.serialise(valid))
+
+    error(name .. " must be one of the following values: " .. textutils.serialise(valid), level + 1)
+end
+
+---Throws an error if `v` is not greater than `threshold`.
+---@param v number
+---@param threshold number
+---@param name string The name of the variable (used in the error message)
+---@param level? integer (default = 2) The stack level to throw the error at
+function Package.must_be_greater(v, threshold, name, level)
+    level = level or 2
+
+    if type(v) ~= "number" then
+        error(name .. " must be a number", level + 1)
+    end
+    if v <= threshold then
+        error(name .. " must be greater than " .. threshold, level + 1)
+    end
 end
 
 return Package

@@ -7,10 +7,10 @@
 -- generate_isaac() - Force a reseed.
 -- random(min, max) - Get a random number between min and max.
 
-local Isaac = {}
+local Package = {}
 
 -- Helper functions:
-Isaac.toBinary = function(a)  -- Convert from an integer to an arbitrary-length table of bits
+Package.to_binary = function(a)  -- Convert from an integer to an arbitrary-length table of bits
     local b = {}
     local copy = a
     while true do
@@ -23,7 +23,7 @@ Isaac.toBinary = function(a)  -- Convert from an integer to an arbitrary-length 
     return b
 end
 
-Isaac.fromBinary = function(a)  -- Convert from an arbitrary-length table of bits (from toBinary) to an integer
+Package.from_binary = function(a)  -- Convert from an arbitrary-length table of bits (from toBinary) to an integer
     local dec = 0
     for i = #a, 1, -1 do
         dec = dec * 2 + a[i]
@@ -32,52 +32,52 @@ Isaac.fromBinary = function(a)  -- Convert from an arbitrary-length table of bit
 end
 
 -- ISAAC internal state:
-Isaac.aa = 0
-Isaac.bb = 0
-Isaac.cc = 0
-Isaac.randrsl = {} -- Acts as entropy/seed-in. Fill to randrsl[256].
-Isaac.mm = {}      -- Fill to mm[256]. Acts as output.
+Package.aa = 0
+Package.bb = 0
+Package.cc = 0
+Package.randrsl = {} -- Acts as entropy/seed-in. Fill to randrsl[256].
+Package.mm = {}      -- Fill to mm[256]. Acts as output.
 
 -- Mersenne Twister State:
-Isaac.MT = {} -- Twister state
-Isaac.index = 0
+Package.MT = {} -- Twister state
+Package.index = 0
 
 -- Other variables for the seeding mechanism
-Isaac.mtSeeded = false
-Isaac.mtSeed = math.random(1, 2 ^ 31 - 1)
+Package.mt_seeded = false
+Package.mt_seed = math.random(1, 2 ^ 31 - 1)
 
 -- The Mersenne Twister can be used as an RNG for non-cryptographic purposes.
 -- Here, we're using it to seed the ISAAC algorithm, which *can* be used for cryptographic purposes.
 
-Isaac.initalize_mt_generator = function(seed)
-    Isaac.index = 0
-    Isaac.MT[0] = seed
+Package.initalize_mt_generator = function(seed)
+    Package.index = 0
+    Package.MT[0] = seed
     for i = 1, 623 do
-        local full = ((1812433253 * bit.bxor(Isaac.MT[i - 1], bit.brshift(Isaac.MT[i - 1], 30))) + i)
-        local b = Isaac.toBinary(full)
+        local full = ((1812433253 * bit.bxor(Package.MT[i - 1], bit.brshift(Package.MT[i - 1], 30))) + i)
+        local b = Package.to_binary(full)
         while #b > 32 do
             table.remove(b, 1)
         end
-        Isaac.MT[i] = Isaac.fromBinary(b)
+        Package.MT[i] = Package.from_binary(b)
     end
 end
 
-Isaac.generate_mt = function()  -- Restock the MT with new random numbers.
+Package.generate_mt = function()  -- Restock the MT with new random numbers.
     for i = 0, 623 do
-        local y = bit.band(Isaac.MT[i], 0x80000000)
-        y = y + bit.band(Isaac.MT[(i + 1) % 624], 0x7FFFFFFF)
-        Isaac.MT[i] = bit.bxor(Isaac.MT[(i + 397) % 624], bit.brshift(y, 1))
+        local y = bit.band(Package.MT[i], 0x80000000)
+        y = y + bit.band(Package.MT[(i + 1) % 624], 0x7FFFFFFF)
+        Package.MT[i] = bit.bxor(Package.MT[(i + 397) % 624], bit.brshift(y, 1))
         if y % 2 == 1 then
-            Isaac.MT[i] = bit.bxor(Isaac.MT[i], 0x9908B0DF)
+            Package.MT[i] = bit.bxor(Package.MT[i], 0x9908B0DF)
         end
     end
 end
 
-Isaac.extract_mt = function(min, max)  -- Get one number from the Mersenne Twister.
-    if Isaac.index == 0 then
-        Isaac.generate_mt()
+Package.extract_mt = function(min, max)  -- Get one number from the Mersenne Twister.
+    if Package.index == 0 then
+        Package.generate_mt()
     end
-    local y = Isaac.MT[Isaac.index]
+    local y = Package.MT[Package.index]
     min = min or 0
     max = max or 2 ^ 32 - 1
     --print("Accessing: isaac.MT["..isaac.index.."]...")
@@ -85,26 +85,26 @@ Isaac.extract_mt = function(min, max)  -- Get one number from the Mersenne Twist
     y = bit.bxor(y, bit.band(bit.blshift(y, 7), 0x9D2C5680))
     y = bit.bxor(y, bit.band(bit.blshift(y, 15), 0xEFC60000))
     y = bit.bxor(y, bit.brshift(y, 18))
-    Isaac.index = (Isaac.index + 1) % 624
+    Package.index = (Package.index + 1) % 624
     return (y % max) + min
 end
 
-Isaac.seed_from_mt = function(seed)  -- seed ISAAC with numbers from the MT:
+Package.seed_from_mt = function(seed)  -- seed ISAAC with numbers from the MT:
     if seed then
-        Isaac.mtSeeded = false
-        Isaac.mtSeed = seed
+        Package.mt_seeded = false
+        Package.mt_seed = seed
     end
-    if not Isaac.mtSeeded or (math.random(1, 100) == 50) then -- Always seed the first time around. Otherwise, seed approximately once per 100 times.
-        Isaac.initalize_mt_generator(Isaac.mtSeed)
-        Isaac.mtSeeded = true
-        Isaac.mtSeed = Isaac.extract_mt()
+    if not Package.mt_seeded or (math.random(1, 100) == 50) then -- Always seed the first time around. Otherwise, seed approximately once per 100 times.
+        Package.initalize_mt_generator(Package.mt_seed)
+        Package.mt_seeded = true
+        Package.mt_seed = Package.extract_mt()
     end
     for i = 1, 256 do
-        Isaac.randrsl[i] = Isaac.extract_mt()
+        Package.randrsl[i] = Package.extract_mt()
     end
 end
 
-Isaac.mix = function(a, b, c, d, e, f, g, h)
+Package.mix = function(a, b, c, d, e, f, g, h)
     a = a % (2 ^ 32 - 1)
     b = b % (2 ^ 32 - 1)
     c = c % (2 ^ 32 - 1)
@@ -140,119 +140,119 @@ Isaac.mix = function(a, b, c, d, e, f, g, h)
     return a, b, c, d, e, f, g, h
 end
 
-Isaac.isaac = function()
+Package.isaac = function()
     local x, y = 0, 0
     for i = 1, 256 do
-        x = Isaac.mm[i]
+        x = Package.mm[i]
         if (i % 4) == 0 then
-            Isaac.aa = bit.bxor(Isaac.aa, bit.blshift(Isaac.aa, 13))
+            Package.aa = bit.bxor(Package.aa, bit.blshift(Package.aa, 13))
         elseif (i % 4) == 1 then
-            Isaac.aa = bit.bxor(Isaac.aa, bit.brshift(Isaac.aa, 6))
+            Package.aa = bit.bxor(Package.aa, bit.brshift(Package.aa, 6))
         elseif (i % 4) == 2 then
-            Isaac.aa = bit.bxor(Isaac.aa, bit.blshift(Isaac.aa, 2))
+            Package.aa = bit.bxor(Package.aa, bit.blshift(Package.aa, 2))
         elseif (i % 4) == 3 then
-            Isaac.aa = bit.bxor(Isaac.aa, bit.brshift(Isaac.aa, 16))
+            Package.aa = bit.bxor(Package.aa, bit.brshift(Package.aa, 16))
         end
-        Isaac.aa = (Isaac.mm[((i + 128) % 256) + 1] + Isaac.aa) % (2 ^ 32 - 1)
-        y = (Isaac.mm[(bit.brshift(x, 2) % 256) + 1] + Isaac.aa + Isaac.bb) % (2 ^ 32 - 1)
-        Isaac.mm[i] = y
-        Isaac.bb = (Isaac.mm[(bit.brshift(y, 10) % 256) + 1] + x) % (2 ^ 32 - 1)
-        Isaac.randrsl[i] = Isaac.bb
+        Package.aa = (Package.mm[((i + 128) % 256) + 1] + Package.aa) % (2 ^ 32 - 1)
+        y = (Package.mm[(bit.brshift(x, 2) % 256) + 1] + Package.aa + Package.bb) % (2 ^ 32 - 1)
+        Package.mm[i] = y
+        Package.bb = (Package.mm[(bit.brshift(y, 10) % 256) + 1] + x) % (2 ^ 32 - 1)
+        Package.randrsl[i] = Package.bb
     end
 end
 
-Isaac.randinit = function(flag)
+Package.randinit = function(flag)
     local a, b, c, d, e, f, g, h = 0x9e3779b9, 0x9e3779b9, 0x9e3779b9, 0x9e3779b9, 0x9e3779b9, 0x9e3779b9, 0x9e3779b9,
         0x9e3779b9                                                                                               -- 0x9e3779b9 is the golden ratio
-    Isaac.aa = 0
-    Isaac.bb = 0
-    Isaac.cc = 0
+    Package.aa = 0
+    Package.bb = 0
+    Package.cc = 0
     for i = 1, 4 do
-        a, b, c, d, e, f, g, h = Isaac.mix(a, b, c, d, e, f, g, h)
+        a, b, c, d, e, f, g, h = Package.mix(a, b, c, d, e, f, g, h)
     end
     for i = 1, 256, 8 do
         if flag then
-            a = (a + Isaac.randrsl[i]) % (2 ^ 32 - 1)
-            b = (b + Isaac.randrsl[i + 1]) % (2 ^ 32 - 1)
-            c = (c + Isaac.randrsl[i + 2]) % (2 ^ 32 - 1)
-            d = (b + Isaac.randrsl[i + 3]) % (2 ^ 32 - 1)
-            e = (e + Isaac.randrsl[i + 4]) % (2 ^ 32 - 1)
-            f = (f + Isaac.randrsl[i + 5]) % (2 ^ 32 - 1)
-            g = (g + Isaac.randrsl[i + 6]) % (2 ^ 32 - 1)
-            h = (h + Isaac.randrsl[i + 7]) % (2 ^ 32 - 1)
+            a = (a + Package.randrsl[i]) % (2 ^ 32 - 1)
+            b = (b + Package.randrsl[i + 1]) % (2 ^ 32 - 1)
+            c = (c + Package.randrsl[i + 2]) % (2 ^ 32 - 1)
+            d = (b + Package.randrsl[i + 3]) % (2 ^ 32 - 1)
+            e = (e + Package.randrsl[i + 4]) % (2 ^ 32 - 1)
+            f = (f + Package.randrsl[i + 5]) % (2 ^ 32 - 1)
+            g = (g + Package.randrsl[i + 6]) % (2 ^ 32 - 1)
+            h = (h + Package.randrsl[i + 7]) % (2 ^ 32 - 1)
         end
-        a, b, c, d, e, f, g, h = Isaac.mix(a, b, c, d, e, f, g, h)
-        Isaac.mm[i] = a
-        Isaac.mm[i + 1] = b
-        Isaac.mm[i + 2] = c
-        Isaac.mm[i + 3] = d
-        Isaac.mm[i + 4] = e
-        Isaac.mm[i + 5] = f
-        Isaac.mm[i + 6] = g
-        Isaac.mm[i + 7] = h
+        a, b, c, d, e, f, g, h = Package.mix(a, b, c, d, e, f, g, h)
+        Package.mm[i] = a
+        Package.mm[i + 1] = b
+        Package.mm[i + 2] = c
+        Package.mm[i + 3] = d
+        Package.mm[i + 4] = e
+        Package.mm[i + 5] = f
+        Package.mm[i + 6] = g
+        Package.mm[i + 7] = h
     end
 
     if flag then
         for i = 1, 256, 8 do
-            a = (a + Isaac.randrsl[i]) % (2 ^ 32 - 1)
-            b = (b + Isaac.randrsl[i + 1]) % (2 ^ 32 - 1)
-            c = (c + Isaac.randrsl[i + 2]) % (2 ^ 32 - 1)
-            d = (b + Isaac.randrsl[i + 3]) % (2 ^ 32 - 1)
-            e = (e + Isaac.randrsl[i + 4]) % (2 ^ 32 - 1)
-            f = (f + Isaac.randrsl[i + 5]) % (2 ^ 32 - 1)
-            g = (g + Isaac.randrsl[i + 6]) % (2 ^ 32 - 1)
-            h = (h + Isaac.randrsl[i + 7]) % (2 ^ 32 - 1)
-            a, b, c, d, e, f, g, h = Isaac.mix(a, b, c, d, e, f, g, h)
-            Isaac.mm[i] = a
-            Isaac.mm[i + 1] = b
-            Isaac.mm[i + 2] = c
-            Isaac.mm[i + 3] = d
-            Isaac.mm[i + 4] = e
-            Isaac.mm[i + 5] = f
-            Isaac.mm[i + 6] = g
-            Isaac.mm[i + 7] = h
+            a = (a + Package.randrsl[i]) % (2 ^ 32 - 1)
+            b = (b + Package.randrsl[i + 1]) % (2 ^ 32 - 1)
+            c = (c + Package.randrsl[i + 2]) % (2 ^ 32 - 1)
+            d = (b + Package.randrsl[i + 3]) % (2 ^ 32 - 1)
+            e = (e + Package.randrsl[i + 4]) % (2 ^ 32 - 1)
+            f = (f + Package.randrsl[i + 5]) % (2 ^ 32 - 1)
+            g = (g + Package.randrsl[i + 6]) % (2 ^ 32 - 1)
+            h = (h + Package.randrsl[i + 7]) % (2 ^ 32 - 1)
+            a, b, c, d, e, f, g, h = Package.mix(a, b, c, d, e, f, g, h)
+            Package.mm[i] = a
+            Package.mm[i + 1] = b
+            Package.mm[i + 2] = c
+            Package.mm[i + 3] = d
+            Package.mm[i + 4] = e
+            Package.mm[i + 5] = f
+            Package.mm[i + 6] = g
+            Package.mm[i + 7] = h
         end
     end
-    Isaac.isaac()
+    Package.isaac()
     local randcnt = 256
 end
 
-Isaac.generate_isaac = function(entropy)
-    Isaac.aa = 0
-    Isaac.bb = 0
-    Isaac.cc = 0
+Package.generate_isaac = function(entropy)
+    Package.aa = 0
+    Package.bb = 0
+    Package.cc = 0
     if entropy and #entropy >= 256 then
         for i = 1, 256 do
-            Isaac.randrsl[i] = entropy[i]
+            Package.randrsl[i] = entropy[i]
         end
     else
-        Isaac.seed_from_mt()
+        Package.seed_from_mt()
     end
     for i = 1, 256 do
-        Isaac.mm[i] = 0
+        Package.mm[i] = 0
     end
-    Isaac.randinit(true)
-    Isaac.isaac()
-    Isaac.isaac() -- run isaac twice
+    Package.randinit(true)
+    Package.isaac()
+    Package.isaac() -- run isaac twice
 end
 
-Isaac.getRandom = function()
-    if #Isaac.mm > 0 then
-        return table.remove(Isaac.mm, 1)
+Package.get_random = function()
+    if #Package.mm > 0 then
+        return table.remove(Package.mm, 1)
     else
-        Isaac.generate_isaac()
-        return table.remove(Isaac.mm, 1)
+        Package.generate_isaac()
+        return table.remove(Package.mm, 1)
     end
 end
 
-Isaac.random = function(min, max)
+Package.random = function(min, max)
     if not max then
         max = 2 ^ 32 - 1
     end
     if not min then
         min = 0
     end
-    return (Isaac.getRandom() % max) + min
+    return (Package.get_random() % max) + min
 end
 
-return Isaac
+return Package

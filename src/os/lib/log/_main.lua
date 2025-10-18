@@ -10,27 +10,27 @@ local CONSOLE_HISTORY_FILE = "/sys/data/console_history"
 
 --* Variables
 
-local activeLog     -- Initialized in setup function
-local activeLogPath -- Initialized in setup function
-local consoleHistory = {}
+local active_log     -- Initialized in setup function
+local active_log_path -- Initialized in setup function
+local console_history = {}
 
 --* Main Functionality
 
 ---@param id string
-local function logPath(id)
+local function log_path(id)
     return LOG_FOLDER .. id .. LOG_FILE_EXTENSION
 end
 
 ---@param color number
 ---@param text string
-local function saveConsoleHistory(color, text)
-    table.insert(consoleHistory, { color, text })
+local function save_console_history(color, text)
+    table.insert(console_history, { color, text })
 end
 
 ---@param color number
 ---@param text string
-local function logToConsole(color, text)
-    if (System.getConsoleLock()) then
+local function log_to_console(color, text)
+    if (System.get_console_lock()) then
         return
     end
 
@@ -40,16 +40,16 @@ local function logToConsole(color, text)
     local _, y = term.getCursorPos()
     term.setCursorPos(1, y + 1)
 
-    saveConsoleHistory(color, text)
+    save_console_history(color, text)
 end
 
 ---@param prefix string
 ---@param text string
-local function logToFile(prefix, text)
-    local activePackage = System.getActivePackage()
+local function log_to_file(prefix, text)
+    local active_package = System.get_active_package()
 
-    local f = fs.open(activeLogPath, "a")
-    f.write(prefix .. " (" .. activePackage .. ") " .. text .. "\n")
+    local f = fs.open(active_log_path, "a")
+    f.write(prefix .. " (" .. active_package .. ") " .. text .. "\n")
     f.close()
 end
 
@@ -63,8 +63,8 @@ local function log(prefix, color, args)
     end
     text = text:sub(1, -2)
 
-    logToConsole(color, text)
-    logToFile(prefix, text)
+    log_to_console(color, text)
+    log_to_file(prefix, text)
 end
 
 ---@param ... any
@@ -98,7 +98,7 @@ end
 ---For the parameters is `1` the newest console entry and `-1` the oldest
 ---@param first integer default = `1`
 ---@param last integer default = the same as `first`
-function Package.getConsoleHistory(first, last)
+function Package.get_console_history(first, last)
     first = first or 1
     last = last or first
 
@@ -110,19 +110,19 @@ function Package.getConsoleHistory(first, last)
     end
 
     if first < 0 then
-        first = #consoleHistory + first + 1
+        first = #console_history + first + 1
     end
     if last < 0 then
-        last = #consoleHistory + last + 1
+        last = #console_history + last + 1
     end
 
     -- invert values
-    first = #consoleHistory - first + 1
-    last = #consoleHistory - last + 1
+    first = #console_history - first + 1
+    last = #console_history - last + 1
 
     local history = {}
     for i = first, last do
-        table.insert(history, consoleHistory[i])
+        table.insert(history, console_history[i])
     end
 
     return history
@@ -131,10 +131,10 @@ end
 --* Setup
 
 local function setup()
-    activeLog = tostring(os.epoch("utc"))
-    activeLogPath = logPath(activeLog)
+    active_log = tostring(os.epoch("utc"))
+    active_log_path = log_path(active_log)
 
-    local f = fs.open(activeLogPath, "w")
+    local f = fs.open(active_log_path, "w")
     f.close()
 
     f = fs.open(CONSOLE_HISTORY_FILE, "w")

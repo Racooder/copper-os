@@ -1,8 +1,8 @@
 ---@type {string: Thread}
-local threadPool = {}
+local thread_pool = {}
 ---@type {string: boolean}
-local suspendedThreads = {}
-local currentThreadId = 0
+local suspended_threads = {}
+local current_thread_id = 0
 local started = false
 
 -- * Thread Class
@@ -10,37 +10,37 @@ local started = false
 ---@class Thread
 ---@field __id integer
 ---@field __thread thread
----@field __attachedThreads table
----@field __parentThread Thread
+---@field __attached_threads table
+---@field __parent_thread Thread
 local Thread = {}
 Thread.__index = Thread
 
 function Thread:kill()
-    threadPool[self.__id] = nil
-    for _, thread in ipairs(self.__attachedThreads) do
+    thread_pool[self.__id] = nil
+    for _, thread in ipairs(self.__attached_threads) do
         thread:kill()
     end
 end
 
 function Thread:suspend()
-    suspendedThreads[self.__id] = true
-    for _, thread in ipairs(self.__attachedThreads) do
+    suspended_threads[self.__id] = true
+    for _, thread in ipairs(self.__attached_threads) do
         thread:suspend()
     end
 end
 
 function Thread:resume()
-    suspendedThreads[self.__id] = nil
-    for _, thread in ipairs(self.__attachedThreads) do
+    suspended_threads[self.__id] = nil
+    for _, thread in ipairs(self.__attached_threads) do
         thread:resume()
     end
 end
 
 function Thread:status()
-    if not threadPool[self.__id] then
+    if not thread_pool[self.__id] then
         return "dead"
     end
-    if suspendedThreads[self.__id] then
+    if suspended_threads[self.__id] then
         return "suspended"
     end
     return "running"
@@ -49,13 +49,13 @@ end
 ---@param thread Thread
 function Thread:attach(thread)
     thread:detach()
-    self.__attachedThreads[thread.__id] = thread
-    thread.__parentThread = self
+    self.__attached_threads[thread.__id] = thread
+    thread.__parent_thread = self
 end
 
 function Thread:detach()
-    self.__parentThread.__attachedThreads[self.__id] = nil
-    self.__parentThread = nil
+    self.__parent_thread.__attached_threads[self.__id] = nil
+    self.__parent_thread = nil
 end
 
 --* Package
@@ -65,71 +65,71 @@ local Threading = {}
 ---@param func function
 ---@return Thread
 function Threading.new(func)
-    local id = #threadPool + 1
+    local id = #thread_pool + 1
     local thread = coroutine.create(func)
 
     local o = {
         __id = id,
         __thread = thread,
-        __attachedThreads = {},
-        __parentThread = nil
+        __attached_threads = {},
+        __parent_thread = nil
     }
     setmetatable(o, Thread)
 
-    threadPool[id] = o
+    thread_pool[id] = o
     return o
 end
 
 ---@return Thread
 function Threading.current()
-    return threadPool[currentThreadId]
+    return thread_pool[current_thread_id]
 end
 
 --- Starts the threading system, running the given main thread function.
----@param mainThread function
+---@param main_thread function
 ---@throws if threading has already been started
-function Threading.start(mainThread)
-    if type(mainThread) ~= "function" then
-        error("Expected function, got " .. type(mainThread), 2)
+function Threading.start(main_thread)
+    if type(main_thread) ~= "function" then
+        error("Expected function, got " .. type(main_thread), 2)
     end
     if started then
         error("Threading has already been started", 2)
     end
 
-    local eventFilters = {}
-    local eventData = { nil }
+    local event_filters = {}
+    local event_data = { nil }
 
     while true do
-        if #threadPool == 0 then
+        if #thread_pool == 0 then
             return
         end
 
-        local eventType = eventData[1]
+        local event_type = event_data[1]
 
-        for id, thread in pairs(threadPool) do
-            currentThreadId = id
-            if (not suspendedThreads[id] and (not eventFilters[id] or eventFilters[id] == eventType)) or eventType == "terminate" then
-                local ok, param = coroutine.resume(thread.__thread, table.unpack(eventData))
+        for id, thread in pairs(thread_pool) do
+            current_thread_id = id
+            if (not suspended_threads[id] and (not event_filters[id] or event_filters[id] == event_type)) or event_type == "terminate" then
+                local ok, param = coroutine.resume(thread.__thread, table.unpack(event_data))
                 if ok then
                     if type(param) == "string" then
-                        eventFilters[id] = param
+                        event_filters[id] = param
                     end
                 else
                     error(param, 0)
                 end
                 if coroutine.status(thread.__thread) == "dead" then
-                    threadPool[id] = nil
+                    thread_pool[id] = nil
                 end
             end
         end
 
-        for id, thread in pairs(threadPool) do
+        for id, thread in pairs(thread_pool) do
             if coroutine.status(thread.__thread) == "dead" then
-                threadPool[id] = nil
+                thread_pool[id] = nil
             end
         end
 
-        eventData = { os.pullEventRaw() }
+        event_data = { os.pullEventRaw() }
     end
 end
 

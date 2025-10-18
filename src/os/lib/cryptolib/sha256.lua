@@ -39,31 +39,31 @@
 ------ DO NOT TOUCH "dklen" if you're using it for passwords, simply pass nil or nothing at all (defaults to 32).
 ------ Passing a dklen higher than 32 will multiply the number of iterations with no additional security whatsoever.
 
-local Sha256       = {}
+local Package       = {}
 
-Sha256.mod32       = 2 ^ 32
-Sha256.band        = bit32 and bit32.band or bit.band
-Sha256.bnot        = bit32 and bit32.bnot or bit.bnot
-Sha256.bxor        = bit32 and bit32.bxor or bit.bxor
-Sha256.blshift     = bit32 and bit32.lshift or bit.blshift
-Sha256.upack       = table.unpack
+Package.mod32       = 2 ^ 32
+Package.band        = bit32 and bit32.band or bit.band
+Package.bnot        = bit32 and bit32.bnot or bit.bnot
+Package.bxor        = bit32 and bit32.bxor or bit.bxor
+Package.blshift     = bit32 and bit32.lshift or bit.blshift
+Package.upack       = table.unpack
 
-Sha256.rrotate     = function(n, b)
+Package.rrotate = function(n, b)
     local s = n / (2 ^ b)
     local f = s % 1
-    return (s - f) + f * Sha256.mod32
+    return (s - f) + f * Package.mod32
 end
-Sha256.brshift     = function(int, by) -- Thanks bit32 for bad rshift
+Package.brshift = function(int, by) -- Thanks bit32 for bad rshift
     local s = int / (2 ^ by)
     return s - s % 1
 end
 
-Sha256.H           = {
+Package.H           = {
     0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a,
     0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19,
 }
 
-Sha256.K           = {
+Package.K           = {
     0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
     0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174,
     0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc, 0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da,
@@ -74,7 +74,7 @@ Sha256.K           = {
     0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2,
 }
 
-Sha256.counter     = function(incr)
+Package.counter = function(incr)
     local t1, t2 = 0, 0
     if 0xFFFFFFFF - t1 < incr then
         t2 = t2 + 1
@@ -85,12 +85,12 @@ Sha256.counter     = function(incr)
     return t2, t1
 end
 
-Sha256.BE_toInt    = function(bs, i)
-    return Sha256.blshift((bs[i] or 0), 24) + Sha256.blshift((bs[i + 1] or 0), 16) + Sha256.blshift((bs[i + 2] or 0), 8) +
+Package.BE_to_int = function(bs, i)
+    return Package.blshift((bs[i] or 0), 24) + Package.blshift((bs[i + 1] or 0), 16) + Package.blshift((bs[i + 2] or 0), 8) +
     (bs[i + 3] or 0)
 end
 
-Sha256.preprocess  = function(data)
+Package.preprocess = function(data)
     local len = #data
     local proc = {}
     data[#data + 1] = 0x80
@@ -99,44 +99,44 @@ Sha256.preprocess  = function(data)
     for i = 1, blocks do
         proc[i] = {}
         for j = 1, 16 do
-            proc[i][j] = Sha256.BE_toInt(data, 1 + ((i - 1) * 64) + ((j - 1) * 4))
+            proc[i][j] = Package.BE_to_int(data, 1 + ((i - 1) * 64) + ((j - 1) * 4))
         end
     end
-    proc[blocks][15], proc[blocks][16] = Sha256.counter(len * 8)
+    proc[blocks][15], proc[blocks][16] = Package.counter(len * 8)
     return proc
 end
 
-Sha256.digestblock = function(w, C)
+Package.digestblock = function(w, C)
     for j = 17, 64 do
         local v = w[j - 15]
-        local s0 = Sha256.bxor(Sha256.bxor(Sha256.rrotate(w[j - 15], 7), Sha256.rrotate(w[j - 15], 18)),
-            Sha256.brshift(w[j - 15], 3))
-        local s1 = Sha256.bxor(Sha256.bxor(Sha256.rrotate(w[j - 2], 17), Sha256.rrotate(w[j - 2], 19)),
-            Sha256.brshift(w[j - 2], 10))
-        w[j] = (w[j - 16] + s0 + w[j - 7] + s1) % Sha256.mod32
+        local s0 = Package.bxor(Package.bxor(Package.rrotate(w[j - 15], 7), Package.rrotate(w[j - 15], 18)),
+            Package.brshift(w[j - 15], 3))
+        local s1 = Package.bxor(Package.bxor(Package.rrotate(w[j - 2], 17), Package.rrotate(w[j - 2], 19)),
+            Package.brshift(w[j - 2], 10))
+        w[j] = (w[j - 16] + s0 + w[j - 7] + s1) % Package.mod32
     end
-    local a, b, c, d, e, f, g, h = Sha256.upack(C)
+    local a, b, c, d, e, f, g, h = Package.upack(C)
     for j = 1, 64 do
-        local S1 = Sha256.bxor(Sha256.bxor(Sha256.rrotate(e, 6), Sha256.rrotate(e, 11)), Sha256.rrotate(e, 25))
-        local ch = Sha256.bxor(Sha256.band(e, f), Sha256.band(Sha256.bnot(e), g))
-        local temp1 = (h + S1 + ch + Sha256.K[j] + w[j]) % Sha256.mod32
-        local S0 = Sha256.bxor(Sha256.bxor(Sha256.rrotate(a, 2), Sha256.rrotate(a, 13)), Sha256.rrotate(a, 22))
-        local maj = Sha256.bxor(Sha256.bxor(Sha256.band(a, b), Sha256.band(a, c)), Sha256.band(b, c))
-        local temp2 = (S0 + maj) % Sha256.mod32
-        h, g, f, e, d, c, b, a = g, f, e, (d + temp1) % Sha256.mod32, c, b, a, (temp1 + temp2) % Sha256.mod32
+        local S1 = Package.bxor(Package.bxor(Package.rrotate(e, 6), Package.rrotate(e, 11)), Package.rrotate(e, 25))
+        local ch = Package.bxor(Package.band(e, f), Package.band(Package.bnot(e), g))
+        local temp1 = (h + S1 + ch + Package.K[j] + w[j]) % Package.mod32
+        local S0 = Package.bxor(Package.bxor(Package.rrotate(a, 2), Package.rrotate(a, 13)), Package.rrotate(a, 22))
+        local maj = Package.bxor(Package.bxor(Package.band(a, b), Package.band(a, c)), Package.band(b, c))
+        local temp2 = (S0 + maj) % Package.mod32
+        h, g, f, e, d, c, b, a = g, f, e, (d + temp1) % Package.mod32, c, b, a, (temp1 + temp2) % Package.mod32
     end
-    C[1] = (C[1] + a) % Sha256.mod32
-    C[2] = (C[2] + b) % Sha256.mod32
-    C[3] = (C[3] + c) % Sha256.mod32
-    C[4] = (C[4] + d) % Sha256.mod32
-    C[5] = (C[5] + e) % Sha256.mod32
-    C[6] = (C[6] + f) % Sha256.mod32
-    C[7] = (C[7] + g) % Sha256.mod32
-    C[8] = (C[8] + h) % Sha256.mod32
+    C[1] = (C[1] + a) % Package.mod32
+    C[2] = (C[2] + b) % Package.mod32
+    C[3] = (C[3] + c) % Package.mod32
+    C[4] = (C[4] + d) % Package.mod32
+    C[5] = (C[5] + e) % Package.mod32
+    C[6] = (C[6] + f) % Package.mod32
+    C[7] = (C[7] + g) % Package.mod32
+    C[8] = (C[8] + h) % Package.mod32
     return C
 end
 
-Sha256.mt          = {
+Package.mt          = {
     __tostring = function(a) return string.char(table.unpack(a)) end,
     __index = {
         toHex = function(self, s) return ("%02x"):rep(#self):format(table.unpack(self)) end,
@@ -145,66 +145,66 @@ Sha256.mt          = {
             if #self ~= #t then return false end
             local ret = 0
             for i = 1, #self do
-                ret = bit32.bor(ret, Sha256.bxor(self[i], t[i]))
+                ret = bit32.bor(ret, Package.bxor(self[i], t[i]))
             end
             return ret == 0
         end
     }
 }
 
-Sha256.toBytes     = function(t, n)
+Package.to_bytes = function(t, n)
     local b = {}
     for i = 1, n do
-        b[(i - 1) * 4 + 1] = Sha256.band(Sha256.brshift(t[i], 24), 0xFF)
-        b[(i - 1) * 4 + 2] = Sha256.band(Sha256.brshift(t[i], 16), 0xFF)
-        b[(i - 1) * 4 + 3] = Sha256.band(Sha256.brshift(t[i], 8), 0xFF)
-        b[(i - 1) * 4 + 4] = Sha256.band(t[i], 0xFF)
+        b[(i - 1) * 4 + 1] = Package.band(Package.brshift(t[i], 24), 0xFF)
+        b[(i - 1) * 4 + 2] = Package.band(Package.brshift(t[i], 16), 0xFF)
+        b[(i - 1) * 4 + 3] = Package.band(Package.brshift(t[i], 8), 0xFF)
+        b[(i - 1) * 4 + 4] = Package.band(t[i], 0xFF)
     end
-    return setmetatable(b, Sha256.mt)
+    return setmetatable(b, Package.mt)
 end
 
-Sha256.digest      = function(data)
+Package.digest = function(data)
     data = data or ""
     data = type(data) == "string" and { data:byte(1, -1) } or data
 
-    data = Sha256.preprocess(data)
-    local C = { Sha256.upack(Sha256.H) }
-    for i = 1, #data do C = Sha256.digestblock(data[i], C) end
-    return Sha256.toBytes(C, 8)
+    data = Package.preprocess(data)
+    local C = { Package.upack(Package.H) }
+    for i = 1, #data do C = Package.digestblock(data[i], C) end
+    return Package.to_bytes(C, 8)
 end
 
-Sha256.hmac        = function(data, key)
-    local data = type(data) == "table" and { Sha256.upack(data) } or { tostring(data):byte(1, -1) }
-    local key = type(key) == "table" and { Sha256.upack(key) } or { tostring(key):byte(1, -1) }
+Package.hmac = function(data, key)
+    local data = type(data) == "table" and { Package.upack(data) } or { tostring(data):byte(1, -1) }
+    local key = type(key) == "table" and { Package.upack(key) } or { tostring(key):byte(1, -1) }
 
     local blocksize = 64
 
-    key = #key > blocksize and Sha256.digest(key) or key
+    key = #key > blocksize and Package.digest(key) or key
 
     local ipad = {}
     local opad = {}
     local padded_key = {}
 
     for i = 1, blocksize do
-        ipad[i] = Sha256.bxor(0x36, key[i] or 0)
-        opad[i] = Sha256.bxor(0x5C, key[i] or 0)
+        ipad[i] = Package.bxor(0x36, key[i] or 0)
+        opad[i] = Package.bxor(0x5C, key[i] or 0)
     end
 
     for i = 1, #data do
         ipad[blocksize + i] = data[i]
     end
 
-    ipad = Sha256.digest(ipad)
+    ipad = Package.digest(ipad)
 
     for i = 1, blocksize do
         padded_key[i] = opad[i]
         padded_key[blocksize + i] = ipad[i]
     end
 
-    return Sha256.digest(padded_key)
+    return Package.digest(padded_key)
 end
 
-Sha256.pbkdf2      = function(pass, salt, iter, dklen)
+Package.pbkdf2 = function(pass, salt, iter, dklen)
     local salt = type(salt) == "table" and salt or { tostring(salt):byte(1, -1) }
     local hashlen = 32
     local dklen = dklen or 32
@@ -213,17 +213,17 @@ Sha256.pbkdf2      = function(pass, salt, iter, dklen)
 
     while dklen > 0 do
         local ikey = {}
-        local isalt = { Sha256.upack(salt) }
+        local isalt = { Package.upack(salt) }
         local clen = dklen > hashlen and hashlen or dklen
 
-        isalt[#isalt + 1] = Sha256.band(Sha256.brshift(block, 24), 0xFF)
-        isalt[#isalt + 1] = Sha256.band(Sha256.brshift(block, 16), 0xFF)
-        isalt[#isalt + 1] = Sha256.band(Sha256.brshift(block, 8), 0xFF)
-        isalt[#isalt + 1] = Sha256.band(block, 0xFF)
+        isalt[#isalt + 1] = Package.band(Package.brshift(block, 24), 0xFF)
+        isalt[#isalt + 1] = Package.band(Package.brshift(block, 16), 0xFF)
+        isalt[#isalt + 1] = Package.band(Package.brshift(block, 8), 0xFF)
+        isalt[#isalt + 1] = Package.band(block, 0xFF)
 
         for j = 1, iter do
-            isalt = Sha256.hmac(isalt, pass)
-            for k = 1, clen do ikey[k] = Sha256.bxor(isalt[k], ikey[k] or 0) end
+            isalt = Package.hmac(isalt, pass)
+            for k = 1, clen do ikey[k] = Package.bxor(isalt[k], ikey[k] or 0) end
             if j % 200 == 0 then
                 os.queueEvent("PBKDF2", j)
                 coroutine.yield("PBKDF2")
@@ -234,7 +234,7 @@ Sha256.pbkdf2      = function(pass, salt, iter, dklen)
         for k = 1, clen do out[#out + 1] = ikey[k] end
     end
 
-    return setmetatable(out, Sha256.mt)
+    return setmetatable(out, Package.mt)
 end
 
-return Sha256
+return Package

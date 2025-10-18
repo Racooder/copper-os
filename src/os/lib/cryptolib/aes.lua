@@ -1,9 +1,9 @@
 -- AES implementation
 -- By KillaVanilla
 
-local Aes = {}
+local Package = {}
 
-Aes.sbox = {
+Package.sbox = {
     [0] = 0x63,
     0x7C,
     0x77,
@@ -262,7 +262,7 @@ Aes.sbox = {
     0x16
 }
 
-Aes.inv_sbox = {
+Package.inv_sbox = {
     [0] = 0x52,
     0x09,
     0x6A,
@@ -521,7 +521,7 @@ Aes.inv_sbox = {
     0x7D
 }
 
-Aes.Rcon = {
+Package.rcon = {
     [0] = 0x8d,
     0x01,
     0x02,
@@ -782,7 +782,7 @@ Aes.Rcon = {
 
 -- Finite-field multiplication lookup tables:
 
-Aes.mul_2 = {
+Package.mul_2 = {
     [0] = 0x00,
     0x02,
     0x04,
@@ -1041,7 +1041,7 @@ Aes.mul_2 = {
     0xe5,
 }
 
-Aes.mul_3 = {
+Package.mul_3 = {
     [0] = 0x00,
     0x03,
     0x06,
@@ -1300,7 +1300,7 @@ Aes.mul_3 = {
     0x1a,
 }
 
-Aes.mul_9 = {
+Package.mul_9 = {
     [0] = 0x00,
     0x09,
     0x12,
@@ -1559,7 +1559,7 @@ Aes.mul_9 = {
     0x46,
 }
 
-Aes.mul_11 = {
+Package.mul_11 = {
     [0] = 0x00,
     0x0b,
     0x16,
@@ -1818,7 +1818,7 @@ Aes.mul_11 = {
     0xa3,
 }
 
-Aes.mul_13 = {
+Package.mul_13 = {
     [0] = 0x00,
     0x0d,
     0x1a,
@@ -2077,7 +2077,7 @@ Aes.mul_13 = {
     0x97,
 }
 
-Aes.mul_14 = {
+Package.mul_14 = {
     [0] = 0x00,
     0x0e,
     0x1c,
@@ -2336,10 +2336,10 @@ Aes.mul_14 = {
     0x8d,
 }
 
-Aes.bxor = bit.bxor
-Aes.insert = table.insert
+Package.bxor = bit.bxor
+Package.insert = table.insert
 
-Aes.copy = function(input)
+Package.copy = function(input)
     local c = {}
     for i, v in pairs(input) do
         c[i] = v
@@ -2347,21 +2347,21 @@ Aes.copy = function(input)
     return c
 end
 
-Aes.subBytes = function(input, invert)
+Package.sub_bytes = function(input, invert)
     for i = 1, #input do
-        if not (Aes.sbox[input[i]] and Aes.inv_sbox[input[i]]) then
-            error("subBytes: input[" .. i .. "] > 0xFF")
+        if not (Package.sbox[input[i]] and Package.inv_sbox[input[i]]) then
+            error("sub_bytes: input[" .. i .. "] > 0xFF")
         end
         if invert then
-            input[i] = Aes.inv_sbox[input[i]]
+            input[i] = Package.inv_sbox[input[i]]
         else
-            input[i] = Aes.sbox[input[i]]
+            input[i] = Package.sbox[input[i]]
         end
     end
     return input
 end
 
-Aes.shiftRows = function(input)
+Package.shift_rows = function(input)
     local copy = {}
     -- Row 1: No change
     copy[1] = input[1]
@@ -2386,7 +2386,7 @@ Aes.shiftRows = function(input)
     return copy
 end
 
-Aes.invShiftRows = function(input)
+Package.inv_shift_rows = function(input)
     local copy = {}
     -- Row 1: No change
     copy[1] = input[1]
@@ -2411,52 +2411,52 @@ Aes.invShiftRows = function(input)
     return copy
 end
 
-Aes.finite_field_mul = function(a, b) -- Multiply two numbers in GF(256), assuming that polynomials are 8 bits wide
+Package.finite_field_mul = function(a, b) -- Multiply two numbers in GF(256), assuming that polynomials are 8 bits wide
     local product = 0
-    local mulA, mulB = a, b
+    local mul_a, mul_b = a, b
     for i = 1, 8 do
-        --print("FFMul: MulA: "..mulA.." MulB: "..mulB)
-        if mulA == 0 or mulB == 0 then
+        --print("FFMul: MulA: "..mul_a.." MulB: "..mul_b)
+        if mul_a == 0 or mul_b == 0 then
             break
         end
-        if bit.band(1, mulB) > 0 then
-            product = Aes.bxor(product, mulA)
+        if bit.band(1, mul_b) > 0 then
+            product = Package.bxor(product, mul_a)
         end
-        mulB = bit.brshift(mulB, 1)
-        local carry = bit.band(0x80, mulA)
-        mulA = bit.band(0xFF, bit.blshift(mulA, 1))
+        mul_b = bit.brshift(mul_b, 1)
+        local carry = bit.band(0x80, mul_a)
+        mul_a = bit.band(0xFF, bit.blshift(mul_a, 1))
         if carry > 0 then
-            mulA = Aes.bxor(mulA, 0x1B)
+            mul_a = Package.bxor(mul_a, 0x1B)
         end
     end
     return product
 end
 
-Aes.mixColumn = function(column)
+Package.mix_column = function(column)
     local output = {}
     --print("MixColumn: #column: "..#column)
-    output[1] = Aes.bxor(Aes.mul_2[column[1]], Aes.bxor(Aes.mul_3[column[2]], Aes.bxor(column[3], column[4])))
-    output[2] = Aes.bxor(column[1], Aes.bxor(Aes.mul_2[column[2]], Aes.bxor(Aes.mul_3[column[3]], column[4])))
-    output[3] = Aes.bxor(column[1], Aes.bxor(column[2], Aes.bxor(Aes.mul_2[column[3]], Aes.mul_3[column[4]])))
-    output[4] = Aes.bxor(Aes.mul_3[column[1]], Aes.bxor(column[2], Aes.bxor(column[3], Aes.mul_2[column[4]])))
+    output[1] = Package.bxor(Package.mul_2[column[1]], Package.bxor(Package.mul_3[column[2]], Package.bxor(column[3], column[4])))
+    output[2] = Package.bxor(column[1], Package.bxor(Package.mul_2[column[2]], Package.bxor(Package.mul_3[column[3]], column[4])))
+    output[3] = Package.bxor(column[1], Package.bxor(column[2], Package.bxor(Package.mul_2[column[3]], Package.mul_3[column[4]])))
+    output[4] = Package.bxor(Package.mul_3[column[1]], Package.bxor(column[2], Package.bxor(column[3], Package.mul_2[column[4]])))
     return output
 end
 
-Aes.invMixColumn = function(column)
+Package.inv_mix_column = function(column)
     local output = {}
     --print("InvMixColumn: #column: "..#column)
-    output[1] = Aes.bxor(Aes.mul_14[column[1]],
-        Aes.bxor(Aes.mul_11[column[2]], Aes.bxor(Aes.mul_13[column[3]], Aes.mul_9[column[4]])))
-    output[2] = Aes.bxor(Aes.mul_9[column[1]],
-        Aes.bxor(Aes.mul_14[column[2]], Aes.bxor(Aes.mul_11[column[3]], Aes.mul_13[column[4]])))
-    output[3] = Aes.bxor(Aes.mul_13[column[1]],
-        Aes.bxor(Aes.mul_9[column[2]], Aes.bxor(Aes.mul_14[column[3]], Aes.mul_11[column[4]])))
-    output[4] = Aes.bxor(Aes.mul_11[column[1]],
-        Aes.bxor(Aes.mul_13[column[2]], Aes.bxor(Aes.mul_9[column[3]], Aes.mul_14[column[4]])))
+    output[1] = Package.bxor(Package.mul_14[column[1]],
+        Package.bxor(Package.mul_11[column[2]], Package.bxor(Package.mul_13[column[3]], Package.mul_9[column[4]])))
+    output[2] = Package.bxor(Package.mul_9[column[1]],
+        Package.bxor(Package.mul_14[column[2]], Package.bxor(Package.mul_11[column[3]], Package.mul_13[column[4]])))
+    output[3] = Package.bxor(Package.mul_13[column[1]],
+        Package.bxor(Package.mul_9[column[2]], Package.bxor(Package.mul_14[column[3]], Package.mul_11[column[4]])))
+    output[4] = Package.bxor(Package.mul_11[column[1]],
+        Package.bxor(Package.mul_13[column[2]], Package.bxor(Package.mul_9[column[3]], Package.mul_14[column[4]])))
     return output
 end
 
-Aes.mixColumns = function(input, invert)
+Package.mix_columns = function(input, invert)
     --print("MixColumns: #input: "..#input)
     -- Ooops. I mixed the ROWS instead of the COLUMNS on accident.
     local output = {}
@@ -2471,15 +2471,15 @@ Aes.mixColumns = function(input, invert)
     local c3 = { input[3], input[7], input[11], input[15] }
     local c4 = { input[4], input[8], input[12], input[16] }
     if invert then
-        c1 = Aes.invMixColumn(c1)
-        c2 = Aes.invMixColumn(c2)
-        c3 = Aes.invMixColumn(c3)
-        c4 = Aes.invMixColumn(c4)
+        c1 = Package.inv_mix_column(c1)
+        c2 = Package.inv_mix_column(c2)
+        c3 = Package.inv_mix_column(c3)
+        c4 = Package.inv_mix_column(c4)
     else
-        c1 = Aes.mixColumn(c1)
-        c2 = Aes.mixColumn(c2)
-        c3 = Aes.mixColumn(c3)
-        c4 = Aes.mixColumn(c4)
+        c1 = Package.mix_column(c1)
+        c2 = Package.mix_column(c2)
+        c3 = Package.mix_column(c3)
+        c4 = Package.mix_column(c4)
     end
     --[[
     output[1] = c1[1]
@@ -2526,26 +2526,26 @@ Aes.mixColumns = function(input, invert)
     return output
 end
 
-Aes.addRoundKey = function(input, exp_key, round)
+Package.add_round_key = function(input, exp_key, round)
     local output = {}
     for i = 1, 16 do
         assert(input[i], "input[" .. i .. "]=nil!")
         assert(exp_key[((round - 1) * 16) + i], "round_key[" .. (((round - 1) * 16) + i) .. "]=nil!")
-        output[i] = Aes.bxor(input[i], exp_key[((round - 1) * 16) + i])
+        output[i] = Package.bxor(input[i], exp_key[((round - 1) * 16) + i])
     end
     return output
 end
 
-Aes.key_schedule = function(enc_key)
+Package.key_schedule = function(enc_key)
     local function core(in1, in2, in3, in4, i)
         local s1 = in2
         local s2 = in3
         local s3 = in4
         local s4 = in1
-        s1 = Aes.bxor(Aes.sbox[s1], Aes.Rcon[i])
-        s2 = Aes.sbox[s2]
-        s3 = Aes.sbox[s3]
-        s4 = Aes.sbox[s4]
+        s1 = Package.bxor(Package.sbox[s1], Package.rcon[i])
+        s2 = Package.sbox[s2]
+        s3 = Package.sbox[s3]
+        s4 = Package.sbox[s4]
         return s1, s2, s3, s4
     end
 
@@ -2586,36 +2586,36 @@ Aes.key_schedule = function(enc_key)
         local t4 = exp_key[#exp_key - 3]
         t1, t2, t3, t4 = core(t1, t2, t3, t4, rcon_iter)
         rcon_iter = rcon_iter + 1
-        t1 = Aes.bxor(t1, exp_key[#exp_key - (n - 1)])
-        t2 = Aes.bxor(t2, exp_key[#exp_key - (n - 2)])
-        t3 = Aes.bxor(t3, exp_key[#exp_key - (n - 3)])
-        t4 = Aes.bxor(t4, exp_key[#exp_key - (n - 4)])
-        Aes.insert(exp_key, t1)
-        Aes.insert(exp_key, t2)
-        Aes.insert(exp_key, t3)
-        Aes.insert(exp_key, t4)
+        t1 = Package.bxor(t1, exp_key[#exp_key - (n - 1)])
+        t2 = Package.bxor(t2, exp_key[#exp_key - (n - 2)])
+        t3 = Package.bxor(t3, exp_key[#exp_key - (n - 3)])
+        t4 = Package.bxor(t4, exp_key[#exp_key - (n - 4)])
+        Package.insert(exp_key, t1)
+        Package.insert(exp_key, t2)
+        Package.insert(exp_key, t3)
+        Package.insert(exp_key, t4)
         for i = 1, 3 do
-            t1 = Aes.bxor(exp_key[#exp_key], exp_key[#exp_key - (n - 1)])
-            t2 = Aes.bxor(exp_key[#exp_key - 1], exp_key[#exp_key - (n - 2)])
-            t3 = Aes.bxor(exp_key[#exp_key - 2], exp_key[#exp_key - (n - 3)])
-            t4 = Aes.bxor(exp_key[#exp_key - 3], exp_key[#exp_key - (n - 4)])
-            Aes.insert(exp_key, t1)
-            Aes.insert(exp_key, t2)
-            Aes.insert(exp_key, t3)
-            Aes.insert(exp_key, t4)
+            t1 = Package.bxor(exp_key[#exp_key], exp_key[#exp_key - (n - 1)])
+            t2 = Package.bxor(exp_key[#exp_key - 1], exp_key[#exp_key - (n - 2)])
+            t3 = Package.bxor(exp_key[#exp_key - 2], exp_key[#exp_key - (n - 3)])
+            t4 = Package.bxor(exp_key[#exp_key - 3], exp_key[#exp_key - (n - 4)])
+            Package.insert(exp_key, t1)
+            Package.insert(exp_key, t2)
+            Package.insert(exp_key, t3)
+            Package.insert(exp_key, t4)
         end
         if key_type == 3 then -- If we're processing a 256 bit key...
             -- Take the previous 4 bytes of the expanded key, run them through the sbox,
             -- then XOR them with the previous n bytes of the expanded key, then output them
             -- as the next 4 bytes of expanded key.
-            t1 = Aes.bxor(Aes.sbox[exp_key[#exp_key]], exp_key[#exp_key - (n - 1)])
-            t2 = Aes.bxor(Aes.sbox[exp_key[#exp_key - 1]], exp_key[#exp_key - (n - 2)])
-            t3 = Aes.bxor(Aes.sbox[exp_key[#exp_key - 2]], exp_key[#exp_key - (n - 3)])
-            t4 = Aes.bxor(Aes.sbox[exp_key[#exp_key - 3]], exp_key[#exp_key - (n - 4)])
-            Aes.insert(exp_key, t1)
-            Aes.insert(exp_key, t2)
-            Aes.insert(exp_key, t3)
-            Aes.insert(exp_key, t4)
+            t1 = Package.bxor(Package.sbox[exp_key[#exp_key]], exp_key[#exp_key - (n - 1)])
+            t2 = Package.bxor(Package.sbox[exp_key[#exp_key - 1]], exp_key[#exp_key - (n - 2)])
+            t3 = Package.bxor(Package.sbox[exp_key[#exp_key - 2]], exp_key[#exp_key - (n - 3)])
+            t4 = Package.bxor(Package.sbox[exp_key[#exp_key - 3]], exp_key[#exp_key - (n - 4)])
+            Package.insert(exp_key, t1)
+            Package.insert(exp_key, t2)
+            Package.insert(exp_key, t3)
+            Package.insert(exp_key, t4)
         end
         if key_type == 2 or key_type == 3 then -- If we're processing a 192-bit or 256-bit key..
             local i = 2
@@ -2623,14 +2623,14 @@ Aes.key_schedule = function(enc_key)
                 i = 3
             end
             for j = 1, i do
-                t1 = Aes.bxor(exp_key[#exp_key], exp_key[#exp_key - (n - 1)])
-                t2 = Aes.bxor(exp_key[#exp_key - 1], exp_key[#exp_key - (n - 2)])
-                t3 = Aes.bxor(exp_key[#exp_key - 2], exp_key[#exp_key - (n - 3)])
-                t4 = Aes.bxor(exp_key[#exp_key - 3], exp_key[#exp_key - (n - 4)])
-                Aes.insert(exp_key, t1)
-                Aes.insert(exp_key, t2)
-                Aes.insert(exp_key, t3)
-                Aes.insert(exp_key, t4)
+                t1 = Package.bxor(exp_key[#exp_key], exp_key[#exp_key - (n - 1)])
+                t2 = Package.bxor(exp_key[#exp_key - 1], exp_key[#exp_key - (n - 2)])
+                t3 = Package.bxor(exp_key[#exp_key - 2], exp_key[#exp_key - (n - 3)])
+                t4 = Package.bxor(exp_key[#exp_key - 3], exp_key[#exp_key - (n - 4)])
+                Package.insert(exp_key, t1)
+                Package.insert(exp_key, t2)
+                Package.insert(exp_key, t3)
+                Package.insert(exp_key, t4)
             end
         end
     end
@@ -2643,22 +2643,22 @@ end
 -- Is transformed into this:
 -- {0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF}, {0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0,0,0,0} (16 0xFF bytes, followed by 12 0xFF bytes and 4 0x00 bytes for padding)
 
-Aes.breakIntoBlocks = function(data)
+Package.break_into_blocks = function(data)
     if type(data) ~= "string" then
-        error("breakIntoBlocks: data is not a string", 2)
+        error("break_into_blocks: data is not a string", 2)
     end
     while (#data % 16) ~= 0 do
         data = data .. "\0"
     end
     local blocks = {}
-    local blockNum = 1
+    local block_num = 1
     local output = {}
     for i = 1, #data, 16 do
-        blocks[blockNum] = {}
+        blocks[block_num] = {}
         for j = 1, 16 do
-            blocks[blockNum][j] = string.byte(data, ((blockNum - 1) * 16) + j, ((blockNum - 1) * 16) + j)
+            blocks[block_num][j] = string.byte(data, ((block_num - 1) * 16) + j, ((block_num - 1) * 16) + j)
         end
-        blockNum = blockNum + 1
+        block_num = block_num + 1
     end
     return blocks
 end
@@ -2669,16 +2669,16 @@ end
 -- local key = strToBlocks(keyStr)
 -- key = key[1]
 
-Aes.strToBlocks = function(str)
-    local rawBytestream = {}
+Package.str_to_blocks = function(str)
+    local raw_bytestream = {}
     local blocks = {}
     for i = 1, #str do
-        rawBytestream[i] = string.byte(str, i, i)
+        raw_bytestream[i] = string.byte(str, i, i)
     end
-    for i = 1, math.ceil(#rawBytestream / 16) do
+    for i = 1, math.ceil(#raw_bytestream / 16) do
         blocks[i] = {}
         for j = 1, 16 do
-            blocks[i][j] = rawBytestream[((i - 1) * 16) + j] or 0
+            blocks[i][j] = raw_bytestream[((i - 1) * 16) + j] or 0
         end
     end
     return blocks
@@ -2686,8 +2686,8 @@ end
 
 -- Encrypt / Decrypt individual blocks:
 
-Aes.encrypt_block = function(data, key)
-    local exp_key = Aes.key_schedule(key)
+Package.encrypt_block = function(data, key)
+    local exp_key = Package.key_schedule(key)
     local state = data
     local nr = 0
 
@@ -2702,25 +2702,25 @@ Aes.encrypt_block = function(data, key)
     end
 
     -- Inital round:
-    state = Aes.addRoundKey(state, exp_key, 1)
+    state = Package.add_round_key(state, exp_key, 1)
 
     -- Repeat (Nr-1) times:
     for round_num = 2, nr - 1 do
-        state = Aes.subBytes(state)
-        state = Aes.shiftRows(state)
-        state = Aes.mixColumns(state)
-        state = Aes.addRoundKey(state, exp_key, round_num)
+        state = Package.sub_bytes(state)
+        state = Package.shift_rows(state)
+        state = Package.mix_columns(state)
+        state = Package.add_round_key(state, exp_key, round_num)
     end
 
     -- Final round (No mixColumns()):
-    state = Aes.subBytes(state)
-    state = Aes.shiftRows(state)
-    state = Aes.addRoundKey(state, exp_key, nr)
+    state = Package.sub_bytes(state)
+    state = Package.shift_rows(state)
+    state = Package.add_round_key(state, exp_key, nr)
     return state
 end
 
-Aes.decrypt_block = function(data, key)
-    local exp_key = Aes.key_schedule(key)
+Package.decrypt_block = function(data, key)
+    local exp_key = Package.key_schedule(key)
     local state = data
     local nr = 0
 
@@ -2735,24 +2735,24 @@ Aes.decrypt_block = function(data, key)
     end
 
     -- Inital round:
-    state = Aes.addRoundKey(state, exp_key, nr)
+    state = Package.add_round_key(state, exp_key, nr)
 
     -- Repeat (Nr-1) times:
     for round_num = nr - 1, 2, -1 do
-        state = Aes.invShiftRows(state)
-        state = Aes.subBytes(state, true)
-        state = Aes.addRoundKey(state, exp_key, round_num)
-        state = Aes.mixColumns(state, true)
+        state = Package.inv_shift_rows(state)
+        state = Package.sub_bytes(state, true)
+        state = Package.add_round_key(state, exp_key, round_num)
+        state = Package.mix_columns(state, true)
     end
 
     -- Final round (No mixColumns()):
-    state = Aes.invShiftRows(state)
-    state = Aes.subBytes(state, true)
-    state = Aes.addRoundKey(state, exp_key, 1)
+    state = Package.inv_shift_rows(state)
+    state = Package.sub_bytes(state, true)
+    state = Package.add_round_key(state, exp_key, 1)
     return state
 end
 
-Aes.encrypt_block_customExpKey = function(data, exp_key --[[, key_type]]) -- Encrypt blocks, but using a precalculated expanded key instead of performing the key expansion on every step like with the normal encrypt_block(2) call
+Package.encrypt_block_custom_exp_key = function(data, exp_key --[[, key_type]]) -- Encrypt blocks, but using a precalculated expanded key instead of performing the key expansion on every step like with the normal encrypt_block(2) call
     local state = data
     local nr = 0
     if #exp_key == 176 then  -- Key type 1 (128-bits)
@@ -2766,24 +2766,24 @@ Aes.encrypt_block_customExpKey = function(data, exp_key --[[, key_type]]) -- Enc
     end
 
     -- Inital round:
-    state = Aes.addRoundKey(state, exp_key, 1)
+    state = Package.add_round_key(state, exp_key, 1)
 
     -- Repeat (Nr-1) times:
     for round_num = 2, nr - 1 do
-        state = Aes.subBytes(state)
-        state = Aes.shiftRows(state)
-        state = Aes.mixColumns(state)
-        state = Aes.addRoundKey(state, exp_key, round_num)
+        state = Package.sub_bytes(state)
+        state = Package.shift_rows(state)
+        state = Package.mix_columns(state)
+        state = Package.add_round_key(state, exp_key, round_num)
     end
 
-    -- Final round (No mixColumns()):
-    state = Aes.subBytes(state)
-    state = Aes.shiftRows(state)
-    state = Aes.addRoundKey(state, exp_key, nr)
+    -- Final round (No mix_columns()):
+    state = Package.sub_bytes(state)
+    state = Package.shift_rows(state)
+    state = Package.add_round_key(state, exp_key, nr)
     return state
 end
 
-Aes.decrypt_block_customExpKey = function(data, exp_key --[[, key_type]])
+Package.decrypt_block_custom_exp_key = function(data, exp_key --[[, key_type]])
     local state = data
     local nr = 0
     if #exp_key == 176 then  -- Key type 1 (128-bits)
@@ -2797,20 +2797,20 @@ Aes.decrypt_block_customExpKey = function(data, exp_key --[[, key_type]])
     end
 
     -- Inital round:
-    state = Aes.addRoundKey(state, exp_key, nr)
+    state = Package.add_round_key(state, exp_key, nr)
 
     -- Repeat (Nr-1) times:
     for round_num = nr - 1, 2, -1 do
-        state = Aes.invShiftRows(state)
-        state = Aes.subBytes(state, true)
-        state = Aes.addRoundKey(state, exp_key, round_num)
-        state = Aes.mixColumns(state, true)
+        state = Package.inv_shift_rows(state)
+        state = Package.sub_bytes(state, true)
+        state = Package.add_round_key(state, exp_key, round_num)
+        state = Package.mix_columns(state, true)
     end
 
-    -- Final round (No mixColumns()):
-    state = Aes.invShiftRows(state)
-    state = Aes.subBytes(state, true)
-    state = Aes.addRoundKey(state, exp_key, 1)
+    -- Final round (No mix_columns()):
+    state = Package.inv_shift_rows(state)
+    state = Package.sub_bytes(state, true)
+    state = Package.add_round_key(state, exp_key, 1)
     return state
 end
 
@@ -2818,56 +2818,56 @@ end
 
 -- ECB (electronic codebook) Mode (not secure, do not use):
 
-Aes.encrypt_bytestream_ecb = function(data, key)
+Package.encrypt_bytestream_ecb = function(data, key)
     local blocks = {}
-    local outputBytestream = {}
-    local exp_key = Aes.key_schedule(key)
+    local output_bytestream = {}
+    local exp_key = Package.key_schedule(key)
     for i = 1, #data, 16 do
         local block = {}
         for j = 1, 16 do
             block[j] = data[i + (j - 1)] or 0
         end
-        block = Aes.encrypt_block_customExpKey(block, exp_key)
+        block = Package.encrypt_block_custom_exp_key(block, exp_key)
         for j = 1, 16 do
-            table.insert(outputBytestream, block[j])
+            table.insert(output_bytestream, block[j])
         end
         os.queueEvent("")
         os.pullEvent("")
     end
-    return outputBytestream
+    return output_bytestream
 end
 
-Aes.decrypt_bytestream_ecb = function(data, key)
-    local outputBytestream = {}
-    local exp_key = Aes.key_schedule(key)
+Package.decrypt_bytestream_ecb = function(data, key)
+    local output_bytestream = {}
+    local exp_key = Package.key_schedule(key)
     for i = 1, #data, 16 do
         local block = {}
         for j = 1, 16 do
             block[j] = data[i + (j - 1)] or 0
         end
-        block = Aes.decrypt_block_customExpKey(block, exp_key)
+        block = Package.decrypt_block_custom_exp_key(block, exp_key)
         for j = 1, 16 do
-            table.insert(outputBytestream, block[j])
+            table.insert(output_bytestream, block[j])
         end
         os.queueEvent("")
         os.pullEvent("")
     end
-    for i = #outputBytestream, 1, -1 do
-        if outputBytestream[i] ~= 0 then
+    for i = #output_bytestream, 1, -1 do
+        if output_bytestream[i] ~= 0 then
             break
         else
-            outputBytestream[i] = nil
+            output_bytestream[i] = nil
         end
     end
-    return outputBytestream
+    return output_bytestream
 end
 
 -- CBC (cipher-block chaining) mode:
 
-Aes.encrypt_bytestream = function(data, key, init_vector)
+Package.encrypt_bytestream = function(data, key, init_vector)
     local blocks = { init_vector }
-    local outputBytestream = {}
-    local exp_key = Aes.key_schedule(key)
+    local output_bytestream = {}
+    local exp_key = Package.key_schedule(key)
     if not init_vector then
         error("encrypt_bytestream: No initalization vector was passed.", 2)
     end
@@ -2888,13 +2888,13 @@ Aes.encrypt_bytestream = function(data, key, init_vector)
         end
         for j = 1, 16 do
             block[j] = data[((i - 1) * 16) + j] or 0
-            block[j] = Aes.bxor(block[j], blocks[i][j]) -- XOR this block with the previous one
+            block[j] = Package.bxor(block[j], blocks[i][j]) -- XOR this block with the previous one
         end
         --print("#bytes: "..#block)
-        block = Aes.encrypt_block_customExpKey(block, exp_key)
+        block = Package.encrypt_block_custom_exp_key(block, exp_key)
         table.insert(blocks, block)
         for j = 1, 16 do
-            Aes.insert(outputBytestream, block[j])
+            Package.insert(output_bytestream, block[j])
         end
         if os.clock() - s >= 2.5 then
             os.queueEvent("")
@@ -2902,13 +2902,13 @@ Aes.encrypt_bytestream = function(data, key, init_vector)
             s = os.clock()
         end
     end
-    return outputBytestream
+    return output_bytestream
 end
 
-Aes.decrypt_bytestream = function(data, key, init_vector)
+Package.decrypt_bytestream = function(data, key, init_vector)
     local blocks = { init_vector }
-    local outputBytestream = {}
-    local exp_key = Aes.key_schedule(key)
+    local output_bytestream = {}
+    local exp_key = Package.key_schedule(key)
     if not init_vector then
         error("decrypt_bytestream: No initalization vector was passed.", 2)
     end
@@ -2922,10 +2922,10 @@ Aes.decrypt_bytestream = function(data, key, init_vector)
             block[j] = data[((i - 1) * 16) + j] or 0
         end
         table.insert(blocks, block)
-        local dec_block = Aes.decrypt_block_customExpKey(block, exp_key)
+        local dec_block = Package.decrypt_block_custom_exp_key(block, exp_key)
         for j = 1, 16 do
-            dec_block[j] = Aes.bxor(dec_block[j], blocks[i][j]) -- We use XOR on the plaintext, not the ciphertext
-            table.insert(outputBytestream, dec_block[j])
+            dec_block[j] = Package.bxor(dec_block[j], blocks[i][j]) -- We use XOR on the plaintext, not the ciphertext
+            table.insert(output_bytestream, dec_block[j])
         end
         if os.clock() - s >= 2.5 then
             os.queueEvent("")
@@ -2934,28 +2934,28 @@ Aes.decrypt_bytestream = function(data, key, init_vector)
         end
     end
     -- Remove padding:
-    for i = #outputBytestream, #outputBytestream - 15, -1 do
-        if outputBytestream[i] ~= 0 then
+    for i = #output_bytestream, #output_bytestream - 15, -1 do
+        if output_bytestream[i] ~= 0 then
             break
         else
-            outputBytestream[i] = nil
+            output_bytestream[i] = nil
         end
     end
-    return outputBytestream
+    return output_bytestream
 end
 
 -- Encrypt / Decrypt strings:
 
-Aes.encrypt_str = function(data, key, iv)
-    local byteStream = {}
+Package.encrypt_str = function(data, key, iv)
+    local byte_stream = {}
     for i = 1, #data do
-        table.insert(byteStream, string.byte(data, i, i))
+        table.insert(byte_stream, string.byte(data, i, i))
     end
     local output_bytestream = {}
     if iv then
-        output_bytestream = Aes.encrypt_bytestream(byteStream, key, iv)
+        output_bytestream = Package.encrypt_bytestream(byte_stream, key, iv)
     else
-        output_bytestream = Aes.encrypt_bytestream_ecb(byteStream, key)
+        output_bytestream = Package.encrypt_bytestream_ecb(byte_stream, key)
     end
     local output = ""
     for i = 1, #output_bytestream do
@@ -2964,16 +2964,16 @@ Aes.encrypt_str = function(data, key, iv)
     return output
 end
 
-Aes.decrypt_str = function(data, key, iv)
-    local byteStream = {}
+Package.decrypt_str = function(data, key, iv)
+    local byte_stream = {}
     for i = 1, #data do
-        table.insert(byteStream, string.byte(data, i, i))
+        table.insert(byte_stream, string.byte(data, i, i))
     end
     local output_bytestream = {}
     if iv then
-        output_bytestream = Aes.decrypt_bytestream(byteStream, key, iv)
+        output_bytestream = Package.decrypt_bytestream(byte_stream, key, iv)
     else
-        output_bytestream = Aes.decrypt_bytestream_ecb(byteStream, key)
+        output_bytestream = Package.decrypt_bytestream_ecb(byte_stream, key)
     end
     local output = ""
     for i = 1, #output_bytestream do
@@ -2982,7 +2982,7 @@ Aes.decrypt_str = function(data, key, iv)
     return output
 end
 
-Aes.davies_meyer = function(data, h0)
+Package.davies_meyer = function(data, h0)
     local last_h = h0
     for dm_iter = 1, 16 do
         for i = 1, math.ceil(#data / 16) do
@@ -2990,9 +2990,9 @@ Aes.davies_meyer = function(data, h0)
             for j = 1, 16 do
                 block[j] = data[((i - 1) * 16) + j] or 0
             end
-            local block = Aes.encrypt_block(last_h, block)
+            local block = Package.encrypt_block(last_h, block)
             for j = 1, 16 do
-                block[j] = Aes.bxor(block[j], last_h[j]) -- XOR h[i-1] with h[i].
+                block[j] = Package.bxor(block[j], last_h[j]) -- XOR h[i-1] with h[i].
             end
             last_h = block
             os.queueEvent("")
@@ -3002,12 +3002,12 @@ Aes.davies_meyer = function(data, h0)
     return last_h
 end
 
-Aes.increment_ctr = function(blk)
+Package.increment_ctr = function(blk)
     local cpy = {}
     for i = 1, 16 do
         cpy[i] = blk[i] or 0
     end
-    cpy[1] = cpy[1] + incAmt
+    cpy[1] = cpy[1] + inc_amt --! FIXME: What is inc_amt?
     for i = 2, 16 do
         if cpy[i - 1] <= 255 then
             break
@@ -3018,7 +3018,7 @@ Aes.increment_ctr = function(blk)
     return cpy
 end
 
-Aes.counter_mode_context = {
+Package.counter_mode_context = {
     key = {},
     ctr = {},
     stream_cache = {}, -- Use "leftover" bytes from generate() here.
@@ -3088,42 +3088,42 @@ Aes.counter_mode_context = {
         end
     end,
     generate = function(self, bytes)
-        local genBytes = {}
+        local gen_bytes = {}
         if #self.stream_cache >= bytes then
             for i = 1, bytes do
-                table.insert(genBytes, table.remove(self.stream_cache))
+                table.insert(gen_bytes, table.remove(self.stream_cache))
             end
         else
             for i = 1, #self.stream_cache do
-                table.insert(genBytes, table.remove(self.stream_cache))
+                table.insert(gen_bytes, table.remove(self.stream_cache))
             end
-            local blocksToGenerate = math.ceil((bytes - #genBytes) / 16)
-            for i = 1, blocksToGenerate - 1 do
-                self.ctr = Aes.increment_ctr(self.ctr)
-                local block = Aes.encrypt_block(self.ctr, self.key)
-                for i = 1, 16 do
-                    table.insert(genBytes, block[i])
+            local blocks_to_generate = math.ceil((bytes - #gen_bytes) / 16)
+            for i = 1, blocks_to_generate - 1 do
+                self.ctr = Package.increment_ctr(self.ctr)
+                local block = Package.encrypt_block(self.ctr, self.key)
+                for j = 1, 16 do
+                    table.insert(gen_bytes, block[j])
                 end
             end
-            self.ctr = Aes.increment_ctr(self.ctr)
-            local block = Aes.encrypt_block(self.ctr, self.key)
-            for i = 1, (bytes - #genBytes) do
-                table.insert(genBytes, table.remove(block))
+            self.ctr = Package.increment_ctr(self.ctr)
+            local block = Package.encrypt_block(self.ctr, self.key)
+            for i = 1, (bytes - #gen_bytes) do
+                table.insert(gen_bytes, table.remove(block))
             end
             for i = 1, #block do
                 table.insert(self.stream_cache, table.remove(block))
             end
         end
-        return genBytes
+        return gen_bytes
     end,
 }
 
-Aes.new_ctrMode = function(key, iv)
+Package.new_ctr_mode = function(key, iv)
     local context = {
         stream_cache = {},
         key = {},
         iv = {},
-        __index = Aes.counter_mode_context,
+        __index = Package.counter_mode_context,
     }
     setmetatable(context, context)
     context:set_key(key)
@@ -3131,4 +3131,4 @@ Aes.new_ctrMode = function(key, iv)
     return context
 end
 
-return Aes
+return Package

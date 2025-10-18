@@ -1,12 +1,12 @@
 local Package = {}
 
-local mainTerm = term.current()
+local main_term = term.current()
 
-local GuiElement = {}
+local Gui_Element = {}
 
-function GuiElement:new(x, y, width, height, parent)
-    parent = parent or mainTerm
-    local w, h = parent.getSize()
+function Gui_Element:new(x, y, width, height, parent)
+    parent = parent or main_term
+    local w, h = parent.get_size()
 
     local obj = {
         __super = self,
@@ -15,8 +15,8 @@ function GuiElement:new(x, y, width, height, parent)
         y = y or 1,
         width = width or w,
         height = height or h,
-        backgroundColor = colors.black,
-        textColor = colors.white,
+        background_color = colors.black,
+        text_color = colors.white,
         window = window.create(parent, x, y, width, height),
     }
     setmetatable(obj, self)
@@ -24,17 +24,17 @@ function GuiElement:new(x, y, width, height, parent)
     return obj
 end
 
-function GuiElement:draw()
-    self.window.setBackgroundColor(self.backgroundColor)
-    self.window.setTextColor(self.textColor)
+function Gui_Element:draw()
+    self.window.setBackgroundColor(self.background_color)
+    self.window.setTextColor(self.text_color)
     self.window.clear()
 end
 
-function GuiElement:setVisible(visible)
+function Gui_Element:set_visible(visible)
     self.window.setVisible(visible)
 end
 
-local Text = GuiElement:new()
+local Text = Gui_Element:new()
 
 function Text:new(x, y, width, height, text, parent)
     local obj = self.__super.new(self, x, y, width, height, parent)

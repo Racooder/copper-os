@@ -2,31 +2,35 @@ local Package = {
     __internal = {}
 }
 
-local activePackage
-local consoleLock
+local active_package
+local console_lock
 
 --* Internal Functions
 
 ---@param package string
-function Package.__internal.setActivePackage(package)
-    activePackage = package
+function Package.__internal.set_active_package(package)
+    active_package = package
 end
 
 ---@param enabled boolean
-function Package.__internal.setConsoleLock(enabled)
-    consoleLock = enabled
+function Package.__internal.set_console_lock(enabled)
+    console_lock = enabled
 end
 
 --* Api Functions
 
 ---Get the currently active/foreground package
-function Package.getActivePackage()
-    return activePackage
+function Package.get_active_package()
+    return active_package
 end
 
 ---Check if gui mode is enabled
-function Package.getConsoleLock()
-    return consoleLock == true
+function Package.get_console_lock()
+    return console_lock == true
+end
+
+function Package.get_home_path()
+    return "/home"
 end
 
 return Package

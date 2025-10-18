@@ -1,15 +1,15 @@
 local Aes = require("aes")
 local Isaac = require("isaac")
-local RsaCrypt = require("rsaCrypt")
-local RsaKeygen = require("rsaKeygen")
+local Rsa = require("rsa")
+local Keygen = require("keygen")
 local Sha256 = require("sha256")
 
-local Cryptolib = {
+local Package = {
     Aes = Aes,
     Isaac = Isaac,
-    RsaCrypt = RsaCrypt,
-    RsaKeygen = RsaKeygen,
+    Rsa = Rsa,
+    Keygen = Keygen,
     Sha256 = Sha256,
 }
 
-return Cryptolib
+return Package
