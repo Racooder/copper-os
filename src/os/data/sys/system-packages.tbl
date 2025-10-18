@@ -1,0 +1,22 @@
+{
+    apps = {
+        "appstore",
+        "cat",
+        "logs",
+        "tasks",
+        "terminal",
+    },
+    libs = {
+        "cnet",
+        "console",
+        "cryptolib",
+        "cryptonet",
+        "gui",
+        "input",
+        "log",
+        "path",
+        "system",
+        "threading",
+        "util",
+    },
+}
